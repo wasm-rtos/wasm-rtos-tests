@@ -1,0 +1,17 @@
+Generated WASM files:
+build/bad_import.wasm
+build/custom_import.wasm
+build/delay_once.wasm
+build/empty_start.wasm
+build/entry_args_mixed_scalar.wasm
+build/get_time_once.wasm
+build/return_code.wasm
+build/return_values.wasm
+build/simple_loop.wasm
+build/snapshot_delay.wasm
+build/snapshot_yield.wasm
+build/spin_forever.wasm
+build/wasi_exit.wasm
+build/wasi_puts.wasm
+build/wasi_task_loop.wasm
+build/yield_once.wasm

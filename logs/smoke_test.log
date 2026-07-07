@@ -1,0 +1,929 @@
+PHASE smoke test start
+INFO hal_init called
+INFO os_init result=OS_STATUS_OK
+INFO current tick count=0
+PHASE empty OS checks start code_base=3
+INFO empty OS checks task counters: tasks=0 ready=0 waiting=0 current=null
+PASS empty OS checks pass
+PHASE HAL native time test start
+INFO HAL native time pre-init value=0
+INFO HAL native time hal_init called
+INFO HAL native time start value=0
+INFO HAL native time after-sleep value=5
+INFO HAL native time retries=0
+INFO HAL native time os_init after HAL test status=OS_STATUS_OK
+PASS HAL native time final PASS
+INFO current tick count=1
+INFO empty OS scheduler status=OS_STATUS_NO_READY_TASKS
+PHASE empty OS checks start code_base=9
+INFO empty OS checks task counters: tasks=0 ready=0 waiting=0 current=null
+PASS empty OS checks pass
+PHASE task id host API test start
+PHASE empty OS checks start code_base=15
+INFO empty OS checks task counters: tasks=0 ready=0 waiting=0 current=null
+PASS empty OS checks pass
+INFO task id host API initial ids a=1 b=2
+INFO task id host API after schedule status=OS_STATUS_OK state_a=OS_TASK_DEAD state_b=OS_TASK_READY ids=1/2
+PHASE empty OS checks start code_base=23
+INFO empty OS checks task counters: tasks=0 ready=0 waiting=0 current=null
+PASS empty OS checks pass
+PASS task id host API test final PASS
+PHASE task find by id host API test start
+PHASE empty OS checks start code_base=18
+INFO empty OS checks task counters: tasks=0 ready=0 waiting=0 current=null
+PASS empty OS checks pass
+INFO task find by id host API initial ids a=3 b=4 unknown=1004
+INFO task find by id host API after schedule status=OS_STATUS_OK state_a=OS_TASK_DEAD state_b=OS_TASK_READY
+PHASE empty OS checks start code_base=28
+INFO empty OS checks task counters: tasks=0 ready=0 waiting=0 current=null
+PASS empty OS checks pass
+PASS task find by id host API test final PASS
+PHASE task id list host API test start
+PHASE empty OS checks start code_base=19
+INFO empty OS checks task counters: tasks=0 ready=0 waiting=0 current=null
+PASS empty OS checks pass
+INFO task id list host API full count=2 ids=5/6 expected=5/6
+INFO task id list host API after schedule status=OS_STATUS_OK state_a=OS_TASK_DEAD state_b=OS_TASK_READY
+PHASE empty OS checks start code_base=30
+INFO empty OS checks task counters: tasks=0 ready=0 waiting=0 current=null
+PASS empty OS checks pass
+PASS task id list host API test final PASS
+PHASE WASM test start name=empty_start.wasm
+INFO WASM file path: build/empty_start.wasm
+PASS WASM file load success path=build/empty_start.wasm
+INFO WASM file byte size=226
+INFO os_task_create status=OS_STATUS_OK
+INFO task handle result=non-null
+INFO empty_start.wasm after create task counters: tasks=1 ready=1 waiting=0 current=null
+PHASE empty_start.wasm schedule loop start max_iterations=1000
+INFO empty_start.wasm scheduler iteration=1 status=OS_STATUS_OK task_state=OS_TASK_DEAD
+INFO empty_start.wasm final task state=OS_TASK_DEAD
+INFO empty_start.wasm scheduler iterations used=1
+INFO empty_start.wasm OS_TASK_DEAD reached=yes
+INFO empty_start.wasm post-death scheduler status=OS_STATUS_NO_READY_TASKS
+INFO empty_start.wasm os_task_delete status=OS_STATUS_OK
+PHASE empty OS checks start code_base=28
+INFO empty OS checks task counters: tasks=0 ready=0 waiting=0 current=null
+PASS empty OS checks pass
+INFO empty_start.wasm final task counters: tasks=0 ready=0 waiting=0 current=null
+PASS WASM test pass name=empty_start.wasm
+PHASE WASM test start name=simple_loop.wasm
+INFO WASM file path: build/simple_loop.wasm
+PASS WASM file load success path=build/simple_loop.wasm
+INFO WASM file byte size=375
+INFO os_task_create status=OS_STATUS_OK
+INFO task handle result=non-null
+INFO simple_loop.wasm after create task counters: tasks=1 ready=1 waiting=0 current=null
+PHASE simple_loop.wasm schedule loop start max_iterations=1000
+INFO simple_loop.wasm scheduler iteration=1 status=OS_STATUS_OK task_state=OS_TASK_READY
+INFO simple_loop.wasm scheduler iteration=3 status=OS_STATUS_OK task_state=OS_TASK_DEAD
+INFO simple_loop.wasm final task state=OS_TASK_DEAD
+INFO simple_loop.wasm scheduler iterations used=3
+INFO simple_loop.wasm OS_TASK_DEAD reached=yes
+INFO simple_loop.wasm post-death scheduler status=OS_STATUS_NO_READY_TASKS
+INFO simple_loop.wasm os_task_delete status=OS_STATUS_OK
+PHASE empty OS checks start code_base=48
+INFO empty OS checks task counters: tasks=0 ready=0 waiting=0 current=null
+PASS empty OS checks pass
+INFO simple_loop.wasm final task counters: tasks=0 ready=0 waiting=0 current=null
+PASS WASM test pass name=simple_loop.wasm
+PHASE WASM yield import test start name=yield_once.wasm
+INFO WASM file path: build/yield_once.wasm
+PASS WASM file load success path=build/yield_once.wasm
+INFO WASM file byte size=349
+INFO os_task_create status=OS_STATUS_OK
+INFO task handle result=non-null
+INFO yield_once.wasm after create task counters: tasks=1 ready=1 waiting=0 current=null
+PHASE yield_once.wasm first scheduler call should hit env.os_yield
+INFO yield_once.wasm first scheduler status=OS_STATUS_OK task_state=OS_TASK_READY
+INFO yield_once.wasm after first scheduler call task counters: tasks=1 ready=1 waiting=0 current=null
+PHASE yield_once.wasm resume schedule loop start max_iterations=1000
+INFO yield_once.wasm resume iteration=1 status=OS_STATUS_OK task_state=OS_TASK_DEAD
+INFO yield_once.wasm resumed=yes
+INFO yield_once.wasm final task state=OS_TASK_DEAD
+INFO yield_once.wasm scheduler iterations used after yield=1
+INFO yield_once.wasm OS_TASK_DEAD reached=yes
+INFO yield_once.wasm os_task_delete status=OS_STATUS_OK
+PHASE empty OS checks start code_base=71
+INFO empty OS checks task counters: tasks=0 ready=0 waiting=0 current=null
+PASS empty OS checks pass
+INFO yield_once.wasm final task counters: tasks=0 ready=0 waiting=0 current=null
+PASS WASM yield import test pass name=yield_once.wasm
+PHASE WASM delay import test start name=delay_once.wasm
+INFO WASM file path: build/delay_once.wasm
+PASS WASM file load success path=build/delay_once.wasm
+INFO WASM file byte size=365
+INFO os_task_create status=OS_STATUS_OK
+INFO task handle result=non-null
+INFO delay_once.wasm tick count before delay=1
+PHASE delay_once.wasm first scheduler call should hit env.os_delay_ms(10)
+INFO delay_once.wasm state after first schedule=OS_TASK_WAITING status=OS_STATUS_OK
+INFO delay_once.wasm counters after delay task counters: tasks=1 ready=0 waiting=1 current=null
+INFO delay_once.wasm tick count after +9 ms=10 state=OS_TASK_WAITING
+INFO delay_once.wasm status before wake=OS_STATUS_NO_READY_TASKS
+INFO delay_once.wasm tick count after +1 ms=11 state=OS_TASK_READY
+INFO delay_once.wasm resume iteration=1 status=OS_STATUS_OK task_state=OS_TASK_DEAD
+INFO delay_once.wasm resume iterations=1
+INFO delay_once.wasm final task state=OS_TASK_DEAD
+INFO delay_once.wasm delete status=OS_STATUS_OK
+PHASE empty OS checks start code_base=93
+INFO empty OS checks task counters: tasks=0 ready=0 waiting=0 current=null
+PASS empty OS checks pass
+INFO delay_once.wasm final counters task counters: tasks=0 ready=0 waiting=0 current=null
+PASS WASM delay import test pass name=delay_once.wasm
+PHASE WASI exit test start name=wasi_exit.wasm
+INFO WASM file path: build/wasi_exit.wasm
+PASS WASM file load success path=build/wasi_exit.wasm
+INFO WASM file byte size=19733
+INFO os_task_create status=OS_STATUS_OK
+INFO wasi_exit.wasm after create task counters: tasks=1 ready=1 waiting=0 current=null
+PHASE wasi_exit.wasm scheduler call should hit WASI exit(7)
+INFO wasi_exit.wasm schedule status=OS_STATUS_OK state=OS_TASK_DEAD run_count=1
+INFO wasi_exit.wasm after schedule task counters: tasks=0 ready=0 waiting=0 current=null
+INFO wasi_exit.wasm post-exit scheduler status=OS_STATUS_NO_READY_TASKS
+INFO wasi_exit.wasm delete status=OS_STATUS_OK
+PHASE empty OS checks start code_base=105
+INFO empty OS checks task counters: tasks=0 ready=0 waiting=0 current=null
+PASS empty OS checks pass
+INFO wasi_exit.wasm final counters task counters: tasks=0 ready=0 waiting=0 current=null
+PASS WASI exit test final PASS
+PHASE exit metadata test start
+PHASE normal return metadata case
+PHASE empty OS checks start code_base=105
+INFO empty OS checks task counters: tasks=0 ready=0 waiting=0 current=null
+PASS empty OS checks pass
+INFO normal return metadata before schedule task=exit_metadata_return_task state=OS_TASK_READY run_count=0 exit_reason=OS_TASK_EXIT_NONE exit_code=0
+INFO normal return metadata before schedule task counters: tasks=1 ready=1 waiting=0 current=null
+INFO normal return metadata before schedule last OS error: status=OS_STATUS_OK phase=none result=null task=null
+INFO normal return metadata after schedule task=exit_metadata_return_task state=OS_TASK_DEAD run_count=1 exit_reason=OS_TASK_EXIT_RETURNED exit_code=0
+INFO normal return metadata after schedule task counters: tasks=0 ready=0 waiting=0 current=null
+INFO normal return metadata after schedule last OS error: status=OS_STATUS_OK phase=none result=null task=null
+PHASE exit metadata cleanup normal return case
+PHASE empty OS checks start code_base=110
+INFO empty OS checks task counters: tasks=0 ready=0 waiting=0 current=null
+PASS empty OS checks pass
+PHASE explicit WASI exit metadata case
+INFO explicit WASI exit metadata before schedule task=exit_metadata_explicit_task state=OS_TASK_READY run_count=0 exit_reason=OS_TASK_EXIT_NONE exit_code=0
+INFO explicit WASI exit metadata before schedule task counters: tasks=1 ready=1 waiting=0 current=null
+INFO explicit WASI exit metadata before schedule last OS error: status=OS_STATUS_OK phase=none result=null task=null
+INFO explicit WASI exit metadata after schedule task=exit_metadata_explicit_task state=OS_TASK_DEAD run_count=1 exit_reason=OS_TASK_EXIT_EXPLICIT exit_code=7
+INFO explicit WASI exit metadata after schedule task counters: tasks=0 ready=0 waiting=0 current=null
+INFO explicit WASI exit metadata after schedule last OS error: status=OS_STATUS_OK phase=none result=null task=null
+PHASE exit metadata cleanup explicit WASI exit case
+PHASE empty OS checks start code_base=116
+INFO empty OS checks task counters: tasks=0 ready=0 waiting=0 current=null
+PASS empty OS checks pass
+PASS WASM exit metadata test final PASS
+PHASE WASM entry return code test start
+INFO WASM file path: build/return_code.wasm
+PHASE empty OS checks start code_base=108
+INFO empty OS checks task counters: tasks=0 ready=0 waiting=0 current=null
+PASS empty OS checks pass
+INFO entry return code before schedule task=entry_return_code_task state=OS_TASK_READY run_count=0 exit_reason=OS_TASK_EXIT_NONE exit_code=0
+INFO entry return code before schedule task counters: tasks=1 ready=1 waiting=0 current=null
+INFO entry return code before schedule last OS error: status=OS_STATUS_OK phase=none result=null task=null
+INFO entry return code after schedule task=entry_return_code_task state=OS_TASK_DEAD run_count=1 exit_reason=OS_TASK_EXIT_RETURNED exit_code=42
+INFO entry return code after schedule task counters: tasks=0 ready=0 waiting=0 current=null
+INFO entry return code after schedule last OS error: status=OS_STATUS_OK phase=none result=null task=null
+PHASE empty OS checks start code_base=114
+INFO empty OS checks task counters: tasks=0 ready=0 waiting=0 current=null
+PASS empty OS checks pass
+PASS WASM entry return code test final PASS
+PHASE WASM entry return values test start
+INFO WASM file path: build/return_values.wasm
+PHASE empty OS checks start code_base=700
+INFO empty OS checks task counters: tasks=0 ready=0 waiting=0 current=null
+PASS empty OS checks pass
+PHASE empty OS checks start code_base=716
+INFO empty OS checks task counters: tasks=0 ready=0 waiting=0 current=null
+PASS empty OS checks pass
+PASS WASM entry return values test final PASS
+PHASE task entry mixed scalar args test start
+INFO WASM file path: build/entry_args_mixed_scalar.wasm
+PHASE empty OS checks start code_base=562
+INFO empty OS checks task counters: tasks=0 ready=0 waiting=0 current=null
+PASS empty OS checks pass
+INFO entry mixed scalar args after schedule task=entry_mixed_scalar_args_task state=OS_TASK_DEAD run_count=1 exit_reason=OS_TASK_EXIT_RETURNED exit_code=37
+INFO entry mixed scalar args after schedule task counters: tasks=0 ready=0 waiting=0 current=null
+INFO entry mixed scalar args after schedule last OS error: status=OS_STATUS_OK phase=none result=null task=null
+PHASE empty OS checks start code_base=566
+INFO empty OS checks task counters: tasks=0 ready=0 waiting=0 current=null
+PASS empty OS checks pass
+PASS task entry mixed scalar args final PASS
+PHASE task entry arg validation negative test start
+INFO WASM file path: build/entry_args_mixed_scalar.wasm
+PHASE empty OS checks start code_base=582
+INFO empty OS checks task counters: tasks=0 ready=0 waiting=0 current=null
+PASS empty OS checks pass
+PHASE entry arg validation negative null args subcase
+INFO null args subcase create status=OS_STATUS_INVALID_ARGUMENT
+INFO entry arg validation null args failed create handle=null
+INFO entry arg validation null args task counters: tasks=0 ready=0 waiting=0 current=null
+INFO entry arg validation null args last OS error: status=OS_STATUS_OK phase=none result=null task=null
+PHASE empty OS checks start code_base=585
+INFO empty OS checks task counters: tasks=0 ready=0 waiting=0 current=null
+PASS empty OS checks pass
+PHASE entry arg validation reset before count mismatch
+INFO entry arg validation reset before count mismatch os_init status=OS_STATUS_OK
+PHASE empty OS checks start code_base=591
+INFO empty OS checks task counters: tasks=0 ready=0 waiting=0 current=null
+PASS empty OS checks pass
+PHASE entry arg validation negative count mismatch subcase
+INFO count mismatch subcase create status=OS_STATUS_INVALID_ARGUMENT phase=validate_entry_signature
+INFO entry arg validation count mismatch failed create handle=null
+INFO entry arg validation count mismatch task counters: tasks=0 ready=0 waiting=0 current=null
+INFO entry arg validation count mismatch last OS error: status=OS_STATUS_INVALID_ARGUMENT phase=validate_entry_signature result=entry argument count mismatch task=entry_arg_count_mismatch_task
+PHASE empty OS checks start code_base=603
+INFO empty OS checks task counters: tasks=0 ready=0 waiting=0 current=null
+PASS empty OS checks pass
+PHASE entry arg validation reset before type mismatch
+INFO entry arg validation reset before type mismatch os_init status=OS_STATUS_OK
+PHASE empty OS checks start code_base=611
+INFO empty OS checks task counters: tasks=0 ready=0 waiting=0 current=null
+PASS empty OS checks pass
+PHASE entry arg validation negative type mismatch subcase
+INFO type mismatch subcase create status=OS_STATUS_INVALID_ARGUMENT phase=validate_entry_signature
+INFO entry arg validation type mismatch failed create handle=null
+INFO entry arg validation type mismatch task counters: tasks=0 ready=0 waiting=0 current=null
+INFO entry arg validation type mismatch last OS error: status=OS_STATUS_INVALID_ARGUMENT phase=validate_entry_signature result=entry argument type mismatch task=entry_arg_type_mismatch_task
+PHASE empty OS checks start code_base=623
+INFO empty OS checks task counters: tasks=0 ready=0 waiting=0 current=null
+PASS empty OS checks pass
+PASS task entry arg validation negative final PASS
+PHASE WASM get-time import test start name=get_time_once.wasm
+INFO WASM file path: build/get_time_once.wasm
+INFO get_time_once.wasm os_init result=OS_STATUS_OK
+INFO get_time_once.wasm deterministic tick=1234
+PASS WASM file load success path=build/get_time_once.wasm
+INFO WASM file byte size=329
+INFO os_task_create status=OS_STATUS_OK
+INFO get_time_once.wasm after create task counters: tasks=1 ready=1 waiting=0 current=null
+PHASE get_time_once.wasm scheduler call should read env.os_get_time_ms and return
+INFO get_time_once.wasm schedule status=OS_STATUS_OK state=OS_TASK_DEAD run_count=1 tick=1234
+INFO get_time_once.wasm after schedule task counters: tasks=0 ready=0 waiting=0 current=null
+INFO get_time_once.wasm post-exit scheduler status=OS_STATUS_NO_READY_TASKS
+INFO get_time_once.wasm delete status=OS_STATUS_OK
+PHASE empty OS checks start code_base=116
+INFO empty OS checks task counters: tasks=0 ready=0 waiting=0 current=null
+PASS empty OS checks pass
+INFO get_time_once.wasm final counters task counters: tasks=0 ready=0 waiting=0 current=null
+PASS WASM get-time import test final PASS
+PHASE Custom host import registration test start
+INFO WASM file path: build/custom_import.wasm
+PHASE empty OS checks start code_base=119
+INFO empty OS checks task counters: tasks=0 ready=0 waiting=0 current=null
+PASS empty OS checks pass
+PASS Custom host import registration test final PASS
+PHASE task snapshot host API
+INFO task snapshot host API os_init status=OS_STATUS_OK
+INFO task snapshot host API create source status=OS_STATUS_OK
+INFO task snapshot host API first schedule status=OS_STATUS_OK source_state=OS_TASK_READY
+INFO task snapshot host API snapshot size status=OS_STATUS_OK size=196760
+INFO task snapshot host API small save status=OS_STATUS_BUFFER_TOO_SMALL required=196760
+INFO task snapshot host API save status=OS_STATUS_OK written=196760 capacity=196760
+INFO task snapshot host API load status=OS_STATUS_OK restore_state=OS_TASK_READY
+INFO snapshot restore after resume task=snapshot_restore state=OS_TASK_DEAD run_count=1 exit_reason=OS_TASK_EXIT_RETURNED exit_code=12
+INFO snapshot restore after resume task counters: tasks=1 ready=1 waiting=0 current=null
+INFO snapshot restore after resume last OS error: status=OS_STATUS_OK phase=none result=null task=null
+PHASE empty OS checks start code_base=136
+INFO empty OS checks task counters: tasks=0 ready=0 waiting=0 current=null
+PASS empty OS checks pass
+PASS task snapshot host API test final PASS
+PHASE task snapshot after source delete
+INFO task snapshot after source delete os_init status=OS_STATUS_OK
+INFO task snapshot after source delete create source status=OS_STATUS_OK
+INFO task snapshot after source delete first schedule status=OS_STATUS_OK source_state=OS_TASK_READY
+INFO task snapshot after source delete snapshot size status=OS_STATUS_OK size=196760
+INFO task snapshot after source delete save status=OS_STATUS_OK written=196760 capacity=196760
+INFO task snapshot after source delete delete source status=OS_STATUS_OK
+PHASE empty OS checks start code_base=124
+INFO empty OS checks task counters: tasks=0 ready=0 waiting=0 current=null
+PASS empty OS checks pass
+INFO task snapshot after source delete create restore status=OS_STATUS_OK
+INFO task snapshot after source delete load status=OS_STATUS_OK restore_state=OS_TASK_READY
+INFO snapshot after source delete restore after resume task=snapshot_delete_restore state=OS_TASK_DEAD run_count=1 exit_reason=OS_TASK_EXIT_RETURNED exit_code=12
+INFO snapshot after source delete restore after resume task counters: tasks=0 ready=0 waiting=0 current=null
+INFO snapshot after source delete restore after resume last OS error: status=OS_STATUS_OK phase=none result=null task=null
+INFO task snapshot after source delete delete restore status=OS_STATUS_OK
+PHASE empty OS checks start code_base=132
+INFO empty OS checks task counters: tasks=0 ready=0 waiting=0 current=null
+PASS empty OS checks pass
+PASS task snapshot after source delete final PASS
+PHASE task snapshot waiting restore
+INFO task snapshot waiting restore os_init status=OS_STATUS_OK
+INFO task snapshot waiting restore create source status=OS_STATUS_OK
+INFO task snapshot waiting restore first schedule status=OS_STATUS_OK source_state=OS_TASK_WAITING
+INFO task snapshot waiting restore snapshot size status=OS_STATUS_OK size=196760
+INFO task snapshot waiting restore save status=OS_STATUS_OK written=196760 capacity=196760
+INFO task snapshot waiting restore delete source status=OS_STATUS_OK
+PHASE empty OS checks start code_base=527
+INFO empty OS checks task counters: tasks=0 ready=0 waiting=0 current=null
+PASS empty OS checks pass
+INFO task snapshot waiting restore advanced host time tick=10
+INFO task snapshot waiting restore create restore status=OS_STATUS_OK
+INFO task snapshot waiting restore load status=OS_STATUS_OK restore_state=OS_TASK_READY
+INFO snapshot waiting restore after resume task=snapshot_wait_restore state=OS_TASK_DEAD run_count=1 exit_reason=OS_TASK_EXIT_RETURNED exit_code=21
+INFO snapshot waiting restore after resume task counters: tasks=0 ready=0 waiting=0 current=null
+INFO snapshot waiting restore after resume last OS error: status=OS_STATUS_OK phase=none result=null task=null
+INFO task snapshot waiting restore delete restore status=OS_STATUS_OK
+PHASE empty OS checks start code_base=535
+INFO empty OS checks task counters: tasks=0 ready=0 waiting=0 current=null
+PASS empty OS checks pass
+PASS task snapshot waiting restore final PASS
+PHASE WASM bad import diagnostics test start name=bad_import.wasm
+INFO WASM file path: build/bad_import.wasm
+PASS WASM file load success path=build/bad_import.wasm
+INFO WASM file byte size=289
+INFO os_task_create status=OS_STATUS_WASM_ERROR
+INFO task handle result=null
+INFO bad_import.wasm last OS error: status=OS_STATUS_WASM_ERROR phase=find_function result=missing imported function task=bad_import.wasm
+INFO bad_import.wasm final counters task counters: tasks=0 ready=0 waiting=0 current=null
+PASS WASM bad import diagnostics test pass name=bad_import.wasm
+PHASE multitask delay fairness test start
+INFO delay task fixture: build/delay_once.wasm
+INFO simple task fixture: build/simple_loop.wasm
+INFO delay_task os_task_create status=OS_STATUS_OK handle=non-null
+INFO simple_task os_task_create status=OS_STATUS_OK handle=non-null
+PASS multitask delay fairness created delay_task and simple_task
+INFO multitask delay fairness after create task counters: tasks=2 ready=2 waiting=0 current=null
+PHASE multitask delay fairness first scheduler call should run high-priority delay_task into OS_TASK_WAITING
+INFO first scheduler status=OS_STATUS_OK delay_task=OS_TASK_WAITING simple_task=OS_TASK_READY
+INFO multitask delay fairness after delay_task delay task counters: tasks=2 ready=1 waiting=1 current=null
+PASS delay_task entered OS_TASK_WAITING while simple_task remained OS_TASK_READY
+PHASE multitask delay fairness running scheduler without waking delay_task until simple_task reaches OS_TASK_DEAD
+INFO simple phase iteration=1 status=OS_STATUS_OK delay_task=OS_TASK_WAITING simple_task=OS_TASK_READY
+INFO simple phase iteration=3 status=OS_STATUS_OK delay_task=OS_TASK_WAITING simple_task=OS_TASK_DEAD
+PASS simple_task ran to OS_TASK_DEAD while delay_task was still OS_TASK_WAITING
+INFO simple_task delete status=OS_STATUS_OK
+INFO after +10 ms tick delay_task state=OS_TASK_READY tick=20
+PASS delay_task woke after tick advancement
+PHASE multitask delay fairness running woken delay_task until OS_TASK_DEAD
+INFO delay phase iteration=1 status=OS_STATUS_OK delay_task=OS_TASK_DEAD
+PASS delay_task reached OS_TASK_DEAD after wake
+INFO delay_task delete status=OS_STATUS_OK
+PHASE empty OS checks start code_base=145
+INFO empty OS checks task counters: tasks=0 ready=0 waiting=0 current=null
+PASS empty OS checks pass
+INFO multitask delay fairness final counters task counters: tasks=0 ready=0 waiting=0 current=null
+PASS multitask delay fairness both tasks reached OS_TASK_DEAD and final counters are clean
+PHASE absolute time update test start
+INFO absolute time fixture: build/delay_once.wasm
+INFO absolute_time_task os_task_create status=OS_STATUS_OK handle=non-null
+INFO absolute time anchor=20 status=OS_STATUS_OK
+PHASE absolute time update first scheduler call should hit env.os_delay_ms(10)
+INFO absolute time waiting state before wake=OS_TASK_WAITING status=OS_STATUS_OK
+INFO absolute time update after delay task counters: tasks=1 ready=0 waiting=1 current=null
+INFO absolute time update to anchor + 9 ms=29 status=OS_STATUS_OK state=OS_TASK_WAITING
+INFO absolute time update to anchor + 10 ms=30 status=OS_STATUS_OK ready state after wake=OS_TASK_READY
+INFO absolute time resume iteration=1 status=OS_STATUS_OK task_state=OS_TASK_DEAD
+INFO absolute time task delete status=OS_STATUS_OK
+PHASE empty OS checks start code_base=160
+INFO empty OS checks task counters: tasks=0 ready=0 waiting=0 current=null
+PASS empty OS checks pass
+INFO absolute time final counters task counters: tasks=0 ready=0 waiting=0 current=null
+PASS absolute time update final PASS
+PHASE tick source re-anchor test start
+INFO tick source re-anchor os_init status=OS_STATUS_OK
+INFO tick source re-anchor absolute anchor at 1000 status=OS_STATUS_OK tick=0
+INFO tick source re-anchor absolute advance to 1005 status=OS_STATUS_OK tick=5
+INFO tick source re-anchor manual relative tick by 7 tick=12
+INFO tick source re-anchor absolute re-anchor at 1012 status=OS_STATUS_OK tick=12
+INFO tick source re-anchor absolute advance to 1013 status=OS_STATUS_OK tick=13
+INFO tick source re-anchor final tick value=13
+INFO tick source re-anchor final counters task counters: tasks=0 ready=0 waiting=0 current=null
+PASS tick source re-anchor final PASS
+PHASE preempt request API test start
+INFO preempt request before os_init returned without crashing
+INFO preempt request API os_init status=OS_STATUS_OK
+INFO preempt request with initialized OS and no current task returned without crashing
+INFO preempt_request_task os_task_create status=OS_STATUS_OK handle=non-null
+INFO preempt request posted before scheduling finite WASM task
+INFO preempt request iteration=1 status=OS_STATUS_OK task_state=OS_TASK_READY
+INFO preempt request iteration=2 status=OS_STATUS_OK task_state=OS_TASK_READY
+INFO preempt request iteration=3 status=OS_STATUS_OK task_state=OS_TASK_READY
+INFO preempt request iteration=4 status=OS_STATUS_OK task_state=OS_TASK_DEAD
+INFO preempt request finite task iterations=4 final_state=OS_TASK_DEAD
+INFO preempt_request_task delete status=OS_STATUS_OK
+PHASE empty OS checks start code_base=190
+INFO empty OS checks task counters: tasks=0 ready=0 waiting=0 current=null
+PASS empty OS checks pass
+INFO preempt request API final counters task counters: tasks=0 ready=0 waiting=0 current=null
+PASS preempt request API final PASS
+PHASE long-running fuel slice test start
+INFO long-running fixture: build/spin_forever.wasm
+INFO spin_forever_task os_task_create status=OS_STATUS_OK handle=non-null
+INFO long-running slice=1 status=OS_STATUS_OK task_state=OS_TASK_READY current=null last_error=OS_STATUS_OK
+INFO long-running slice=2 status=OS_STATUS_OK task_state=OS_TASK_READY current=null last_error=OS_STATUS_OK
+INFO long-running slice=3 status=OS_STATUS_OK task_state=OS_TASK_READY current=null last_error=OS_STATUS_OK
+INFO spin_forever_task delete status=OS_STATUS_OK
+PHASE empty OS checks start code_base=207
+INFO empty OS checks task counters: tasks=0 ready=0 waiting=0 current=null
+PASS empty OS checks pass
+INFO long-running fuel slice final counters task counters: tasks=0 ready=0 waiting=0 current=null
+PASS long-running fuel slice final PASS
+PHASE two long-running task fairness test start
+INFO two long-running fairness fixture: build/spin_forever.wasm
+INFO spin_forever_task_a os_task_create status=OS_STATUS_OK handle=non-null
+INFO spin_forever_task_b os_task_create status=OS_STATUS_OK handle=non-null
+INFO two long-running task fairness after create task counters: tasks=2 ready=2 waiting=0 current=null
+INFO initial states task_a=OS_TASK_READY task_b=OS_TASK_READY run_count_a=0 run_count_b=0
+INFO fairness slice=1 status=OS_STATUS_OK task_a=OS_TASK_READY task_b=OS_TASK_READY run_count_a=1 run_count_b=0 current=null last_error=OS_STATUS_OK
+INFO fairness slice=2 status=OS_STATUS_OK task_a=OS_TASK_READY task_b=OS_TASK_READY run_count_a=1 run_count_b=1 current=null last_error=OS_STATUS_OK
+INFO fairness slice=3 status=OS_STATUS_OK task_a=OS_TASK_READY task_b=OS_TASK_READY run_count_a=2 run_count_b=1 current=null last_error=OS_STATUS_OK
+INFO fairness slice=4 status=OS_STATUS_OK task_a=OS_TASK_READY task_b=OS_TASK_READY run_count_a=2 run_count_b=2 current=null last_error=OS_STATUS_OK
+INFO fairness slice=5 status=OS_STATUS_OK task_a=OS_TASK_READY task_b=OS_TASK_READY run_count_a=3 run_count_b=2 current=null last_error=OS_STATUS_OK
+INFO fairness slice=6 status=OS_STATUS_OK task_a=OS_TASK_READY task_b=OS_TASK_READY run_count_a=3 run_count_b=3 current=null last_error=OS_STATUS_OK
+INFO fairness final run counts task_a=3 task_b=3 total=6
+PASS two long-running task fairness both tasks received bounded scheduler slices
+INFO spin_forever_task_a delete status=OS_STATUS_OK
+INFO spin_forever_task_b delete status=OS_STATUS_OK
+PHASE empty OS checks start code_base=232
+INFO empty OS checks task counters: tasks=0 ready=0 waiting=0 current=null
+PASS empty OS checks pass
+INFO two long-running task fairness final counters task counters: tasks=0 ready=0 waiting=0 current=null
+PASS two long-running task fairness final PASS
+PHASE priority scheduler policy test start
+INFO priority scheduler policy fixture: build/spin_forever.wasm
+INFO priority_low_task create status=OS_STATUS_OK handle=non-null
+INFO priority_high_task create status=OS_STATUS_OK handle=non-null
+INFO priority scheduler policy after create task counters: tasks=2 ready=2 waiting=0 current=null
+INFO priority both-ready slice=1 status=OS_STATUS_OK low_state=OS_TASK_READY high_state=OS_TASK_READY low_runs=0 high_runs=1 current=null last_error=OS_STATUS_OK
+INFO priority both-ready slice=2 status=OS_STATUS_OK low_state=OS_TASK_READY high_state=OS_TASK_READY low_runs=0 high_runs=2 current=null last_error=OS_STATUS_OK
+INFO priority both-ready slice=3 status=OS_STATUS_OK low_state=OS_TASK_READY high_state=OS_TASK_READY low_runs=0 high_runs=3 current=null last_error=OS_STATUS_OK
+INFO priority scheduler policy after high suspend task counters: tasks=2 ready=1 waiting=0 current=null
+INFO priority high-suspended slice=1 status=OS_STATUS_OK low_state=OS_TASK_READY high_state=OS_TASK_SUSPENDED low_runs=1 high_runs=3 current=null last_error=OS_STATUS_OK
+INFO priority high-suspended slice=2 status=OS_STATUS_OK low_state=OS_TASK_READY high_state=OS_TASK_SUSPENDED low_runs=2 high_runs=3 current=null last_error=OS_STATUS_OK
+INFO priority scheduler policy after high resume task counters: tasks=2 ready=2 waiting=0 current=null
+INFO priority after-resume slice=1 status=OS_STATUS_OK low_state=OS_TASK_READY high_state=OS_TASK_READY low_runs=2 high_runs=4 current=null last_error=OS_STATUS_OK
+INFO priority after-resume slice=2 status=OS_STATUS_OK low_state=OS_TASK_READY high_state=OS_TASK_READY low_runs=2 high_runs=5 current=null last_error=OS_STATUS_OK
+INFO priority_low_task delete status=OS_STATUS_OK
+INFO priority_high_task delete status=OS_STATUS_OK
+INFO priority scheduler policy final counters task counters: tasks=0 ready=0 waiting=0 current=null
+PASS priority scheduler policy final PASS
+PHASE equal-priority wake ordering test start
+INFO equal-priority wake ordering fixtures: build/delay_once.wasm and build/spin_forever.wasm
+INFO equal-priority initial task counters: tasks=3 ready=3 waiting=0 current=null
+INFO wake policy task_a name=equal_wake_task priority=5 state=OS_TASK_READY run_count=0
+INFO wake policy task_b name=equal_peer_b_task priority=5 state=OS_TASK_READY run_count=0
+INFO wake policy task_c name=equal_peer_c_task priority=5 state=OS_TASK_READY run_count=0
+INFO equal-priority initial tick=0 last_error=OS_STATUS_OK
+INFO equal-priority after wake task delay task counters: tasks=3 ready=2 waiting=1 current=null
+INFO wake policy task_a name=equal_wake_task priority=5 state=OS_TASK_WAITING run_count=1
+INFO wake policy task_b name=equal_peer_b_task priority=5 state=OS_TASK_READY run_count=0
+INFO wake policy task_c name=equal_peer_c_task priority=5 state=OS_TASK_READY run_count=0
+INFO equal-priority after wake task delay tick=0 last_error=OS_STATUS_OK
+INFO equal-priority after peer b slice task counters: tasks=3 ready=2 waiting=1 current=null
+INFO wake policy task_a name=equal_wake_task priority=5 state=OS_TASK_WAITING run_count=1
+INFO wake policy task_b name=equal_peer_b_task priority=5 state=OS_TASK_READY run_count=1
+INFO wake policy task_c name=equal_peer_c_task priority=5 state=OS_TASK_READY run_count=0
+INFO equal-priority after peer b slice tick=0 last_error=OS_STATUS_OK
+INFO equal-priority after manual wake tick task counters: tasks=3 ready=3 waiting=0 current=null
+INFO wake policy task_a name=equal_wake_task priority=5 state=OS_TASK_READY run_count=1
+INFO wake policy task_b name=equal_peer_b_task priority=5 state=OS_TASK_READY run_count=1
+INFO wake policy task_c name=equal_peer_c_task priority=5 state=OS_TASK_READY run_count=0
+INFO equal-priority after manual wake tick tick=10 last_error=OS_STATUS_OK
+INFO equal-priority after key peer c slice task counters: tasks=3 ready=3 waiting=0 current=null
+INFO wake policy task_a name=equal_wake_task priority=5 state=OS_TASK_READY run_count=1
+INFO wake policy task_b name=equal_peer_b_task priority=5 state=OS_TASK_READY run_count=1
+INFO wake policy task_c name=equal_peer_c_task priority=5 state=OS_TASK_READY run_count=1
+INFO equal-priority after key peer c slice tick=10 last_error=OS_STATUS_OK
+INFO equal-priority after woken task resume task counters: tasks=2 ready=2 waiting=0 current=null
+INFO wake policy task_a name=equal_wake_task priority=5 state=OS_TASK_DEAD run_count=2
+INFO wake policy task_b name=equal_peer_b_task priority=5 state=OS_TASK_READY run_count=1
+INFO wake policy task_c name=equal_peer_c_task priority=5 state=OS_TASK_READY run_count=1
+INFO equal-priority after woken task resume tick=10 last_error=OS_STATUS_OK
+PHASE empty OS checks start code_base=272
+INFO empty OS checks task counters: tasks=0 ready=0 waiting=0 current=null
+PASS empty OS checks pass
+PASS equal-priority wake ordering final PASS
+PHASE higher-priority wake precedence test start
+INFO higher-priority wake precedence fixtures: build/delay_once.wasm and build/spin_forever.wasm
+INFO higher-priority initial task counters: tasks=2 ready=2 waiting=0 current=null
+INFO wake policy task_a name=high_wake_task priority=10 state=OS_TASK_READY run_count=0
+INFO wake policy task_b name=low_ready_task priority=1 state=OS_TASK_READY run_count=0
+INFO higher-priority initial tick=10 last_error=OS_STATUS_OK
+INFO higher-priority after high delay task counters: tasks=2 ready=1 waiting=1 current=null
+INFO wake policy task_a name=high_wake_task priority=10 state=OS_TASK_WAITING run_count=1
+INFO wake policy task_b name=low_ready_task priority=1 state=OS_TASK_READY run_count=0
+INFO higher-priority after high delay tick=10 last_error=OS_STATUS_OK
+INFO higher-priority after low slice task counters: tasks=2 ready=1 waiting=1 current=null
+INFO wake policy task_a name=high_wake_task priority=10 state=OS_TASK_WAITING run_count=1
+INFO wake policy task_b name=low_ready_task priority=1 state=OS_TASK_READY run_count=1
+INFO higher-priority after low slice tick=10 last_error=OS_STATUS_OK
+INFO higher-priority after manual wake tick task counters: tasks=2 ready=2 waiting=0 current=null
+INFO wake policy task_a name=high_wake_task priority=10 state=OS_TASK_READY run_count=1
+INFO wake policy task_b name=low_ready_task priority=1 state=OS_TASK_READY run_count=1
+INFO higher-priority after manual wake tick tick=20 last_error=OS_STATUS_OK
+INFO higher-priority after key high wake slice task counters: tasks=1 ready=1 waiting=0 current=null
+INFO wake policy task_a name=high_wake_task priority=10 state=OS_TASK_DEAD run_count=2
+INFO wake policy task_b name=low_ready_task priority=1 state=OS_TASK_READY run_count=1
+INFO higher-priority after key high wake slice tick=20 last_error=OS_STATUS_OK
+PHASE empty OS checks start code_base=309
+INFO empty OS checks task counters: tasks=0 ready=0 waiting=0 current=null
+PASS empty OS checks pass
+PASS higher-priority wake precedence final PASS
+PHASE priority change scheduler policy test start
+INFO priority change scheduler policy fixture: build/spin_forever.wasm
+INFO priority_change_task_a create status=OS_STATUS_OK handle=non-null
+INFO priority_change_task_b create status=OS_STATUS_OK handle=non-null
+PHASE priority change scheduler policy initial equal-priority phase
+INFO priority change initial task counters: tasks=2 ready=2 waiting=0 current=null
+INFO priority change task_a name=priority_change_task_a priority=5 state=OS_TASK_READY run_count=0
+INFO priority change task_b name=priority_change_task_b priority=5 state=OS_TASK_READY run_count=0
+INFO priority change initial last_error=OS_STATUS_OK
+INFO priority change equal slice=1 status=OS_STATUS_OK task_a_runs=1 task_b_runs=0 current=null last_error=OS_STATUS_OK
+INFO priority change equal slice=2 status=OS_STATUS_OK task_a_runs=1 task_b_runs=1 current=null last_error=OS_STATUS_OK
+INFO priority change equal slice=3 status=OS_STATUS_OK task_a_runs=2 task_b_runs=1 current=null last_error=OS_STATUS_OK
+INFO priority change equal slice=4 status=OS_STATUS_OK task_a_runs=2 task_b_runs=2 current=null last_error=OS_STATUS_OK
+INFO priority change after equal-priority phase task counters: tasks=2 ready=2 waiting=0 current=null
+INFO priority change task_a name=priority_change_task_a priority=5 state=OS_TASK_READY run_count=2
+INFO priority change task_b name=priority_change_task_b priority=5 state=OS_TASK_READY run_count=2
+INFO priority change after equal-priority phase last_error=OS_STATUS_OK
+PHASE priority change scheduler policy priority raised phase
+INFO priority_change_task_b raise priority status=OS_STATUS_OK
+INFO priority change after priority raise task counters: tasks=2 ready=2 waiting=0 current=null
+INFO priority change task_a name=priority_change_task_a priority=5 state=OS_TASK_READY run_count=2
+INFO priority change task_b name=priority_change_task_b priority=10 state=OS_TASK_READY run_count=2
+INFO priority change after priority raise last_error=OS_STATUS_OK
+INFO priority change raised slice=1 status=OS_STATUS_OK task_a_runs=2 task_b_runs=3 current=null last_error=OS_STATUS_OK
+INFO priority change raised slice=2 status=OS_STATUS_OK task_a_runs=2 task_b_runs=4 current=null last_error=OS_STATUS_OK
+INFO priority change raised slice=3 status=OS_STATUS_OK task_a_runs=2 task_b_runs=5 current=null last_error=OS_STATUS_OK
+INFO priority change after raised-priority phase task counters: tasks=2 ready=2 waiting=0 current=null
+INFO priority change task_a name=priority_change_task_a priority=5 state=OS_TASK_READY run_count=2
+INFO priority change task_b name=priority_change_task_b priority=10 state=OS_TASK_READY run_count=5
+INFO priority change after raised-priority phase last_error=OS_STATUS_OK
+PHASE priority change scheduler policy priority restored phase
+INFO priority_change_task_b restore priority status=OS_STATUS_OK
+INFO priority change after priority restore task counters: tasks=2 ready=2 waiting=0 current=null
+INFO priority change task_a name=priority_change_task_a priority=5 state=OS_TASK_READY run_count=2
+INFO priority change task_b name=priority_change_task_b priority=5 state=OS_TASK_READY run_count=5
+INFO priority change after priority restore last_error=OS_STATUS_OK
+INFO priority change restored slice=1 status=OS_STATUS_OK task_a_runs=3 task_b_runs=5 current=null last_error=OS_STATUS_OK
+INFO priority change restored slice=2 status=OS_STATUS_OK task_a_runs=3 task_b_runs=6 current=null last_error=OS_STATUS_OK
+INFO priority change restored slice=3 status=OS_STATUS_OK task_a_runs=4 task_b_runs=6 current=null last_error=OS_STATUS_OK
+INFO priority change restored slice=4 status=OS_STATUS_OK task_a_runs=4 task_b_runs=7 current=null last_error=OS_STATUS_OK
+INFO priority change after restored-priority phase task counters: tasks=2 ready=2 waiting=0 current=null
+INFO priority change task_a name=priority_change_task_a priority=5 state=OS_TASK_READY run_count=4
+INFO priority change task_b name=priority_change_task_b priority=5 state=OS_TASK_READY run_count=7
+INFO priority change after restored-priority phase last_error=OS_STATUS_OK
+PHASE priority change scheduler policy cleanup
+INFO priority_change_task_a delete status=OS_STATUS_OK
+INFO priority_change_task_b delete status=OS_STATUS_OK
+PHASE empty OS checks start code_base=316
+INFO empty OS checks task counters: tasks=0 ready=0 waiting=0 current=null
+PASS empty OS checks pass
+INFO priority change scheduler policy final counters task counters: tasks=0 ready=0 waiting=0 current=null
+INFO priority change scheduler policy cleanup last OS error: status=OS_STATUS_OK phase=none result=null task=null
+PASS priority change scheduler policy final PASS
+PHASE waiting priority raise setup
+INFO waiting priority raise fixtures: build/delay_once.wasm and build/spin_forever.wasm
+INFO waiting_raise_task create status=OS_STATUS_OK handle=non-null
+INFO waiting_raise_peer_task create status=OS_STATUS_OK handle=non-null
+INFO waiting priority raise setup task counters: tasks=2 ready=2 waiting=0 current=null
+INFO waiting priority task name=waiting_raise_task priority=5 state=OS_TASK_READY run_count=0
+INFO waiting priority peer name=waiting_raise_peer_task priority=5 state=OS_TASK_READY run_count=0
+INFO waiting priority raise setup last_error=OS_STATUS_OK
+INFO waiting priority raise delay schedule status=OS_STATUS_OK
+INFO waiting priority raise after delay task counters: tasks=2 ready=1 waiting=1 current=null
+INFO waiting priority task name=waiting_raise_task priority=5 state=OS_TASK_WAITING run_count=1
+INFO waiting priority peer name=waiting_raise_peer_task priority=5 state=OS_TASK_READY run_count=0
+INFO waiting priority raise after delay last_error=OS_STATUS_OK
+INFO waiting priority raise peer schedule status=OS_STATUS_OK
+INFO waiting_raise_task raise priority status=OS_STATUS_OK
+INFO waiting priority raise after priority update task counters: tasks=2 ready=1 waiting=1 current=null
+INFO waiting priority task name=waiting_raise_task priority=10 state=OS_TASK_WAITING run_count=1
+INFO waiting priority peer name=waiting_raise_peer_task priority=5 state=OS_TASK_READY run_count=1
+INFO waiting priority raise after priority update last_error=OS_STATUS_OK
+INFO waiting priority raise after wake task counters: tasks=2 ready=2 waiting=0 current=null
+INFO waiting priority task name=waiting_raise_task priority=10 state=OS_TASK_READY run_count=1
+INFO waiting priority peer name=waiting_raise_peer_task priority=5 state=OS_TASK_READY run_count=1
+INFO waiting priority raise after wake last_error=OS_STATUS_OK
+INFO waiting priority raise key schedule status=OS_STATUS_OK
+INFO waiting priority raise key schedule task counters: tasks=1 ready=1 waiting=0 current=null
+INFO waiting priority task name=waiting_raise_task priority=10 state=OS_TASK_DEAD run_count=2
+INFO waiting priority peer name=waiting_raise_peer_task priority=5 state=OS_TASK_READY run_count=1
+INFO waiting priority raise key schedule last_error=OS_STATUS_OK
+PHASE waiting priority raise cleanup
+PHASE empty OS checks start code_base=330
+INFO empty OS checks task counters: tasks=0 ready=0 waiting=0 current=null
+PASS empty OS checks pass
+INFO waiting priority raise cleanup task counters: tasks=0 ready=0 waiting=0 current=null
+PASS waiting priority raise policy final PASS
+PHASE waiting priority lower setup
+INFO waiting priority lower fixtures: build/delay_once.wasm and build/spin_forever.wasm
+INFO waiting priority lower setup task counters: tasks=2 ready=2 waiting=0 current=null
+INFO waiting priority task name=waiting_lower_task priority=5 state=OS_TASK_READY run_count=0
+INFO waiting priority peer name=waiting_lower_peer_task priority=5 state=OS_TASK_READY run_count=0
+INFO waiting priority lower setup last_error=OS_STATUS_OK
+INFO waiting priority lower after delay task counters: tasks=2 ready=1 waiting=1 current=null
+INFO waiting priority task name=waiting_lower_task priority=5 state=OS_TASK_WAITING run_count=1
+INFO waiting priority peer name=waiting_lower_peer_task priority=5 state=OS_TASK_READY run_count=0
+INFO waiting priority lower after delay last_error=OS_STATUS_OK
+INFO waiting_lower_task lower priority status=OS_STATUS_OK
+INFO waiting priority lower after priority update task counters: tasks=2 ready=1 waiting=1 current=null
+INFO waiting priority task name=waiting_lower_task priority=1 state=OS_TASK_WAITING run_count=1
+INFO waiting priority peer name=waiting_lower_peer_task priority=5 state=OS_TASK_READY run_count=1
+INFO waiting priority lower after priority update last_error=OS_STATUS_OK
+INFO waiting priority lower after wake task counters: tasks=2 ready=2 waiting=0 current=null
+INFO waiting priority task name=waiting_lower_task priority=1 state=OS_TASK_READY run_count=1
+INFO waiting priority peer name=waiting_lower_peer_task priority=5 state=OS_TASK_READY run_count=1
+INFO waiting priority lower after wake last_error=OS_STATUS_OK
+INFO waiting priority lower key schedule task counters: tasks=2 ready=2 waiting=0 current=null
+INFO waiting priority task name=waiting_lower_task priority=1 state=OS_TASK_READY run_count=1
+INFO waiting priority peer name=waiting_lower_peer_task priority=5 state=OS_TASK_READY run_count=2
+INFO waiting priority lower key schedule last_error=OS_STATUS_OK
+INFO waiting priority lower second key schedule task counters: tasks=2 ready=2 waiting=0 current=null
+INFO waiting priority task name=waiting_lower_task priority=1 state=OS_TASK_READY run_count=1
+INFO waiting priority peer name=waiting_lower_peer_task priority=5 state=OS_TASK_READY run_count=3
+INFO waiting priority lower second key schedule last_error=OS_STATUS_OK
+PHASE waiting priority lower cleanup
+PHASE empty OS checks start code_base=351
+INFO empty OS checks task counters: tasks=0 ready=0 waiting=0 current=null
+PASS empty OS checks pass
+INFO waiting priority lower cleanup task counters: tasks=0 ready=0 waiting=0 current=null
+PASS waiting priority lower policy final PASS
+PHASE high-priority suspend setup
+INFO suspend resume high-priority fixture: build/spin_forever.wasm
+INFO suspend_high_task create status=OS_STATUS_OK handle=non-null
+INFO suspend_low_task create status=OS_STATUS_OK handle=non-null
+INFO high-priority suspend setup task counters: tasks=2 ready=2 waiting=0 current=null
+INFO suspend resume task_a name=suspend_high_task priority=10 state=OS_TASK_READY run_count=0
+INFO suspend resume task_b name=suspend_low_task priority=1 state=OS_TASK_READY run_count=0
+INFO high-priority suspend setup last_error=OS_STATUS_OK
+INFO suspend_high_task suspend status=OS_STATUS_OK
+PHASE high-priority after suspend
+INFO high-priority after suspend task counters: tasks=2 ready=1 waiting=0 current=null
+INFO suspend resume task_a name=suspend_high_task priority=10 state=OS_TASK_SUSPENDED run_count=0
+INFO suspend resume task_b name=suspend_low_task priority=1 state=OS_TASK_READY run_count=0
+INFO high-priority after suspend last_error=OS_STATUS_OK
+PHASE high-priority while suspended scheduling
+INFO high-priority suspended slice=1 status=OS_STATUS_OK high_runs=0 low_runs=1 current=null last_error=OS_STATUS_OK
+INFO high-priority suspended slice=2 status=OS_STATUS_OK high_runs=0 low_runs=2 current=null last_error=OS_STATUS_OK
+INFO suspend_high_task resume status=OS_STATUS_OK
+PHASE high-priority after resume
+INFO high-priority after resume task counters: tasks=2 ready=2 waiting=0 current=null
+INFO suspend resume task_a name=suspend_high_task priority=10 state=OS_TASK_READY run_count=0
+INFO suspend resume task_b name=suspend_low_task priority=1 state=OS_TASK_READY run_count=2
+INFO high-priority after resume last_error=OS_STATUS_OK
+PHASE high-priority key schedule
+INFO high-priority key schedule task counters: tasks=2 ready=2 waiting=0 current=null
+INFO suspend resume task_a name=suspend_high_task priority=10 state=OS_TASK_READY run_count=1
+INFO suspend resume task_b name=suspend_low_task priority=1 state=OS_TASK_READY run_count=2
+INFO high-priority key schedule last_error=OS_STATUS_OK
+PHASE cleanup
+INFO suspend_high_task delete status=OS_STATUS_OK
+INFO suspend_low_task delete status=OS_STATUS_OK
+PHASE empty OS checks start code_base=369
+INFO empty OS checks task counters: tasks=0 ready=0 waiting=0 current=null
+PASS empty OS checks pass
+INFO suspend resume high-priority cleanup task counters: tasks=0 ready=0 waiting=0 current=null
+PASS suspend resume high-priority policy final PASS
+PHASE equal-priority baseline
+INFO suspend resume equal-priority fixture: build/spin_forever.wasm
+INFO equal-priority baseline setup task counters: tasks=3 ready=3 waiting=0 current=null
+INFO suspend resume task_a name=suspend_equal_a_task priority=5 state=OS_TASK_READY run_count=0
+INFO suspend resume task_b name=suspend_equal_b_task priority=5 state=OS_TASK_READY run_count=0
+INFO suspend resume task_c name=suspend_equal_c_task priority=5 state=OS_TASK_READY run_count=0
+INFO equal-priority baseline setup last_error=OS_STATUS_OK
+INFO equal-priority baseline slice=1 status=OS_STATUS_OK runs=1/0/0 current=null last_error=OS_STATUS_OK
+INFO equal-priority baseline slice=2 status=OS_STATUS_OK runs=1/1/0 current=null last_error=OS_STATUS_OK
+INFO equal-priority baseline slice=3 status=OS_STATUS_OK runs=1/1/1 current=null last_error=OS_STATUS_OK
+INFO equal-priority baseline task counters: tasks=3 ready=3 waiting=0 current=null
+INFO suspend resume task_a name=suspend_equal_a_task priority=5 state=OS_TASK_READY run_count=1
+INFO suspend resume task_b name=suspend_equal_b_task priority=5 state=OS_TASK_READY run_count=1
+INFO suspend resume task_c name=suspend_equal_c_task priority=5 state=OS_TASK_READY run_count=1
+INFO equal-priority baseline last_error=OS_STATUS_OK
+INFO suspend_equal_b_task suspend status=OS_STATUS_OK
+PHASE equal-priority after suspend
+INFO equal-priority after suspend task counters: tasks=3 ready=2 waiting=0 current=null
+INFO suspend resume task_a name=suspend_equal_a_task priority=5 state=OS_TASK_READY run_count=1
+INFO suspend resume task_b name=suspend_equal_b_task priority=5 state=OS_TASK_SUSPENDED run_count=1
+INFO suspend resume task_c name=suspend_equal_c_task priority=5 state=OS_TASK_READY run_count=1
+INFO equal-priority after suspend last_error=OS_STATUS_OK
+PHASE equal-priority while suspended scheduling
+INFO equal-priority suspended slice=1 status=OS_STATUS_OK runs=2/1/1 current=null last_error=OS_STATUS_OK
+INFO equal-priority suspended slice=2 status=OS_STATUS_OK runs=2/1/2 current=null last_error=OS_STATUS_OK
+INFO equal-priority while suspended scheduling task counters: tasks=3 ready=2 waiting=0 current=null
+INFO suspend resume task_a name=suspend_equal_a_task priority=5 state=OS_TASK_READY run_count=2
+INFO suspend resume task_b name=suspend_equal_b_task priority=5 state=OS_TASK_SUSPENDED run_count=1
+INFO suspend resume task_c name=suspend_equal_c_task priority=5 state=OS_TASK_READY run_count=2
+INFO equal-priority while suspended scheduling last_error=OS_STATUS_OK
+INFO suspend_equal_b_task resume status=OS_STATUS_OK
+PHASE equal-priority after resume
+INFO equal-priority after resume task counters: tasks=3 ready=3 waiting=0 current=null
+INFO suspend resume task_a name=suspend_equal_a_task priority=5 state=OS_TASK_READY run_count=2
+INFO suspend resume task_b name=suspend_equal_b_task priority=5 state=OS_TASK_READY run_count=1
+INFO suspend resume task_c name=suspend_equal_c_task priority=5 state=OS_TASK_READY run_count=2
+INFO equal-priority after resume last_error=OS_STATUS_OK
+PHASE equal-priority post-resume scheduling
+INFO equal-priority post-resume slice=1 status=OS_STATUS_OK runs=3/1/2 current=null last_error=OS_STATUS_OK
+INFO equal-priority post-resume slice=2 status=OS_STATUS_OK runs=3/2/2 current=null last_error=OS_STATUS_OK
+INFO equal-priority post-resume slice=3 status=OS_STATUS_OK runs=3/2/3 current=null last_error=OS_STATUS_OK
+INFO equal-priority post-resume scheduling task counters: tasks=3 ready=3 waiting=0 current=null
+INFO suspend resume task_a name=suspend_equal_a_task priority=5 state=OS_TASK_READY run_count=3
+INFO suspend resume task_b name=suspend_equal_b_task priority=5 state=OS_TASK_READY run_count=2
+INFO suspend resume task_c name=suspend_equal_c_task priority=5 state=OS_TASK_READY run_count=3
+INFO equal-priority post-resume scheduling last_error=OS_STATUS_OK
+PHASE cleanup
+PHASE empty OS checks start code_base=405
+INFO empty OS checks task counters: tasks=0 ready=0 waiting=0 current=null
+PASS empty OS checks pass
+INFO suspend resume equal-priority cleanup task counters: tasks=0 ready=0 waiting=0 current=null
+PASS suspend resume equal-priority policy final PASS
+PHASE delete last scheduled task setup
+INFO delete last scheduled task fixture: build/spin_forever.wasm
+INFO delete_last_a_task create status=OS_STATUS_OK handle=non-null
+INFO delete_last_b_task create status=OS_STATUS_OK handle=non-null
+INFO delete_last_c_task create status=OS_STATUS_OK handle=non-null
+INFO delete last scheduled task setup task counters: tasks=3 ready=3 waiting=0 current=null
+INFO delete pointer task_a name=delete_last_a_task priority=5 state=OS_TASK_READY run_count=0
+INFO delete pointer task_b name=delete_last_b_task priority=5 state=OS_TASK_READY run_count=0
+INFO delete pointer task_c name=delete_last_c_task priority=5 state=OS_TASK_READY run_count=0
+INFO delete last scheduled task setup last_error=OS_STATUS_OK
+PHASE delete last scheduled task after initial schedule
+INFO delete last scheduled task after initial schedule task counters: tasks=3 ready=3 waiting=0 current=null
+INFO delete pointer task_a name=delete_last_a_task priority=5 state=OS_TASK_READY run_count=1
+INFO delete pointer task_b name=delete_last_b_task priority=5 state=OS_TASK_READY run_count=0
+INFO delete pointer task_c name=delete_last_c_task priority=5 state=OS_TASK_READY run_count=0
+INFO delete last scheduled task after initial schedule last_error=OS_STATUS_OK
+INFO delete_last_a_task delete status=OS_STATUS_OK
+PHASE delete last scheduled task after delete
+INFO delete last scheduled task after delete task counters: tasks=2 ready=2 waiting=0 current=null
+INFO delete pointer task_b name=delete_last_b_task priority=5 state=OS_TASK_READY run_count=0
+INFO delete pointer task_c name=delete_last_c_task priority=5 state=OS_TASK_READY run_count=0
+INFO delete last scheduled task after delete last_error=OS_STATUS_OK
+PHASE delete last scheduled task key schedule
+INFO delete last scheduled task key schedule task counters: tasks=2 ready=2 waiting=0 current=null
+INFO delete pointer task_b name=delete_last_b_task priority=5 state=OS_TASK_READY run_count=1
+INFO delete pointer task_c name=delete_last_c_task priority=5 state=OS_TASK_READY run_count=0
+INFO delete last scheduled task key schedule last_error=OS_STATUS_OK
+INFO delete last scheduled task follow-up schedule task counters: tasks=2 ready=2 waiting=0 current=null
+INFO delete pointer task_b name=delete_last_b_task priority=5 state=OS_TASK_READY run_count=1
+INFO delete pointer task_c name=delete_last_c_task priority=5 state=OS_TASK_READY run_count=1
+INFO delete last scheduled task follow-up schedule last_error=OS_STATUS_OK
+PHASE cleanup
+PHASE empty OS checks start code_base=410
+INFO empty OS checks task counters: tasks=0 ready=0 waiting=0 current=null
+PASS empty OS checks pass
+INFO delete last scheduled task cleanup task counters: tasks=0 ready=0 waiting=0 current=null
+INFO delete last scheduled task cleanup last OS error: status=OS_STATUS_OK phase=none result=null task=null
+PASS delete last scheduled task policy final PASS
+PHASE delete before last scheduled task setup
+INFO delete before last scheduled task fixture: build/spin_forever.wasm
+INFO delete_before_a_task create status=OS_STATUS_OK handle=non-null
+INFO delete_before_b_task create status=OS_STATUS_OK handle=non-null
+INFO delete_before_c_task create status=OS_STATUS_OK handle=non-null
+INFO delete before last scheduled task setup task counters: tasks=3 ready=3 waiting=0 current=null
+INFO delete pointer task_a name=delete_before_a_task priority=5 state=OS_TASK_READY run_count=0
+INFO delete pointer task_b name=delete_before_b_task priority=5 state=OS_TASK_READY run_count=0
+INFO delete pointer task_c name=delete_before_c_task priority=5 state=OS_TASK_READY run_count=0
+INFO delete before last scheduled task setup last_error=OS_STATUS_OK
+PHASE delete before last scheduled task after baseline schedules
+INFO delete before last scheduled task after baseline schedules task counters: tasks=3 ready=3 waiting=0 current=null
+INFO delete pointer task_a name=delete_before_a_task priority=5 state=OS_TASK_READY run_count=1
+INFO delete pointer task_b name=delete_before_b_task priority=5 state=OS_TASK_READY run_count=1
+INFO delete pointer task_c name=delete_before_c_task priority=5 state=OS_TASK_READY run_count=0
+INFO delete before last scheduled task after baseline schedules last_error=OS_STATUS_OK
+INFO delete_before_a_task delete status=OS_STATUS_OK
+PHASE delete before last scheduled task after delete
+INFO delete before last scheduled task after delete task counters: tasks=2 ready=2 waiting=0 current=null
+INFO delete pointer task_b name=delete_before_b_task priority=5 state=OS_TASK_READY run_count=1
+INFO delete pointer task_c name=delete_before_c_task priority=5 state=OS_TASK_READY run_count=0
+INFO delete before last scheduled task after delete last_error=OS_STATUS_OK
+PHASE delete before last scheduled task key schedule
+INFO delete before last scheduled task key schedule task counters: tasks=2 ready=2 waiting=0 current=null
+INFO delete pointer task_b name=delete_before_b_task priority=5 state=OS_TASK_READY run_count=1
+INFO delete pointer task_c name=delete_before_c_task priority=5 state=OS_TASK_READY run_count=1
+INFO delete before last scheduled task key schedule last_error=OS_STATUS_OK
+INFO delete before last scheduled task follow-up schedule task counters: tasks=2 ready=2 waiting=0 current=null
+INFO delete pointer task_b name=delete_before_b_task priority=5 state=OS_TASK_READY run_count=2
+INFO delete pointer task_c name=delete_before_c_task priority=5 state=OS_TASK_READY run_count=1
+INFO delete before last scheduled task follow-up schedule last_error=OS_STATUS_OK
+PHASE cleanup
+PHASE empty OS checks start code_base=440
+INFO empty OS checks task counters: tasks=0 ready=0 waiting=0 current=null
+PASS empty OS checks pass
+INFO delete before last scheduled task cleanup task counters: tasks=0 ready=0 waiting=0 current=null
+INFO delete before last scheduled task cleanup last OS error: status=OS_STATUS_OK phase=none result=null task=null
+PASS delete before last scheduled task policy final PASS
+PHASE delete after last scheduled task setup
+INFO delete after last scheduled task fixture: build/spin_forever.wasm
+INFO delete_after_a_task create status=OS_STATUS_OK handle=non-null
+INFO delete_after_b_task create status=OS_STATUS_OK handle=non-null
+INFO delete_after_c_task create status=OS_STATUS_OK handle=non-null
+INFO delete after last scheduled task setup task counters: tasks=3 ready=3 waiting=0 current=null
+INFO delete pointer task_a name=delete_after_a_task priority=5 state=OS_TASK_READY run_count=0
+INFO delete pointer task_b name=delete_after_b_task priority=5 state=OS_TASK_READY run_count=0
+INFO delete pointer task_c name=delete_after_c_task priority=5 state=OS_TASK_READY run_count=0
+INFO delete after last scheduled task setup last_error=OS_STATUS_OK
+PHASE delete after last scheduled task after baseline schedule
+INFO delete after last scheduled task after baseline schedule task counters: tasks=3 ready=3 waiting=0 current=null
+INFO delete pointer task_a name=delete_after_a_task priority=5 state=OS_TASK_READY run_count=1
+INFO delete pointer task_b name=delete_after_b_task priority=5 state=OS_TASK_READY run_count=0
+INFO delete pointer task_c name=delete_after_c_task priority=5 state=OS_TASK_READY run_count=0
+INFO delete after last scheduled task after baseline schedule last_error=OS_STATUS_OK
+INFO delete_after_c_task delete status=OS_STATUS_OK
+PHASE delete after last scheduled task after delete
+INFO delete after last scheduled task after delete task counters: tasks=2 ready=2 waiting=0 current=null
+INFO delete pointer task_a name=delete_after_a_task priority=5 state=OS_TASK_READY run_count=1
+INFO delete pointer task_b name=delete_after_b_task priority=5 state=OS_TASK_READY run_count=0
+INFO delete after last scheduled task after delete last_error=OS_STATUS_OK
+PHASE delete after last scheduled task key schedule
+INFO delete after last scheduled task key schedule task counters: tasks=2 ready=2 waiting=0 current=null
+INFO delete pointer task_a name=delete_after_a_task priority=5 state=OS_TASK_READY run_count=1
+INFO delete pointer task_b name=delete_after_b_task priority=5 state=OS_TASK_READY run_count=1
+INFO delete after last scheduled task key schedule last_error=OS_STATUS_OK
+INFO delete after last scheduled task follow-up schedule task counters: tasks=2 ready=2 waiting=0 current=null
+INFO delete pointer task_a name=delete_after_a_task priority=5 state=OS_TASK_READY run_count=2
+INFO delete pointer task_b name=delete_after_b_task priority=5 state=OS_TASK_READY run_count=1
+INFO delete after last scheduled task follow-up schedule last_error=OS_STATUS_OK
+PHASE cleanup
+PHASE empty OS checks start code_base=470
+INFO empty OS checks task counters: tasks=0 ready=0 waiting=0 current=null
+PASS empty OS checks pass
+INFO delete after last scheduled task cleanup task counters: tasks=0 ready=0 waiting=0 current=null
+INFO delete after last scheduled task cleanup last OS error: status=OS_STATUS_OK phase=none result=null task=null
+PASS delete after last scheduled task policy final PASS
+PHASE tick wraparound delay wake test start
+INFO tick wraparound fixtures: build/delay_once.wasm and build/spin_forever.wasm
+PHASE empty OS checks start code_base=480
+INFO empty OS checks task counters: tasks=0 ready=0 waiting=0 current=null
+PASS empty OS checks pass
+PHASE tick wraparound setup
+INFO tick wraparound current tick before move=40 target=4294967288
+PHASE after moving tick near wrap
+INFO tick wraparound tick=4294967288
+INFO tick wraparound delay wake last OS error: status=OS_STATUS_OK phase=none result=null task=null
+INFO tick wraparound initial task counters: tasks=2 ready=2 waiting=0 current=null
+INFO wake policy task_a name=tick_wrap_delay_task priority=5 state=OS_TASK_READY run_count=0
+INFO wake policy task_b name=tick_wrap_peer_task priority=5 state=OS_TASK_READY run_count=0
+INFO tick wraparound initial tick=4294967288 last_error=OS_STATUS_OK
+PHASE after delay task enters waiting
+INFO tick wraparound after delay task enters waiting task counters: tasks=2 ready=1 waiting=1 current=null
+INFO wake policy task_a name=tick_wrap_delay_task priority=5 state=OS_TASK_WAITING run_count=1
+INFO wake policy task_b name=tick_wrap_peer_task priority=5 state=OS_TASK_READY run_count=0
+INFO tick wraparound after delay task enters waiting tick=4294967288 last_error=OS_STATUS_OK
+PHASE after early 5 ms tick
+INFO tick wraparound after early 5 ms tick task counters: tasks=2 ready=1 waiting=1 current=null
+INFO wake policy task_a name=tick_wrap_delay_task priority=5 state=OS_TASK_WAITING run_count=1
+INFO wake policy task_b name=tick_wrap_peer_task priority=5 state=OS_TASK_READY run_count=0
+INFO tick wraparound after early 5 ms tick tick=4294967293 last_error=OS_STATUS_OK
+PHASE while waiting peer schedule
+INFO tick wraparound while waiting peer schedule task counters: tasks=2 ready=1 waiting=1 current=null
+INFO wake policy task_a name=tick_wrap_delay_task priority=5 state=OS_TASK_WAITING run_count=1
+INFO wake policy task_b name=tick_wrap_peer_task priority=5 state=OS_TASK_READY run_count=1
+INFO tick wraparound while waiting peer schedule tick=4294967293 last_error=OS_STATUS_OK
+PHASE after wrapped wake tick
+INFO tick wraparound after wrapped wake tick task counters: tasks=2 ready=2 waiting=0 current=null
+INFO wake policy task_a name=tick_wrap_delay_task priority=5 state=OS_TASK_READY run_count=1
+INFO wake policy task_b name=tick_wrap_peer_task priority=5 state=OS_TASK_READY run_count=1
+INFO tick wraparound after wrapped wake tick tick=2 last_error=OS_STATUS_OK
+PHASE after resumed delay task schedule
+INFO tick wraparound after resumed delay task schedule task counters: tasks=1 ready=1 waiting=0 current=null
+INFO wake policy task_a name=tick_wrap_delay_task priority=5 state=OS_TASK_DEAD run_count=2
+INFO wake policy task_b name=tick_wrap_peer_task priority=5 state=OS_TASK_READY run_count=1
+INFO tick wraparound after resumed delay task schedule tick=2 last_error=OS_STATUS_OK
+PHASE cleanup
+INFO tick wraparound cleanup task counters: tasks=0 ready=0 waiting=0 current=null
+INFO tick wraparound cleanup last OS error: status=OS_STATUS_OK phase=none result=null task=null
+PHASE empty OS checks start code_base=499
+INFO empty OS checks task counters: tasks=0 ready=0 waiting=0 current=null
+PASS empty OS checks pass
+PASS tick wraparound delay wake policy final PASS
+PHASE task deletion state coverage test start
+PHASE task deletion state coverage READY task scenario
+INFO delete_ready_task create status=OS_STATUS_OK state=OS_TASK_READY handle=non-null
+INFO delete_ready_task after create task counters: tasks=1 ready=1 waiting=0 current=null
+INFO delete_ready_task delete status=OS_STATUS_OK
+PHASE empty OS checks start code_base=503
+INFO empty OS checks task counters: tasks=0 ready=0 waiting=0 current=null
+PASS empty OS checks pass
+PASS task deletion state coverage READY task scenario PASS
+PHASE task deletion state coverage WAITING task scenario
+INFO delete_waiting_task first schedule status=OS_STATUS_OK state=OS_TASK_WAITING
+INFO delete_waiting_task after delay task counters: tasks=1 ready=0 waiting=1 current=null
+INFO delete_waiting_task delete status=OS_STATUS_OK
+PHASE empty OS checks start code_base=508
+INFO empty OS checks task counters: tasks=0 ready=0 waiting=0 current=null
+PASS empty OS checks pass
+PASS task deletion state coverage WAITING task scenario PASS
+PHASE task deletion state coverage SUSPENDED task scenario
+INFO delete_suspended_task suspend status=OS_STATUS_OK state=OS_TASK_SUSPENDED
+INFO delete_suspended_task after suspend task counters: tasks=1 ready=0 waiting=0 current=null
+INFO delete_suspended_task delete status=OS_STATUS_OK
+PHASE empty OS checks start code_base=513
+INFO empty OS checks task counters: tasks=0 ready=0 waiting=0 current=null
+PASS empty OS checks pass
+PASS task deletion state coverage SUSPENDED task scenario PASS
+PHASE task deletion state coverage long-running READY-after-slice scenario
+INFO delete_spin_forever_task schedule status=OS_STATUS_OK state=OS_TASK_READY current=null
+INFO delete_spin_forever_task after bounded fuel slice task counters: tasks=1 ready=1 waiting=0 current=null
+INFO delete_spin_forever_task delete status=OS_STATUS_OK
+PHASE empty OS checks start code_base=518
+INFO empty OS checks task counters: tasks=0 ready=0 waiting=0 current=null
+PASS empty OS checks pass
+PASS task deletion state coverage long-running READY-after-slice scenario PASS
+INFO task deletion state coverage final counters task counters: tasks=0 ready=0 waiting=0 current=null
+PASS task deletion state coverage final PASS
+INFO final task counters: tasks=0 ready=0 waiting=0 current=null
+PASS smoke test final PASS
