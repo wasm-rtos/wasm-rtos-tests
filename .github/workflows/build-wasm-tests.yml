@@ -1,0 +1,301 @@
+name: Build WASM tests
+
+permissions:
+  contents: write
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "tests/*.c"
+      - "tests/**/*.c"
+      - ".github/workflows/build-wasm-tests.yml"
+  pull_request:
+    paths:
+      - "tests/*.c"
+      - "tests/**/*.c"
+      - ".github/workflows/build-wasm-tests.yml"
+
+jobs:
+  build-wasm-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Update submodules to latest remote commits
+        run: |
+          set -euo pipefail
+          git submodule sync --recursive
+          git submodule update --init --recursive --remote
+
+      - name: Prepare log directories
+        if: always()
+        run: |
+          mkdir -p build logs
+          : > logs/status.env
+          {
+            echo "workflow_started_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            echo "github_sha=${GITHUB_SHA}"
+            echo "github_ref=${GITHUB_REF}"
+            echo "runner_os=${RUNNER_OS}"
+          } | tee logs/workflow_context.log
+
+      - name: Install LLVM and WASI toolchain
+        id: install_toolchain
+        if: always()
+        continue-on-error: true
+        run: |
+          set +e
+          mkdir -p logs
+          {
+            echo "+ sudo apt-get update"
+            sudo apt-get update
+            update_status=$?
+            echo "apt_get_update_status=${update_status}"
+
+            echo "+ sudo apt-get install -y clang lld wasi-libc libclang-rt-dev-wasm32"
+            sudo apt-get install -y clang lld wasi-libc libclang-rt-dev-wasm32
+            install_status=$?
+            echo "apt_get_install_status=${install_status}"
+
+            if [ "${update_status}" -ne 0 ] || [ "${install_status}" -ne 0 ]; then
+              echo "TOOLCHAIN_STATUS=failed" >> logs/status.env
+              exit 1
+            fi
+
+            clang --version
+            echo "TOOLCHAIN_STATUS=passed" >> logs/status.env
+          } 2>&1 | tee logs/toolchain_install.log
+          exit "${PIPESTATUS[0]}"
+
+      - name: Build all test C files into build/*.wasm
+        id: build_wasm
+        if: always()
+        continue-on-error: true
+        shell: bash
+        run: |
+          set +e
+          mkdir -p build logs
+          python3 - <<'PY' 2>&1 | tee logs/wasm_build.log
+          import re
+          import subprocess
+          from pathlib import Path
+
+          tests_dir = Path("tests")
+          build_dir = Path("build")
+          sources = sorted(tests_dir.rglob("*.c"))
+          failures = []
+
+          wasi_markers = (
+              "#include <wasi",
+              "__wasi_",
+              "proc_exit",
+              "fd_write",
+          )
+          export_pattern = re.compile(r"\b(app_main[A-Za-z0-9_]*)\s*\(")
+
+          def is_wasi_source(source, text):
+              return source.name.startswith("wasi_") or any(marker in text for marker in wasi_markers)
+
+          def bare_exports(text):
+              exports = sorted(set(export_pattern.findall(text)))
+              if not exports:
+                  exports = ["app_main"]
+              return exports
+
+          if not sources:
+              print("ERROR: No C test sources found under tests/", flush=True)
+              raise SystemExit(1)
+
+          for source in sources:
+              text = source.read_text(encoding="utf-8")
+              output = build_dir / f"{source.stem}.wasm"
+
+              if is_wasi_source(source, text):
+                  command = [
+                      "clang",
+                      "--target=wasm32-wasi",
+                      "-O0",
+                      "-o",
+                      str(output),
+                      str(source),
+                  ]
+              else:
+                  command = [
+                      "clang",
+                      "--target=wasm32",
+                      "-nostdlib",
+                      "-Wl,--no-entry",
+                      "-O0",
+                  ]
+                  for export in bare_exports(text):
+                      command.append(f"-Wl,--export={export}")
+                  command.extend(["-o", str(output), str(source)])
+
+              print("+ " + " ".join(command), flush=True)
+              result = subprocess.run(command)
+              print(f"status={result.returncode} source={source}", flush=True)
+              if result.returncode != 0:
+                  failures.append((source, result.returncode))
+
+          if failures:
+              print("FAILED_WASM_BUILDS:", flush=True)
+              for source, status in failures:
+                  print(f"  {source}: {status}", flush=True)
+              raise SystemExit(1)
+
+          print("All WASM sources built successfully.", flush=True)
+          PY
+          status=${PIPESTATUS[0]}
+          if [ "${status}" -eq 0 ]; then
+            echo "WASM_BUILD_STATUS=passed" >> logs/status.env
+          else
+            echo "WASM_BUILD_STATUS=failed" >> logs/status.env
+          fi
+          exit "${status}"
+
+      - name: List generated WASM files
+        if: always()
+        run: |
+          set +e
+          mkdir -p logs
+          {
+            echo "Generated WASM files:"
+            find build -maxdepth 1 -type f -name "*.wasm" -print | sort
+          } 2>&1 | tee logs/generated_wasm_files.log
+          exit 0
+
+      - name: Build native test runner
+        id: build_runner
+        if: always()
+        continue-on-error: true
+        shell: bash
+        run: |
+          set +e
+          mkdir -p build logs
+          cc -std=c11 -Wall -Wextra -D_GNU_SOURCE -D_POSIX_C_SOURCE=200809L -Dd_m3HasWASI -Iwasm-rtos \
+            main.c wasm-rtos/os.c wasm-rtos/hal.c wasm-rtos/wasm3/source/*.c \
+            -lm -o build/wasm-rtos-tests 2>&1 | tee logs/native_build.log
+          status=${PIPESTATUS[0]}
+          if [ "${status}" -eq 0 ]; then
+            echo "NATIVE_BUILD_STATUS=passed" >> logs/status.env
+          else
+            echo "NATIVE_BUILD_STATUS=failed" >> logs/status.env
+          fi
+          exit "${status}"
+
+      - name: Run native test runner
+        id: run_runner
+        if: always()
+        continue-on-error: true
+        shell: bash
+        run: |
+          set +e
+          mkdir -p logs
+          if [ ! -x build/wasm-rtos-tests ]; then
+            echo "Native runner was not built; skipping execution." | tee logs/native_run.log
+            echo "NATIVE_RUN_STATUS=failed" >> logs/status.env
+            exit 1
+          fi
+
+          ./build/wasm-rtos-tests 2>&1 | tee logs/native_run.log
+          status=${PIPESTATUS[0]}
+          if [ -f logs/smoke_test.log ]; then
+            {
+              echo "----- logs/smoke_test.log -----"
+              cat logs/smoke_test.log
+              echo "----- end logs/smoke_test.log -----"
+            } | tee -a logs/native_run.log
+          else
+            echo "logs/smoke_test.log was not created." | tee -a logs/native_run.log
+          fi
+
+          if [ "${status}" -eq 0 ]; then
+            echo "NATIVE_RUN_STATUS=passed" >> logs/status.env
+          else
+            echo "NATIVE_RUN_STATUS=failed" >> logs/status.env
+          fi
+          exit "${status}"
+
+      - name: Write build summary
+        if: always()
+        run: |
+          {
+            echo "## WASM test workflow summary"
+            echo
+            echo "### Step status"
+            echo
+            echo '```text'
+            cat logs/status.env 2>/dev/null || true
+            echo '```'
+            echo
+            echo "### Generated WASM files"
+            echo
+            echo '```text'
+            find build -maxdepth 1 -type f -name "*.wasm" -print | sort
+            echo '```'
+            echo
+            echo "Logs are uploaded as the artifact named \`logs\`."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload build directory
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build
+          path: build/
+          if-no-files-found: warn
+
+      - name: Upload test logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: logs
+          path: logs/
+          if-no-files-found: warn
+
+      - name: Commit generated WASM files and logs
+        if: github.event_name != 'pull_request' && always()
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          added=0
+          if compgen -G "build/*.wasm" > /dev/null; then
+            git add -f build/*.wasm
+            added=1
+          fi
+          if compgen -G "logs/*" > /dev/null; then
+            git add -f logs/*
+            added=1
+          fi
+          git add wasm-rtos
+          added=1
+
+          if [ "${added}" -eq 0 ]; then
+            echo "No generated WASM files, logs, or submodule updates were found to commit."
+            exit 0
+          fi
+
+          if git diff --cached --quiet; then
+            echo "No generated WASM, log, or submodule changes to commit."
+          else
+            git commit -m "Update generated WASM test files, logs, and submodules"
+            git push
+          fi
+
+      - name: Finalize workflow status
+        if: always()
+        run: |
+          if grep -q '=failed' logs/status.env 2>/dev/null; then
+            echo "One or more workflow phases failed. See logs/ artifacts and committed logs for details."
+            cat logs/status.env
+            exit 1
+          fi
+          echo "All workflow phases passed."
