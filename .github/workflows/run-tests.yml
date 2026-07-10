@@ -1,7 +1,7 @@
 name: Run isolated WASM tests
 
 permissions:
-  contents: write
+  contents: read
 
 on:
   workflow_dispatch:
@@ -23,32 +23,25 @@ on:
 jobs:
   tests:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
           submodules: recursive
-          fetch-depth: 0
+
       - name: Install toolchain
         run: |
           sudo apt-get update
           sudo apt-get install -y clang lld wasi-libc libclang-rt-dev-wasm32
-      - name: Run tests
+
+      - name: Build and run every isolated test
         run: bash ./run-tests.sh
-      - name: Upload test directories
+
+      - name: Upload generated WASM files and logs
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: isolated-tests
           path: tests/
-      - name: Commit generated WASM and logs
-        if: github.event_name != 'pull_request' && always()
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -f 'tests/*/*.wasm' 'tests/*/*.log'
-          if git diff --cached --quiet; then
-            echo "No generated test outputs changed."
-          else
-            git commit -m "Update isolated test outputs [skip ci]"
-            git push
-          fi
+          if-no-files-found: error
