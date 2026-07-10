@@ -156,6 +156,10 @@ static const char* os_status_name(OsStatus status)
         case OS_STATUS_NO_READY_TASKS: return "OS_STATUS_NO_READY_TASKS";
         case OS_STATUS_BUFFER_TOO_SMALL: return "OS_STATUS_BUFFER_TOO_SMALL";
         case OS_STATUS_UNSUPPORTED: return "OS_STATUS_UNSUPPORTED";
+        case OS_STATUS_OUT_OF_BOUNDS: return "OS_STATUS_OUT_OF_BOUNDS";
+        case OS_STATUS_QUEUE_FULL: return "OS_STATUS_QUEUE_FULL";
+        case OS_STATUS_QUEUE_EMPTY: return "OS_STATUS_QUEUE_EMPTY";
+        case OS_STATUS_QUEUE_NOT_FOUND: return "OS_STATUS_QUEUE_NOT_FOUND";
         default: return "OS_STATUS_UNKNOWN";
     }
 }
@@ -1585,18 +1589,71 @@ static int run_wasm_entry_return_code_test(int code_base)
     return no_task_status;
 }
 
+static m3ApiRawFunction(smoke_os_queue_create)
+{
+    m3ApiReturnType(uint32_t);
+    m3ApiGetArg(uint32_t, item_size);
+    m3ApiGetArg(uint32_t, item_count);
+    OsQueueHandle queue = 0;
+    OsStatus status = OS_STATUS_OK;
+    (void)runtime;
+    (void)_ctx;
+    (void)_mem;
+
+    status = os_queue_create(&queue, item_size, item_count);
+    if (status != OS_STATUS_OK || queue == 0)
+    {
+        m3ApiReturn(0U);
+    }
+
+    m3ApiReturn(os_queue_get_id(queue));
+}
+
+static m3ApiRawFunction(smoke_os_queue_delete)
+{
+    m3ApiReturnType(uint32_t);
+    m3ApiGetArg(uint32_t, queue_id);
+    OsQueueHandle queue = os_queue_find_by_id(queue_id);
+    (void)runtime;
+    (void)_ctx;
+    (void)_mem;
+
+    if (queue == 0)
+    {
+        m3ApiReturn((uint32_t)OS_STATUS_QUEUE_NOT_FOUND);
+    }
+
+    os_queue_delete(queue);
+    m3ApiReturn((uint32_t)OS_STATUS_OK);
+}
+
 static int run_queue_api_wasm_test(int code_base)
 {
     TestBinary wasm_binary;
     OsTaskHandle task = 0;
     OsStatus status = OS_STATUS_OK;
     int no_task_status = 0;
+    uint32_t iteration = 0U;
+    uint32_t iterations_used = 0U;
+    int task_dead = 0;
 
     wasm_binary.bytes = 0;
     wasm_binary.size = 0U;
 
     log_phase("queue API WASM test start");
     log_info("WASM file path: build/queue_api.wasm");
+
+    status = os_host_import_register("env", "os_queue_create", "i(ii)", smoke_os_queue_create);
+    if (status != OS_STATUS_OK && status != OS_STATUS_INVALID_ARGUMENT)
+    {
+        return fail_test("queue API WASM os_queue_create import registration failed", code_base);
+    }
+
+    status = os_host_import_register("env", "os_queue_delete", "i(i)", smoke_os_queue_delete);
+    if (status != OS_STATUS_OK && status != OS_STATUS_INVALID_ARGUMENT)
+    {
+        return fail_test("queue API WASM os_queue_delete import registration failed", code_base);
+    }
 
     no_task_status = verify_no_tasks(code_base);
     if (no_task_status != 0)
@@ -1609,6 +1666,7 @@ static int run_queue_api_wasm_test(int code_base)
         log_fail("WASM file load failure path=build/queue_api.wasm");
         return fail_test("queue_api.wasm missing or unreadable for queue API WASM test", TEST_FAILURE_MISSING_WASM);
     }
+    log_pass("WASM file load success path=build/queue_api.wasm");
 
     status = os_task_create(&task, wasm_binary.bytes, wasm_binary.size, "app_main", "queue_api_task", TEST_WASM_STACK_SIZE, OS_TASK_PRIORITY_NORMAL);
     if (status != OS_STATUS_OK || task == 0)
@@ -1636,21 +1694,45 @@ static int run_queue_api_wasm_test(int code_base)
         return fail_test("queue API WASM initial expectations failed", code_base + 2);
     }
 
-    status = os_schedule();
+    for (iteration = 0U; iteration < TEST_MAX_SCHEDULE_ITERATIONS; ++iteration)
+    {
+        status = os_schedule();
+        iterations_used = iteration + 1U;
+        if (status == OS_STATUS_WASM_ERROR || os_task_get_state(task) == OS_TASK_DEAD)
+        {
+            break;
+        }
+        if (status != OS_STATUS_OK)
+        {
+            break;
+        }
+    }
+    task_dead = os_task_get_state(task) == OS_TASK_DEAD;
     log_exit_metadata_task_snapshot("queue API WASM after schedule", task);
-    if (status != OS_STATUS_OK || os_task_get_state(task) != OS_TASK_DEAD ||
+    if (status != OS_STATUS_OK || !task_dead ||
         os_task_get_run_count(task) != 1U ||
         os_task_get_exit_reason(task) != OS_TASK_EXIT_RETURNED ||
         os_task_get_exit_code(task) != 0U || os_get_task_count() != 0U ||
         os_get_ready_task_count() != 0U || os_get_waiting_task_count() != 0U ||
         os_task_get_current() != 0 || os_get_last_error_status() == OS_STATUS_WASM_ERROR)
     {
+        if (os_task_get_exit_code(task) != 0U)
+        {
+            char message[TEST_MESSAGE_BUFFER_SIZE];
+            format_message(message, TEST_MESSAGE_BUFFER_SIZE, "queue API WASM task returned non-zero exit code=%u", os_task_get_exit_code(task));
+            log_fail(message);
+        }
         if (status == OS_STATUS_WASM_ERROR || os_get_last_error_status() == OS_STATUS_WASM_ERROR)
         {
             log_last_os_error("queue API WASM after schedule");
         }
         free_binary(&wasm_binary);
         return fail_test("queue API WASM after schedule expectations failed", code_base + 3);
+    }
+    {
+        char message[TEST_MESSAGE_BUFFER_SIZE];
+        format_message(message, TEST_MESSAGE_BUFFER_SIZE, "queue API WASM scheduler iterations used=%u", iterations_used);
+        log_info(message);
     }
 
     status = os_schedule();

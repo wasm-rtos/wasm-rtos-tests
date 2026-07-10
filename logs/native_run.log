@@ -1,5 +1,4 @@
-Smoke test failure: queue API WASM task creation failed (code 761)
-Smoke test FAIL. 1 failure(s). Log written to logs/smoke_test.log
+Smoke test PASS. Log written to logs/smoke_test.log
 ----- logs/smoke_test.log -----
 PHASE smoke test start
 INFO hal_init called
@@ -197,10 +196,18 @@ INFO WASM file path: build/queue_api.wasm
 PHASE empty OS checks start code_base=760
 INFO empty OS checks task counters: tasks=0 ready=0 waiting=0 current=null
 PASS empty OS checks pass
-INFO queue API WASM create last OS error: status=OS_STATUS_WASM_ERROR phase=link_imports result=function signature mismatch task=queue_api_task
-FAIL queue API WASM task creation failed code=761
-INFO failure task counters: tasks=0 ready=0 waiting=0 current=null
-FAIL wasm test failed with code=761; continuing
+PASS WASM file load success path=build/queue_api.wasm
+INFO queue API WASM before schedule task=queue_api_task state=OS_TASK_READY run_count=0 exit_reason=OS_TASK_EXIT_NONE exit_code=0
+INFO queue API WASM before schedule task counters: tasks=1 ready=1 waiting=0 current=null
+INFO queue API WASM before schedule last OS error: status=OS_STATUS_OK phase=none result=null task=null
+INFO queue API WASM after schedule task=queue_api_task state=OS_TASK_DEAD run_count=1 exit_reason=OS_TASK_EXIT_RETURNED exit_code=0
+INFO queue API WASM after schedule task counters: tasks=0 ready=0 waiting=0 current=null
+INFO queue API WASM after schedule last OS error: status=OS_STATUS_OK phase=none result=null task=null
+INFO queue API WASM scheduler iterations used=1
+PHASE empty OS checks start code_base=766
+INFO empty OS checks task counters: tasks=0 ready=0 waiting=0 current=null
+PASS empty OS checks pass
+PASS queue API WASM test final PASS
 PHASE WASM entry return values test start
 INFO WASM file path: build/return_values.wasm
 PHASE empty OS checks start code_base=700
@@ -938,5 +945,5 @@ PASS task deletion state coverage long-running READY-after-slice scenario PASS
 INFO task deletion state coverage final counters task counters: tasks=0 ready=0 waiting=0 current=null
 PASS task deletion state coverage final PASS
 INFO final task counters: tasks=0 ready=0 waiting=0 current=null
-FAIL smoke test final FAIL failure_count=1 first_failure_code=761
+PASS smoke test final PASS
 ----- end logs/smoke_test.log -----
