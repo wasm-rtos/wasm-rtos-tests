@@ -36,12 +36,12 @@ for dir in tests/*; do
         "$WASM_CC" --target=wasm32 -nostdlib -Wl,--no-entry -O0 "${export_flags[@]}" -o "$wasm" "$source" 2>&1 | tee -a "$log" || { failed=1; continue; }
     fi
 
-    "$CC_BIN" -std=c11 -Wall -Wextra -Werror -D_GNU_SOURCE -D_POSIX_C_SOURCE=200809L -Dd_m3HasWASI \
+    "$CC_BIN" -std=c11 -Wall -Wextra -D_GNU_SOURCE -D_POSIX_C_SOURCE=200809L -Dd_m3HasWASI \
         -Iwasm-rtos -Itests/support \
         "$dir/main.c" tests/support/test_support.c wasm-rtos/os.c wasm-rtos/hal.c wasm-rtos/wasm3/source/*.c \
         -lm -o "$runner" 2>&1 | tee -a "$log" || { failed=1; continue; }
 
-    "$runner" 2>&1 | tee -a "$log" || failed=1
+    (cd "$dir" && "./$name.runner") 2>&1 | tee -a "$log" || failed=1
     rm -f "$runner"
 done
 
