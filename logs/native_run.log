@@ -1,4 +1,5 @@
-Smoke test PASS. Log written to logs/smoke_test.log
+Smoke test failure: queue API WASM task creation failed (code 761)
+Smoke test FAIL. 1 failure(s). Log written to logs/smoke_test.log
 ----- logs/smoke_test.log -----
 PHASE smoke test start
 INFO hal_init called
@@ -191,6 +192,15 @@ PHASE empty OS checks start code_base=114
 INFO empty OS checks task counters: tasks=0 ready=0 waiting=0 current=null
 PASS empty OS checks pass
 PASS WASM entry return code test final PASS
+PHASE queue API WASM test start
+INFO WASM file path: build/queue_api.wasm
+PHASE empty OS checks start code_base=760
+INFO empty OS checks task counters: tasks=0 ready=0 waiting=0 current=null
+PASS empty OS checks pass
+INFO queue API WASM create last OS error: status=OS_STATUS_WASM_ERROR phase=link_imports result=function signature mismatch task=queue_api_task
+FAIL queue API WASM task creation failed code=761
+INFO failure task counters: tasks=0 ready=0 waiting=0 current=null
+FAIL wasm test failed with code=761; continuing
 PHASE WASM entry return values test start
 INFO WASM file path: build/return_values.wasm
 PHASE empty OS checks start code_base=700
@@ -928,5 +938,5 @@ PASS task deletion state coverage long-running READY-after-slice scenario PASS
 INFO task deletion state coverage final counters task counters: tasks=0 ready=0 waiting=0 current=null
 PASS task deletion state coverage final PASS
 INFO final task counters: tasks=0 ready=0 waiting=0 current=null
-PASS smoke test final PASS
+FAIL smoke test final FAIL failure_count=1 first_failure_code=761
 ----- end logs/smoke_test.log -----

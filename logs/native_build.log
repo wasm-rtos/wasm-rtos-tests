@@ -1,5 +1,5 @@
-wasm-rtos/os.c:1949:13: warning: ‘os_mark_current_task_exiting’ defined but not used [-Wunused-function]
- 1949 | static void os_mark_current_task_exiting(uint32_t exit_code)
+wasm-rtos/os.c:2461:13: warning: ‘os_mark_current_task_exiting’ defined but not used [-Wunused-function]
+ 2461 | static void os_mark_current_task_exiting(uint32_t exit_code)
       |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
 In file included from wasm-rtos/wasm3/source/m3_core.h:17,
                  from wasm-rtos/wasm3/source/m3_api_libc.h:11,

@@ -5,6 +5,7 @@ build/delay_once.wasm
 build/empty_start.wasm
 build/entry_args_mixed_scalar.wasm
 build/get_time_once.wasm
+build/queue_api.wasm
 build/return_code.wasm
 build/return_values.wasm
 build/simple_loop.wasm

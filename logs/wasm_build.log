@@ -10,6 +10,8 @@ status=0 source=tests/empty_start.c
 status=0 source=tests/entry_args_mixed_scalar.c
 + clang --target=wasm32 -nostdlib -Wl,--no-entry -O0 -Wl,--export=app_main -o build/get_time_once.wasm tests/get_time_once.c
 status=0 source=tests/get_time_once.c
++ clang --target=wasm32 -nostdlib -Wl,--no-entry -O0 -Wl,--export=app_main -o build/queue_api.wasm tests/queue_api.c
+status=0 source=tests/queue_api.c
 + clang --target=wasm32 -nostdlib -Wl,--no-entry -O0 -Wl,--export=app_main -o build/return_code.wasm tests/return_code.c
 status=0 source=tests/return_code.c
 + clang --target=wasm32 -nostdlib -Wl,--no-entry -O0 -Wl,--export=app_main_f32 -Wl,--export=app_main_f64 -Wl,--export=app_main_i32 -Wl,--export=app_main_i64 -o build/return_values.wasm tests/return_values.c
