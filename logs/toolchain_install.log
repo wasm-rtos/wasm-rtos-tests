@@ -1,16 +1,16 @@
 + sudo apt-get update
 Get:1 file:/etc/apt/apt-mirrors.txt Mirrorlist [144 B]
-Hit:2 http://azure.archive.ubuntu.com/ubuntu noble InRelease
 Get:6 https://packages.microsoft.com/repos/azure-cli noble InRelease [3564 B]
 Get:7 https://packages.microsoft.com/ubuntu/24.04/prod noble InRelease [3600 B]
+Hit:2 http://azure.archive.ubuntu.com/ubuntu noble InRelease
 Get:3 http://azure.archive.ubuntu.com/ubuntu noble-updates InRelease [126 kB]
 Get:4 http://azure.archive.ubuntu.com/ubuntu noble-backports InRelease [126 kB]
 Get:5 http://azure.archive.ubuntu.com/ubuntu noble-security InRelease [126 kB]
 Get:8 https://dl.google.com/linux/chrome-stable/deb stable InRelease [1825 B]
 Get:9 https://packages.microsoft.com/repos/azure-cli noble/main amd64 Packages [2314 B]
-Get:10 https://packages.microsoft.com/ubuntu/24.04/prod noble/main arm64 Packages [175 kB]
+Get:10 https://packages.microsoft.com/ubuntu/24.04/prod noble/main armhf Packages [11.7 kB]
 Get:11 https://packages.microsoft.com/ubuntu/24.04/prod noble/main amd64 Packages [208 kB]
-Get:12 https://packages.microsoft.com/ubuntu/24.04/prod noble/main armhf Packages [11.7 kB]
+Get:12 https://packages.microsoft.com/ubuntu/24.04/prod noble/main arm64 Packages [175 kB]
 Get:13 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 Packages [1092 kB]
 Get:14 http://azure.archive.ubuntu.com/ubuntu noble-updates/main Translation-en [269 kB]
 Get:15 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 Components [181 kB]
@@ -31,7 +31,7 @@ Get:29 http://azure.archive.ubuntu.com/ubuntu noble-security/universe Translatio
 Get:30 http://azure.archive.ubuntu.com/ubuntu noble-security/universe amd64 Components [76.3 kB]
 Get:31 http://azure.archive.ubuntu.com/ubuntu noble-security/universe amd64 c-n-f Metadata [24.2 kB]
 Get:32 https://dl.google.com/linux/chrome-stable/deb stable/main amd64 Packages [1218 B]
-Fetched 8797 kB in 1s (7169 kB/s)
+Fetched 8797 kB in 1s (7789 kB/s)
 Reading package lists...
 apt_get_update_status=0
 + sudo apt-get install -y clang lld wasi-libc libclang-rt-dev-wasm32
@@ -51,7 +51,7 @@ Get:3 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe amd64 libcla
 Get:4 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 libclang-rt-dev-wasm32 amd64 1:18.0-59~exp2 [5304 B]
 Get:5 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 lld amd64 1:18.0-59~exp2 [5494 B]
 Get:6 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 wasi-libc all 0.0~git20230113.4362b18-3 [980 kB]
-Fetched 1082 kB in 0s (3745 kB/s)
+Fetched 1082 kB in 1s (1339 kB/s)
 Selecting previously unselected package clang.
 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 202701 files and directories currently installed.)
 Preparing to unpack .../clang_1%3a18.0-59~exp2_amd64.deb ...
