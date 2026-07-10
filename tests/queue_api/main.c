@@ -87,7 +87,7 @@ int main(void)
     OsTaskHandle task = NULL;
     uint32_t iteration;
 
-    log_file = fopen("queue_api.log", "a");
+    log_file = fopen("queue_api.log", "w");
     hal_init();
     expect(os_init() == OS_STATUS_OK, "initialize OS");
     expect(os_host_import_register("env", "os_queue_create", "i(ii)", queue_create_import) == OS_STATUS_OK,
