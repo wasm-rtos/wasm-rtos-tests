@@ -1,37 +1,37 @@
 + sudo apt-get update
 Get:1 file:/etc/apt/apt-mirrors.txt Mirrorlist [144 B]
 Hit:2 http://azure.archive.ubuntu.com/ubuntu noble InRelease
-Get:6 https://dl.google.com/linux/chrome-stable/deb stable InRelease [1825 B]
+Get:6 https://packages.microsoft.com/repos/azure-cli noble InRelease [3564 B]
+Get:7 https://packages.microsoft.com/ubuntu/24.04/prod noble InRelease [3600 B]
 Get:3 http://azure.archive.ubuntu.com/ubuntu noble-updates InRelease [126 kB]
 Get:4 http://azure.archive.ubuntu.com/ubuntu noble-backports InRelease [126 kB]
 Get:5 http://azure.archive.ubuntu.com/ubuntu noble-security InRelease [126 kB]
-Get:7 https://packages.microsoft.com/repos/azure-cli noble InRelease [3564 B]
-Get:8 https://packages.microsoft.com/ubuntu/24.04/prod noble InRelease [3600 B]
-Get:9 https://dl.google.com/linux/chrome-stable/deb stable/main amd64 Packages [1218 B]
-Get:10 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 Packages [1092 kB]
-Get:11 http://azure.archive.ubuntu.com/ubuntu noble-updates/main Translation-en [269 kB]
-Get:12 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 Components [181 kB]
-Get:13 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe amd64 Packages [1660 kB]
-Get:14 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe Translation-en [327 kB]
-Get:15 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe amd64 Components [388 kB]
-Get:16 http://azure.archive.ubuntu.com/ubuntu noble-updates/restricted amd64 Packages [1225 kB]
-Get:17 http://azure.archive.ubuntu.com/ubuntu noble-updates/restricted Translation-en [276 kB]
-Get:18 http://azure.archive.ubuntu.com/ubuntu noble-updates/multiverse amd64 Components [940 B]
-Get:19 http://azure.archive.ubuntu.com/ubuntu noble-backports/main amd64 Components [5740 B]
-Get:20 http://azure.archive.ubuntu.com/ubuntu noble-backports/universe amd64 Components [10.6 kB]
-Get:21 http://azure.archive.ubuntu.com/ubuntu noble-security/main amd64 Packages [827 kB]
-Get:22 http://azure.archive.ubuntu.com/ubuntu noble-security/main Translation-en [187 kB]
-Get:23 http://azure.archive.ubuntu.com/ubuntu noble-security/main amd64 Components [44.8 kB]
-Get:24 http://azure.archive.ubuntu.com/ubuntu noble-security/main amd64 c-n-f Metadata [11.9 kB]
-Get:25 http://azure.archive.ubuntu.com/ubuntu noble-security/universe amd64 Packages [1174 kB]
-Get:26 http://azure.archive.ubuntu.com/ubuntu noble-security/universe Translation-en [231 kB]
-Get:27 http://azure.archive.ubuntu.com/ubuntu noble-security/universe amd64 Components [76.3 kB]
-Get:28 http://azure.archive.ubuntu.com/ubuntu noble-security/universe amd64 c-n-f Metadata [24.2 kB]
-Get:29 https://packages.microsoft.com/repos/azure-cli noble/main amd64 Packages [2314 B]
-Get:30 https://packages.microsoft.com/ubuntu/24.04/prod noble/main arm64 Packages [175 kB]
-Get:31 https://packages.microsoft.com/ubuntu/24.04/prod noble/main armhf Packages [11.7 kB]
-Get:32 https://packages.microsoft.com/ubuntu/24.04/prod noble/main amd64 Packages [208 kB]
-Fetched 8797 kB in 1s (8225 kB/s)
+Get:8 https://dl.google.com/linux/chrome-stable/deb stable InRelease [1825 B]
+Get:9 https://packages.microsoft.com/repos/azure-cli noble/main amd64 Packages [2314 B]
+Get:10 https://packages.microsoft.com/ubuntu/24.04/prod noble/main arm64 Packages [175 kB]
+Get:11 https://packages.microsoft.com/ubuntu/24.04/prod noble/main amd64 Packages [208 kB]
+Get:12 https://packages.microsoft.com/ubuntu/24.04/prod noble/main armhf Packages [11.7 kB]
+Get:13 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 Packages [1092 kB]
+Get:14 http://azure.archive.ubuntu.com/ubuntu noble-updates/main Translation-en [269 kB]
+Get:15 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 Components [181 kB]
+Get:16 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe amd64 Packages [1660 kB]
+Get:17 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe Translation-en [327 kB]
+Get:18 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe amd64 Components [388 kB]
+Get:19 http://azure.archive.ubuntu.com/ubuntu noble-updates/restricted amd64 Packages [1225 kB]
+Get:20 http://azure.archive.ubuntu.com/ubuntu noble-updates/restricted Translation-en [276 kB]
+Get:21 http://azure.archive.ubuntu.com/ubuntu noble-updates/multiverse amd64 Components [940 B]
+Get:22 http://azure.archive.ubuntu.com/ubuntu noble-backports/main amd64 Components [5740 B]
+Get:23 http://azure.archive.ubuntu.com/ubuntu noble-backports/universe amd64 Components [10.6 kB]
+Get:24 http://azure.archive.ubuntu.com/ubuntu noble-security/main amd64 Packages [827 kB]
+Get:25 http://azure.archive.ubuntu.com/ubuntu noble-security/main Translation-en [187 kB]
+Get:26 http://azure.archive.ubuntu.com/ubuntu noble-security/main amd64 Components [44.8 kB]
+Get:27 http://azure.archive.ubuntu.com/ubuntu noble-security/main amd64 c-n-f Metadata [11.9 kB]
+Get:28 http://azure.archive.ubuntu.com/ubuntu noble-security/universe amd64 Packages [1174 kB]
+Get:29 http://azure.archive.ubuntu.com/ubuntu noble-security/universe Translation-en [231 kB]
+Get:30 http://azure.archive.ubuntu.com/ubuntu noble-security/universe amd64 Components [76.3 kB]
+Get:31 http://azure.archive.ubuntu.com/ubuntu noble-security/universe amd64 c-n-f Metadata [24.2 kB]
+Get:32 https://dl.google.com/linux/chrome-stable/deb stable/main amd64 Packages [1218 B]
+Fetched 8797 kB in 1s (7169 kB/s)
 Reading package lists...
 apt_get_update_status=0
 + sudo apt-get install -y clang lld wasi-libc libclang-rt-dev-wasm32
@@ -51,7 +51,7 @@ Get:3 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe amd64 libcla
 Get:4 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 libclang-rt-dev-wasm32 amd64 1:18.0-59~exp2 [5304 B]
 Get:5 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 lld amd64 1:18.0-59~exp2 [5494 B]
 Get:6 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 wasi-libc all 0.0~git20230113.4362b18-3 [980 kB]
-Fetched 1082 kB in 0s (3117 kB/s)
+Fetched 1082 kB in 0s (3745 kB/s)
 Selecting previously unselected package clang.
 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 202701 files and directories currently installed.)
 Preparing to unpack .../clang_1%3a18.0-59~exp2_amd64.deb ...
