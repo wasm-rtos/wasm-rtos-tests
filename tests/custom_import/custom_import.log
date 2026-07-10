@@ -1,0 +1,22 @@
+START custom_import
+PASS register custom host import
+WASM bytes=342
+PASS link task against custom import
+scheduler iterations=1
+PASS custom-import task reaches DEAD
+PASS custom-import task returned normally
+PASS custom import returned expected value
+PASS delete custom-import task
+PASS clean OS state
+PASS custom_import
+START custom_import
+PASS register custom host import
+WASM bytes=342
+PASS link task against custom import
+scheduler iterations=1
+PASS custom-import task reaches DEAD
+PASS custom-import task returned normally
+PASS custom import returned expected value
+PASS delete custom-import task
+PASS clean OS state
+PASS custom_import

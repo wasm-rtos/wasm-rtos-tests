@@ -1,0 +1,20 @@
+START return_code
+WASM bytes=235
+PASS create task
+scheduler iterations=1
+PASS task reaches DEAD
+PASS exit reason is RETURNED
+PASS entry return code is preserved
+PASS delete completed task
+PASS clean OS state
+PASS return_code
+START return_code
+WASM bytes=235
+PASS create task
+scheduler iterations=1
+PASS task reaches DEAD
+PASS exit reason is RETURNED
+PASS entry return code is preserved
+PASS delete completed task
+PASS clean OS state
+PASS return_code

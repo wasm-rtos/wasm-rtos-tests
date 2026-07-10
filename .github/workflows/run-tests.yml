@@ -1,0 +1,47 @@
+name: Run isolated WASM tests
+
+permissions:
+  contents: read
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "tests/**"
+      - "run-tests.sh"
+      - "wasm-rtos"
+      - ".gitmodules"
+      - ".github/workflows/run-tests.yml"
+  pull_request:
+    paths:
+      - "tests/**"
+      - "run-tests.sh"
+      - "wasm-rtos"
+      - ".gitmodules"
+      - ".github/workflows/run-tests.yml"
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang lld wasi-libc libclang-rt-dev-wasm32
+
+      - name: Build and run every isolated test
+        run: bash ./run-tests.sh
+
+      - name: Upload generated WASM files and logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: isolated-tests
+          path: tests/
+          if-no-files-found: error

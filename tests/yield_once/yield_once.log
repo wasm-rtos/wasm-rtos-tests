@@ -1,0 +1,26 @@
+START yield_once
+WASM bytes=349
+PASS create task
+PASS run until yield
+PASS yield returns task to READY
+PASS yield consumed one scheduler slice
+scheduler iterations=1
+PASS resume task after yield
+PASS task returned normally
+PASS task returned zero
+PASS delete completed task
+PASS clean OS state
+PASS yield_once
+START yield_once
+WASM bytes=349
+PASS create task
+PASS run until yield
+PASS yield returns task to READY
+PASS yield consumed one scheduler slice
+scheduler iterations=1
+PASS resume task after yield
+PASS task returned normally
+PASS task returned zero
+PASS delete completed task
+PASS clean OS state
+PASS yield_once

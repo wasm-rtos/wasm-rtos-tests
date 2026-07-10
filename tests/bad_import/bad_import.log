@@ -1,0 +1,20 @@
+START bad_import
+WASM bytes=289
+PASS task creation reports WASM error
+PASS failed creation returns null task
+PASS diagnostic status is WASM error
+PASS diagnostic phase is recorded
+PASS diagnostic result is recorded
+PASS failed task was not inserted
+PASS clean OS state
+PASS bad_import
+START bad_import
+WASM bytes=289
+PASS task creation reports WASM error
+PASS failed creation returns null task
+PASS diagnostic status is WASM error
+PASS diagnostic phase is recorded
+PASS diagnostic result is recorded
+PASS failed task was not inserted
+PASS clean OS state
+PASS bad_import

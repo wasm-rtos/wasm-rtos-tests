@@ -1,0 +1,20 @@
+START entry_args_mixed_scalar
+WASM bytes=488
+PASS create task with mixed scalar arguments
+scheduler iterations=1
+PASS task with arguments reaches DEAD
+PASS task returned normally
+PASS arguments arrived in correct order and type
+PASS delete argument task
+PASS clean OS state
+PASS entry_args_mixed_scalar
+START entry_args_mixed_scalar
+WASM bytes=488
+PASS create task with mixed scalar arguments
+scheduler iterations=1
+PASS task with arguments reaches DEAD
+PASS task returned normally
+PASS arguments arrived in correct order and type
+PASS delete argument task
+PASS clean OS state
+PASS entry_args_mixed_scalar

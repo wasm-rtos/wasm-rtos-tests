@@ -1,3 +1,4 @@
+=== snapshot_delay ===
 wasm-rtos/os.c:2461:13: warning: ‘os_mark_current_task_exiting’ defined but not used [-Wunused-function]
  2461 | static void os_mark_current_task_exiting(uint32_t exit_code)
       |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -925,3 +926,6 @@ wasm-rtos/wasm3/source/m3_parse.c: In function ‘ParseSection_Code’:
 wasm-rtos/wasm3/source/m3_parse.c:366:24: warning: unused variable ‘ptr’ [-Wunused-variable]
   366 |             const u8 * ptr = i_bytes;
       |                        ^~~
+/usr/bin/ld: /tmp/ccqvlQvt.o: in function `main':
+main.c:(.text+0x9): undefined reference to `test_runner_main'
+collect2: error: ld returned 1 exit status

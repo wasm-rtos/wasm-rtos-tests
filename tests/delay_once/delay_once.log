@@ -1,0 +1,32 @@
+START delay_once
+WASM bytes=365
+PASS create task
+PASS run until delay
+PASS delay places task in WAITING
+PASS waiting counter increments
+PASS task stays waiting before deadline
+PASS task becomes ready at deadline
+PASS waiting counter clears at deadline
+scheduler iterations=1
+PASS resume delayed task
+PASS task returned normally
+PASS task returned zero
+PASS delete completed task
+PASS clean OS state
+PASS delay_once
+START delay_once
+WASM bytes=365
+PASS create task
+PASS run until delay
+PASS delay places task in WAITING
+PASS waiting counter increments
+PASS task stays waiting before deadline
+PASS task becomes ready at deadline
+PASS waiting counter clears at deadline
+scheduler iterations=1
+PASS resume delayed task
+PASS task returned normally
+PASS task returned zero
+PASS delete completed task
+PASS clean OS state
+PASS delay_once

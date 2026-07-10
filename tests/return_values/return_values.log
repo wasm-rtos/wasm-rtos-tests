@@ -1,0 +1,64 @@
+START return_values
+WASM bytes=401
+PASS create typed return task
+scheduler iterations=1
+PASS typed return task reaches DEAD
+PASS read return value
+PASS return value type matches export
+PASS i32 return value
+PASS delete typed return task
+PASS create typed return task
+scheduler iterations=1
+PASS typed return task reaches DEAD
+PASS read return value
+PASS return value type matches export
+PASS i64 return value
+PASS delete typed return task
+PASS create typed return task
+scheduler iterations=1
+PASS typed return task reaches DEAD
+PASS read return value
+PASS return value type matches export
+PASS f32 return value
+PASS delete typed return task
+PASS create typed return task
+scheduler iterations=1
+PASS typed return task reaches DEAD
+PASS read return value
+PASS return value type matches export
+PASS f64 return value
+PASS delete typed return task
+PASS clean OS state
+PASS return_values
+START return_values
+WASM bytes=401
+PASS create typed return task
+scheduler iterations=1
+PASS typed return task reaches DEAD
+PASS read return value
+PASS return value type matches export
+PASS i32 return value
+PASS delete typed return task
+PASS create typed return task
+scheduler iterations=1
+PASS typed return task reaches DEAD
+PASS read return value
+PASS return value type matches export
+PASS i64 return value
+PASS delete typed return task
+PASS create typed return task
+scheduler iterations=1
+PASS typed return task reaches DEAD
+PASS read return value
+PASS return value type matches export
+PASS f32 return value
+PASS delete typed return task
+PASS create typed return task
+scheduler iterations=1
+PASS typed return task reaches DEAD
+PASS read return value
+PASS return value type matches export
+PASS f64 return value
+PASS delete typed return task
+PASS clean OS state
+PASS return_values

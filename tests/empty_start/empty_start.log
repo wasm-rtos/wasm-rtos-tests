@@ -1,0 +1,24 @@
+START empty_start
+WASM bytes=226
+PASS create empty task
+PASS task starts READY
+PASS schedule empty task
+PASS task becomes DEAD
+PASS exit reason is RETURNED
+PASS exit code is zero
+PASS task ran once
+PASS delete empty task
+PASS clean OS state
+PASS empty_start
+START empty_start
+WASM bytes=226
+PASS create empty task
+PASS task starts READY
+PASS schedule empty task
+PASS task becomes DEAD
+PASS exit reason is RETURNED
+PASS exit code is zero
+PASS task ran once
+PASS delete empty task
+PASS clean OS state
+PASS empty_start
