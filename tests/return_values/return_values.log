@@ -1,64 +1,27 @@
-START return_values
-WASM bytes=401
+PASS initialize OS
+PASS load return_values.wasm
 PASS create typed return task
-scheduler iterations=1
 PASS typed return task reaches DEAD
 PASS read return value
-PASS return value type matches export
-PASS i32 return value
-PASS delete typed return task
+PASS return type matches
+PASS i32 value
+PASS delete task
 PASS create typed return task
-scheduler iterations=1
 PASS typed return task reaches DEAD
 PASS read return value
-PASS return value type matches export
-PASS i64 return value
-PASS delete typed return task
+PASS return type matches
+PASS i64 value
+PASS delete task
 PASS create typed return task
-scheduler iterations=1
 PASS typed return task reaches DEAD
 PASS read return value
-PASS return value type matches export
-PASS f32 return value
-PASS delete typed return task
+PASS return type matches
+PASS f32 value
+PASS delete task
 PASS create typed return task
-scheduler iterations=1
 PASS typed return task reaches DEAD
 PASS read return value
-PASS return value type matches export
-PASS f64 return value
-PASS delete typed return task
-PASS clean OS state
-PASS return_values
-START return_values
-WASM bytes=401
-PASS create typed return task
-scheduler iterations=1
-PASS typed return task reaches DEAD
-PASS read return value
-PASS return value type matches export
-PASS i32 return value
-PASS delete typed return task
-PASS create typed return task
-scheduler iterations=1
-PASS typed return task reaches DEAD
-PASS read return value
-PASS return value type matches export
-PASS i64 return value
-PASS delete typed return task
-PASS create typed return task
-scheduler iterations=1
-PASS typed return task reaches DEAD
-PASS read return value
-PASS return value type matches export
-PASS f32 return value
-PASS delete typed return task
-PASS create typed return task
-scheduler iterations=1
-PASS typed return task reaches DEAD
-PASS read return value
-PASS return value type matches export
-PASS f64 return value
-PASS delete typed return task
-PASS clean OS state
-PASS return_values
+PASS return type matches
+PASS f64 value
+PASS delete task
+PASS OS is clean
