@@ -56,7 +56,7 @@ int main(void)
     Binary binary = {0};
     OsTaskHandle task = NULL;
     uint32_t i;
-    log_file = fopen("return_code.log", "a");
+    log_file = fopen("return_code.log", "w");
     hal_init();
     expect(os_init() == OS_STATUS_OK, "initialize OS");
     expect(load(&binary), "load return_code.wasm");
