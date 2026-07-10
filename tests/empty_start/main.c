@@ -51,11 +51,11 @@ static int load_wasm(WasmBinary* binary)
     binary->bytes = NULL;
     binary->size = 0U;
 
-    if (file == NULL || fseek(file, 0L, SEEK_END) != 0 ||
-        (size = ftell(file)) <= 0L || (unsigned long)size > 0xFFFFFFFFUL ||
-        fseek(file, 0L, SEEK_SET) != 0)
+    if (file == NULL || fseek(file, 0L, SEEK_END) != 0 || (size = ftell(file)) <= 0L ||
+        (unsigned long)size > 0xFFFFFFFFUL || fseek(file, 0L, SEEK_SET) != 0)
     {
-        if (file != NULL) fclose(file);
+        if (file != NULL)
+            fclose(file);
         expect(0, "open empty_start.wasm");
         return 0;
     }
@@ -92,15 +92,8 @@ int main(void)
 
     if (load_wasm(&wasm))
     {
-        status = os_task_create(
-            &task,
-            wasm.bytes,
-            wasm.size,
-            "app_main",
-            "empty_start",
-            64U * 1024U,
-            OS_TASK_PRIORITY_NORMAL
-        );
+        status = os_task_create(&task, wasm.bytes, wasm.size, "app_main", "empty_start", 64U * 1024U,
+                                OS_TASK_PRIORITY_NORMAL);
         expect(status == OS_STATUS_OK && task != NULL, "create empty task");
 
         if (task != NULL)
