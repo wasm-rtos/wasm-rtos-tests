@@ -1,0 +1,23 @@
+name: Run isolated WASM tests
+
+permissions:
+  contents: write
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "tests/**"
+      - "wasm-rtos"
+      - ".gitmodules"
+      - ".github/workflows/run-tests.yml"
+  pull_request:
+    paths:
+      - "tests/**"
+      - "wasm-rtos"
+      - ".gitmodules"
+      - ".github/workflows/run-tests.yml"
+
+jobs:
+  tests:
+   
