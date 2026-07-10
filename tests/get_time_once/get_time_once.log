@@ -1,22 +1,9 @@
-START get_time_once
-PASS host tick advanced to expected value
-WASM bytes=329
+PASS initialize OS
+PASS host tick advanced to 1234 ms
+PASS load get_time_once.wasm
 PASS create get-time task
-scheduler iterations=1
-PASS get-time task reaches DEAD
-PASS get-time task returned normally
-PASS guest observed host time 1234 ms
-PASS delete get-time task
-PASS clean OS state
-PASS get_time_once
-START get_time_once
-PASS host tick advanced to expected value
-WASM bytes=329
-PASS create get-time task
-scheduler iterations=1
-PASS get-time task reaches DEAD
-PASS get-time task returned normally
-PASS guest observed host time 1234 ms
-PASS delete get-time task
-PASS clean OS state
-PASS get_time_once
+PASS task reaches DEAD
+PASS task returned normally
+PASS guest observed 1234 ms
+PASS delete task
+PASS OS is clean
