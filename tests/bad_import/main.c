@@ -58,8 +58,8 @@ static int load_wasm(const char* path, WasmBinary* binary)
         return 0;
     }
 
-    if (fseek(file, 0L, SEEK_END) != 0 || (size = ftell(file)) <= 0L ||
-        (unsigned long)size > 0xFFFFFFFFUL || fseek(file, 0L, SEEK_SET) != 0)
+    if (fseek(file, 0L, SEEK_END) != 0 || (size = ftell(file)) <= 0L || (unsigned long)size > 0xFFFFFFFFUL ||
+        fseek(file, 0L, SEEK_SET) != 0)
     {
         fclose(file);
         expect(0, "read bad_import.wasm size");
@@ -100,15 +100,8 @@ int main(void)
 
     if (load_wasm("bad_import.wasm", &wasm))
     {
-        status = os_task_create(
-            &task,
-            wasm.bytes,
-            wasm.size,
-            "app_main",
-            "bad_import",
-            64U * 1024U,
-            OS_TASK_PRIORITY_NORMAL
-        );
+        status = os_task_create(&task, wasm.bytes, wasm.size, "app_main", "bad_import", 64U * 1024U,
+                                OS_TASK_PRIORITY_NORMAL);
 
         phase = os_get_last_error_phase();
         result = os_get_last_error_result();
@@ -123,13 +116,9 @@ int main(void)
         free(wasm.bytes);
     }
 
-    expect(
-        os_get_task_count() == 0U &&
-        os_get_ready_task_count() == 0U &&
-        os_get_waiting_task_count() == 0U &&
-        os_task_get_current() == NULL,
-        "OS remains empty"
-    );
+    expect(os_get_task_count() == 0U && os_get_ready_task_count() == 0U && os_get_waiting_task_count() == 0U &&
+               os_task_get_current() == NULL,
+           "OS remains empty");
 
     log_message("%s bad_import", g_failures == 0 ? "PASS" : "FAIL");
     os_shutdown();
