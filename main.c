@@ -1585,6 +1585,98 @@ static int run_wasm_entry_return_code_test(int code_base)
     return no_task_status;
 }
 
+static int run_queue_api_wasm_test(int code_base)
+{
+    TestBinary wasm_binary;
+    OsTaskHandle task = 0;
+    OsStatus status = OS_STATUS_OK;
+    int no_task_status = 0;
+
+    wasm_binary.bytes = 0;
+    wasm_binary.size = 0U;
+
+    log_phase("queue API WASM test start");
+    log_info("WASM file path: build/queue_api.wasm");
+
+    no_task_status = verify_no_tasks(code_base);
+    if (no_task_status != 0)
+    {
+        return no_task_status;
+    }
+
+    if (!read_binary_file("build/queue_api.wasm", &wasm_binary))
+    {
+        log_fail("WASM file load failure path=build/queue_api.wasm");
+        return fail_test("queue_api.wasm missing or unreadable for queue API WASM test", TEST_FAILURE_MISSING_WASM);
+    }
+
+    status = os_task_create(&task, wasm_binary.bytes, wasm_binary.size, "app_main", "queue_api_task", TEST_WASM_STACK_SIZE, OS_TASK_PRIORITY_NORMAL);
+    if (status != OS_STATUS_OK || task == 0)
+    {
+        if (status == OS_STATUS_WASM_ERROR)
+        {
+            log_last_os_error("queue API WASM create");
+        }
+        free_binary(&wasm_binary);
+        return fail_test("queue API WASM task creation failed", code_base + 1);
+    }
+
+    log_exit_metadata_task_snapshot("queue API WASM before schedule", task);
+    if (os_task_get_state(task) != OS_TASK_READY || os_task_get_run_count(task) != 0U ||
+        os_task_get_exit_reason(task) != OS_TASK_EXIT_NONE || os_task_get_exit_code(task) != 0U ||
+        os_get_task_count() != 1U || os_get_ready_task_count() != 1U ||
+        os_get_waiting_task_count() != 0U || os_task_get_current() != 0 ||
+        os_get_last_error_status() == OS_STATUS_WASM_ERROR)
+    {
+        if (os_get_last_error_status() == OS_STATUS_WASM_ERROR)
+        {
+            log_last_os_error("queue API WASM before schedule");
+        }
+        free_binary(&wasm_binary);
+        return fail_test("queue API WASM initial expectations failed", code_base + 2);
+    }
+
+    status = os_schedule();
+    log_exit_metadata_task_snapshot("queue API WASM after schedule", task);
+    if (status != OS_STATUS_OK || os_task_get_state(task) != OS_TASK_DEAD ||
+        os_task_get_run_count(task) != 1U ||
+        os_task_get_exit_reason(task) != OS_TASK_EXIT_RETURNED ||
+        os_task_get_exit_code(task) != 0U || os_get_task_count() != 0U ||
+        os_get_ready_task_count() != 0U || os_get_waiting_task_count() != 0U ||
+        os_task_get_current() != 0 || os_get_last_error_status() == OS_STATUS_WASM_ERROR)
+    {
+        if (status == OS_STATUS_WASM_ERROR || os_get_last_error_status() == OS_STATUS_WASM_ERROR)
+        {
+            log_last_os_error("queue API WASM after schedule");
+        }
+        free_binary(&wasm_binary);
+        return fail_test("queue API WASM after schedule expectations failed", code_base + 3);
+    }
+
+    status = os_schedule();
+    if (status != OS_STATUS_NO_READY_TASKS)
+    {
+        free_binary(&wasm_binary);
+        return fail_test("queue API WASM post-exit scheduler did not report no ready tasks", code_base + 4);
+    }
+
+    status = os_task_delete(task);
+    if (status != OS_STATUS_OK && status != OS_STATUS_TASK_DEAD)
+    {
+        free_binary(&wasm_binary);
+        return fail_test("queue API WASM cleanup delete failed", code_base + 5);
+    }
+
+    no_task_status = verify_no_tasks(code_base + 6);
+    if (no_task_status == 0)
+    {
+        log_pass("queue API WASM test final PASS");
+    }
+
+    free_binary(&wasm_binary);
+    return no_task_status;
+}
+
 static int run_wasm_entry_return_values_test(int code_base)
 {
     TestBinary wasm_binary;
@@ -5522,6 +5614,9 @@ int main(void)
     record_test_status("wasm test", wasm_test_status, &failure_count, &first_failure_code);
 
     wasm_test_status = run_wasm_entry_return_code_test(108);
+    record_test_status("wasm test", wasm_test_status, &failure_count, &first_failure_code);
+
+    wasm_test_status = run_queue_api_wasm_test(760);
     record_test_status("wasm test", wasm_test_status, &failure_count, &first_failure_code);
 
     wasm_test_status = run_wasm_entry_return_values_test(700);
