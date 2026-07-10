@@ -926,6 +926,6 @@ wasm-rtos/wasm3/source/m3_parse.c: In function ‘ParseSection_Code’:
 wasm-rtos/wasm3/source/m3_parse.c:366:24: warning: unused variable ‘ptr’ [-Wunused-variable]
   366 |             const u8 * ptr = i_bytes;
       |                        ^~~
-/usr/bin/ld: /tmp/ccNxyiY6.o: in function `main':
+/usr/bin/ld: /tmp/ccw81D5W.o: in function `main':
 main.c:(.text+0x9): undefined reference to `test_runner_main'
 collect2: error: ld returned 1 exit status
