@@ -1,2 +1,13 @@
-=== task_id_api ===
-FAIL missing tests/task_id_api/task_id_api.c
+PASS initialize OS
+PASS load task_id_api.wasm
+PASS NULL task id is zero
+PASS create first task
+PASS create second task
+PASS task ids are unique
+PASS task ids are stable
+PASS find tasks by id
+PASS delete first task
+PASS delete second task
+PASS deleted first task id not found
+PASS deleted second task id not found
+PASS clean OS state
