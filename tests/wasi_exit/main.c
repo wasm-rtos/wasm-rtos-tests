@@ -1,7 +1,6 @@
-#define TEST_NAME "wasi_exit"
-#define TEST_KIND TEST_FINITE
-#define TEST_ENTRY "_start"
-#define TEST_EXPECTED_CODE 7U
-#define TEST_EXPECTED_REASON OS_TASK_EXIT_EXPLICIT
-#include "../support/test_runner.h"
-int main(void) { return test_runner_main(); }
+#include "os.h"
+#include "hal.h"
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+typedef struct{uint8_t*d;uint32_t n;}Bin;static FILE*l;static int f;static void ok(int c,const char*s){printf("%s %s\n",c?"PASS":"FAIL",s);if(l){fprintf(l,"%s %s\n",c?"PASS":"FAIL",s);fflush(l);}if(!c)f++;}static int load(Bin*b){FILE*x=fopen("wasi_exit.wasm","rb");long
