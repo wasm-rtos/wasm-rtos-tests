@@ -16,8 +16,4 @@ on:
       - "tests/**"
       - "wasm-rtos"
       - ".gitmodules"
-      - ".github/workflows/run-tests.yml"
-
-jobs:
-  tests:
-   
+      - ".github/workflows/run-tests
