@@ -1,22 +1,11 @@
-START simple_loop
-WASM bytes=375
+PASS initialize OS
+PASS load simple_loop.wasm
 PASS create loop task
-scheduler iterations=3
+PASS run scheduler slice
+PASS run scheduler slice
+PASS run scheduler slice
 PASS finite loop reaches DEAD
 PASS finite loop returned normally
 PASS finite loop returned zero
-PASS scheduler recorded loop execution
 PASS delete loop task
 PASS clean OS state
-PASS simple_loop
-START simple_loop
-WASM bytes=375
-PASS create loop task
-scheduler iterations=3
-PASS finite loop reaches DEAD
-PASS finite loop returned normally
-PASS finite loop returned zero
-PASS scheduler recorded loop execution
-PASS delete loop task
-PASS clean OS state
-PASS simple_loop

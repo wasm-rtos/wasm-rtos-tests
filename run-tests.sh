@@ -28,6 +28,7 @@ for dir in tests/*; do
 
     echo "=== $name ==="
     : > "$build_log"
+    : > "$log"
 
     if [ ! -f "$main" ]; then
         echo "FAIL missing $main" | tee "$log"
