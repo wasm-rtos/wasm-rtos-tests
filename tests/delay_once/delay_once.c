@@ -1,5 +1,4 @@
-__attribute__((import_module("env"), import_name("os_delay_ms")))
-void os_delay_ms(unsigned int delay_ms);
+__attribute__((import_module("env"), import_name("os_delay_ms"))) void os_delay_ms(unsigned int delay_ms);
 
 void app_main(void)
 {
