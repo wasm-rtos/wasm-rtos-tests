@@ -1,5 +1,8 @@
 name: Run isolated WASM tests
 
+permissions:
+  contents: write
+
 on:
   workflow_dispatch:
   push:
@@ -24,6 +27,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
+          fetch-depth: 0
       - name: Install toolchain
         run: |
           sudo apt-get update
@@ -36,3 +40,15 @@ jobs:
         with:
           name: isolated-tests
           path: tests/
+      - name: Commit generated WASM and logs
+        if: github.event_name != 'pull_request' && always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f 'tests/*/*.wasm' 'tests/*/*.log'
+          if git diff --cached --quiet; then
+            echo "No generated test outputs changed."
+          else
+            git commit -m "Update isolated test outputs [skip ci]"
+            git push
+          fi
