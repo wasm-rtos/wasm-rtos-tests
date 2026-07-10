@@ -2,17 +2,16 @@
 
 #define OS_STATUS_OK 0
 #define OS_STATUS_INVALID_ARGUMENT 2
-__attribute__((import_module("env"), import_name("os_queue_create")))
-extern int32_t os_queue_create(uint32_t item_size, uint32_t item_count);
+__attribute__((import_module("env"), import_name("os_queue_create"))) extern int32_t
+os_queue_create(uint32_t item_size, uint32_t item_count);
 
-__attribute__((import_module("env"), import_name("os_queue_send")))
-extern int32_t os_queue_send(int32_t queue, const void* item);
+__attribute__((import_module("env"), import_name("os_queue_send"))) extern int32_t os_queue_send(int32_t queue,
+                                                                                                 const void* item);
 
-__attribute__((import_module("env"), import_name("os_queue_receive")))
-extern int32_t os_queue_receive(int32_t queue, void* item);
+__attribute__((import_module("env"), import_name("os_queue_receive"))) extern int32_t os_queue_receive(int32_t queue,
+                                                                                                       void* item);
 
-__attribute__((import_module("env"), import_name("os_queue_delete")))
-extern int32_t os_queue_delete(int32_t queue);
+__attribute__((import_module("env"), import_name("os_queue_delete"))) extern int32_t os_queue_delete(int32_t queue);
 
 static int items_match(const uint32_t* actual, const uint32_t* expected, uint32_t count)
 {
@@ -31,10 +30,10 @@ static int items_match(const uint32_t* actual, const uint32_t* expected, uint32_
 
 uint32_t app_main(void)
 {
-    const uint32_t first[2] = { 0x12345678U, 0xABCDEF01U };
-    const uint32_t second[2] = { 0x11111111U, 0x22222222U };
-    const uint32_t third[2] = { 0x33333333U, 0x44444444U };
-    uint32_t received[2] = { 0U, 0U };
+    const uint32_t first[2] = {0x12345678U, 0xABCDEF01U};
+    const uint32_t second[2] = {0x11111111U, 0x22222222U};
+    const uint32_t third[2] = {0x33333333U, 0x44444444U};
+    uint32_t received[2] = {0U, 0U};
     int32_t queue = 0;
     int32_t invalid_queue = 0;
     int32_t status = OS_STATUS_OK;
