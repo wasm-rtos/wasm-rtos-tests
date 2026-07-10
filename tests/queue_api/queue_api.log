@@ -1,0 +1,931 @@
+=== queue_api ===
+wasm-rtos/os.c:2461:13: warning: ‘os_mark_current_task_exiting’ defined but not used [-Wunused-function]
+ 2461 | static void os_mark_current_task_exiting(uint32_t exit_code)
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from wasm-rtos/wasm3/source/m3_core.h:17,
+                 from wasm-rtos/wasm3/source/m3_api_libc.h:11,
+                 from wasm-rtos/wasm3/source/m3_api_libc.c:8:
+wasm-rtos/wasm3/source/m3_api_libc.c: In function ‘m3_libc_abort’:
+wasm-rtos/wasm3/source/wasm3.h:386:67: warning: unused parameter ‘runtime’ [-Wunused-parameter]
+  386 | # define m3ApiRawFunction(NAME)     const void * NAME (IM3Runtime runtime, IM3ImportContext _ctx, uint64_t * _sp, void * _mem)
+      |                                                        ~~~~~~~~~~~^~~~~~~
+wasm-rtos/wasm3/source/m3_api_libc.c:20:1: note: in expansion of macro ‘m3ApiRawFunction’
+   20 | m3ApiRawFunction(m3_libc_abort)
+      | ^~~~~~~~~~~~~~~~
+wasm-rtos/wasm3/source/wasm3.h:386:93: warning: unused parameter ‘_ctx’ [-Wunused-parameter]
+  386 | # define m3ApiRawFunction(NAME)     const void * NAME (IM3Runtime runtime, IM3ImportContext _ctx, uint64_t * _sp, void * _mem)
+      |                                                                            ~~~~~~~~~~~~~~~~~^~~~
+wasm-rtos/wasm3/source/m3_api_libc.c:20:1: note: in expansion of macro ‘m3ApiRawFunction’
+   20 | m3ApiRawFunction(m3_libc_abort)
+      | ^~~~~~~~~~~~~~~~
+wasm-rtos/wasm3/source/wasm3.h:386:110: warning: unused parameter ‘_sp’ [-Wunused-parameter]
+  386 | # define m3ApiRawFunction(NAME)     const void * NAME (IM3Runtime runtime, IM3ImportContext _ctx, uint64_t * _sp, void * _mem)
+      |                                                                                                   ~~~~~~~~~~~^~~
+wasm-rtos/wasm3/source/m3_api_libc.c:20:1: note: in expansion of macro ‘m3ApiRawFunction’
+   20 | m3ApiRawFunction(m3_libc_abort)
+      | ^~~~~~~~~~~~~~~~
+wasm-rtos/wasm3/source/wasm3.h:386:122: warning: unused parameter ‘_mem’ [-Wunused-parameter]
+  386 | # define m3ApiRawFunction(NAME)     const void * NAME (IM3Runtime runtime, IM3ImportContext _ctx, uint64_t * _sp, void * _mem)
+      |                                                                                                                   ~~~~~~~^~~~
+wasm-rtos/wasm3/source/m3_api_libc.c:20:1: note: in expansion of macro ‘m3ApiRawFunction’
+   20 | m3ApiRawFunction(m3_libc_abort)
+      | ^~~~~~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_api_libc.c: In function ‘m3_libc_exit’:
+wasm-rtos/wasm3/source/m3_api_libc.c:27:31: warning: unused variable ‘code’ [-Wunused-variable]
+   27 |     m3ApiGetArg     (int32_t, code)
+      |                               ^~~~
+wasm-rtos/wasm3/source/wasm3.h:377:53: note: in definition of macro ‘m3ApiGetArg’
+  377 | # define m3ApiGetArg(TYPE, NAME)               TYPE NAME = \
+      |                                                     ^~~~
+wasm-rtos/wasm3/source/wasm3.h:386:67: warning: unused parameter ‘runtime’ [-Wunused-parameter]
+  386 | # define m3ApiRawFunction(NAME)     const void * NAME (IM3Runtime runtime, IM3ImportContext _ctx, uint64_t * _sp, void * _mem)
+      |                                                        ~~~~~~~~~~~^~~~~~~
+wasm-rtos/wasm3/source/m3_api_libc.c:25:1: note: in expansion of macro ‘m3ApiRawFunction’
+   25 | m3ApiRawFunction(m3_libc_exit)
+      | ^~~~~~~~~~~~~~~~
+wasm-rtos/wasm3/source/wasm3.h:386:93: warning: unused parameter ‘_ctx’ [-Wunused-parameter]
+  386 | # define m3ApiRawFunction(NAME)     const void * NAME (IM3Runtime runtime, IM3ImportContext _ctx, uint64_t * _sp, void * _mem)
+      |                                                                            ~~~~~~~~~~~~~~~~~^~~~
+wasm-rtos/wasm3/source/m3_api_libc.c:25:1: note: in expansion of macro ‘m3ApiRawFunction’
+   25 | m3ApiRawFunction(m3_libc_exit)
+      | ^~~~~~~~~~~~~~~~
+wasm-rtos/wasm3/source/wasm3.h:386:122: warning: unused parameter ‘_mem’ [-Wunused-parameter]
+  386 | # define m3ApiRawFunction(NAME)     const void * NAME (IM3Runtime runtime, IM3ImportContext _ctx, uint64_t * _sp, void * _mem)
+      |                                                                                                                   ~~~~~~~^~~~
+wasm-rtos/wasm3/source/m3_api_libc.c:25:1: note: in expansion of macro ‘m3ApiRawFunction’
+   25 | m3ApiRawFunction(m3_libc_exit)
+      | ^~~~~~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_api_libc.c: In function ‘m3_libc_memset’:
+wasm-rtos/wasm3/source/wasm3.h:386:93: warning: unused parameter ‘_ctx’ [-Wunused-parameter]
+  386 | # define m3ApiRawFunction(NAME)     const void * NAME (IM3Runtime runtime, IM3ImportContext _ctx, uint64_t * _sp, void * _mem)
+      |                                                                            ~~~~~~~~~~~~~~~~~^~~~
+wasm-rtos/wasm3/source/m3_api_libc.c:33:1: note: in expansion of macro ‘m3ApiRawFunction’
+   33 | m3ApiRawFunction(m3_libc_memset)
+      | ^~~~~~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_api_libc.c: In function ‘m3_libc_memmove’:
+wasm-rtos/wasm3/source/wasm3.h:386:93: warning: unused parameter ‘_ctx’ [-Wunused-parameter]
+  386 | # define m3ApiRawFunction(NAME)     const void * NAME (IM3Runtime runtime, IM3ImportContext _ctx, uint64_t * _sp, void * _mem)
+      |                                                                            ~~~~~~~~~~~~~~~~~^~~~
+wasm-rtos/wasm3/source/m3_api_libc.c:47:1: note: in expansion of macro ‘m3ApiRawFunction’
+   47 | m3ApiRawFunction(m3_libc_memmove)
+      | ^~~~~~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_api_libc.c: In function ‘m3_libc_print’:
+wasm-rtos/wasm3/source/wasm3.h:386:93: warning: unused parameter ‘_ctx’ [-Wunused-parameter]
+  386 | # define m3ApiRawFunction(NAME)     const void * NAME (IM3Runtime runtime, IM3ImportContext _ctx, uint64_t * _sp, void * _mem)
+      |                                                                            ~~~~~~~~~~~~~~~~~^~~~
+wasm-rtos/wasm3/source/m3_api_libc.c:62:1: note: in expansion of macro ‘m3ApiRawFunction’
+   62 | m3ApiRawFunction(m3_libc_print)
+      | ^~~~~~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_api_libc.c: In function ‘m3_libc_printf’:
+wasm-rtos/wasm3/source/wasm3.h:386:93: warning: unused parameter ‘_ctx’ [-Wunused-parameter]
+  386 | # define m3ApiRawFunction(NAME)     const void * NAME (IM3Runtime runtime, IM3ImportContext _ctx, uint64_t * _sp, void * _mem)
+      |                                                                            ~~~~~~~~~~~~~~~~~^~~~
+wasm-rtos/wasm3/source/m3_api_libc.c:105:1: note: in expansion of macro ‘m3ApiRawFunction’
+  105 | m3ApiRawFunction(m3_libc_printf)
+      | ^~~~~~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_api_libc.c: In function ‘m3_libc_clock_ms’:
+wasm-rtos/wasm3/source/wasm3.h:386:67: warning: unused parameter ‘runtime’ [-Wunused-parameter]
+  386 | # define m3ApiRawFunction(NAME)     const void * NAME (IM3Runtime runtime, IM3ImportContext _ctx, uint64_t * _sp, void * _mem)
+      |                                                        ~~~~~~~~~~~^~~~~~~
+wasm-rtos/wasm3/source/m3_api_libc.c:177:1: note: in expansion of macro ‘m3ApiRawFunction’
+  177 | m3ApiRawFunction(m3_libc_clock_ms)
+      | ^~~~~~~~~~~~~~~~
+wasm-rtos/wasm3/source/wasm3.h:386:93: warning: unused parameter ‘_ctx’ [-Wunused-parameter]
+  386 | # define m3ApiRawFunction(NAME)     const void * NAME (IM3Runtime runtime, IM3ImportContext _ctx, uint64_t * _sp, void * _mem)
+      |                                                                            ~~~~~~~~~~~~~~~~~^~~~
+wasm-rtos/wasm3/source/m3_api_libc.c:177:1: note: in expansion of macro ‘m3ApiRawFunction’
+  177 | m3ApiRawFunction(m3_libc_clock_ms)
+      | ^~~~~~~~~~~~~~~~
+wasm-rtos/wasm3/source/wasm3.h:386:122: warning: unused parameter ‘_mem’ [-Wunused-parameter]
+  386 | # define m3ApiRawFunction(NAME)     const void * NAME (IM3Runtime runtime, IM3ImportContext _ctx, uint64_t * _sp, void * _mem)
+      |                                                                                                                   ~~~~~~~^~~~
+wasm-rtos/wasm3/source/m3_api_libc.c:177:1: note: in expansion of macro ‘m3ApiRawFunction’
+  177 | m3ApiRawFunction(m3_libc_clock_ms)
+      | ^~~~~~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_api_libc.c: In function ‘m3_spectest_dummy’:
+wasm-rtos/wasm3/source/wasm3.h:386:67: warning: unused parameter ‘runtime’ [-Wunused-parameter]
+  386 | # define m3ApiRawFunction(NAME)     const void * NAME (IM3Runtime runtime, IM3ImportContext _ctx, uint64_t * _sp, void * _mem)
+      |                                                        ~~~~~~~~~~~^~~~~~~
+wasm-rtos/wasm3/source/m3_api_libc.c:201:1: note: in expansion of macro ‘m3ApiRawFunction’
+  201 | m3ApiRawFunction(m3_spectest_dummy)
+      | ^~~~~~~~~~~~~~~~
+wasm-rtos/wasm3/source/wasm3.h:386:93: warning: unused parameter ‘_ctx’ [-Wunused-parameter]
+  386 | # define m3ApiRawFunction(NAME)     const void * NAME (IM3Runtime runtime, IM3ImportContext _ctx, uint64_t * _sp, void * _mem)
+      |                                                                            ~~~~~~~~~~~~~~~~~^~~~
+wasm-rtos/wasm3/source/m3_api_libc.c:201:1: note: in expansion of macro ‘m3ApiRawFunction’
+  201 | m3ApiRawFunction(m3_spectest_dummy)
+      | ^~~~~~~~~~~~~~~~
+wasm-rtos/wasm3/source/wasm3.h:386:110: warning: unused parameter ‘_sp’ [-Wunused-parameter]
+  386 | # define m3ApiRawFunction(NAME)     const void * NAME (IM3Runtime runtime, IM3ImportContext _ctx, uint64_t * _sp, void * _mem)
+      |                                                                                                   ~~~~~~~~~~~^~~
+wasm-rtos/wasm3/source/m3_api_libc.c:201:1: note: in expansion of macro ‘m3ApiRawFunction’
+  201 | m3ApiRawFunction(m3_spectest_dummy)
+      | ^~~~~~~~~~~~~~~~
+wasm-rtos/wasm3/source/wasm3.h:386:122: warning: unused parameter ‘_mem’ [-Wunused-parameter]
+  386 | # define m3ApiRawFunction(NAME)     const void * NAME (IM3Runtime runtime, IM3ImportContext _ctx, uint64_t * _sp, void * _mem)
+      |                                                                                                                   ~~~~~~~^~~~
+wasm-rtos/wasm3/source/m3_api_libc.c:201:1: note: in expansion of macro ‘m3ApiRawFunction’
+  201 | m3ApiRawFunction(m3_spectest_dummy)
+      | ^~~~~~~~~~~~~~~~
+In file included from wasm-rtos/wasm3/source/m3_core.h:17,
+                 from wasm-rtos/wasm3/source/m3_api_wasi.h:11,
+                 from wasm-rtos/wasm3/source/m3_api_wasi.c:8:
+wasm-rtos/wasm3/source/m3_api_wasi.c: In function ‘m3_wasi_generic_environ_get’:
+wasm-rtos/wasm3/source/m3_api_wasi.c:263:46: warning: unused variable ‘env_buf’ [-Wunused-variable]
+  263 |     m3ApiGetArgMem   (char *               , env_buf)
+      |                                              ^~~~~~~
+wasm-rtos/wasm3/source/wasm3.h:381:53: note: in definition of macro ‘m3ApiGetArgMem’
+  381 | # define m3ApiGetArgMem(TYPE, NAME)            TYPE NAME = (TYPE)m3ApiOffsetToPtr(* ((uint32_t *) (_sp++)));
+      |                                                     ^~~~
+wasm-rtos/wasm3/source/m3_api_wasi.c:262:46: warning: unused variable ‘env’ [-Wunused-variable]
+  262 |     m3ApiGetArgMem   (uint32_t *           , env)
+      |                                              ^~~
+wasm-rtos/wasm3/source/wasm3.h:381:53: note: in definition of macro ‘m3ApiGetArgMem’
+  381 | # define m3ApiGetArgMem(TYPE, NAME)            TYPE NAME = (TYPE)m3ApiOffsetToPtr(* ((uint32_t *) (_sp++)));
+      |                                                     ^~~~
+wasm-rtos/wasm3/source/wasm3.h:386:67: warning: unused parameter ‘runtime’ [-Wunused-parameter]
+  386 | # define m3ApiRawFunction(NAME)     const void * NAME (IM3Runtime runtime, IM3ImportContext _ctx, uint64_t * _sp, void * _mem)
+      |                                                        ~~~~~~~~~~~^~~~~~~
+wasm-rtos/wasm3/source/m3_api_wasi.c:259:1: note: in expansion of macro ‘m3ApiRawFunction’
+  259 | m3ApiRawFunction(m3_wasi_generic_environ_get)
+      | ^~~~~~~~~~~~~~~~
+wasm-rtos/wasm3/source/wasm3.h:386:93: warning: unused parameter ‘_ctx’ [-Wunused-parameter]
+  386 | # define m3ApiRawFunction(NAME)     const void * NAME (IM3Runtime runtime, IM3ImportContext _ctx, uint64_t * _sp, void * _mem)
+      |                                                                            ~~~~~~~~~~~~~~~~~^~~~
+wasm-rtos/wasm3/source/m3_api_wasi.c:259:1: note: in expansion of macro ‘m3ApiRawFunction’
+  259 | m3ApiRawFunction(m3_wasi_generic_environ_get)
+      | ^~~~~~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_api_wasi.c: In function ‘m3_wasi_generic_environ_sizes_get’:
+wasm-rtos/wasm3/source/wasm3.h:386:93: warning: unused parameter ‘_ctx’ [-Wunused-parameter]
+  386 | # define m3ApiRawFunction(NAME)     const void * NAME (IM3Runtime runtime, IM3ImportContext _ctx, uint64_t * _sp, void * _mem)
+      |                                                                            ~~~~~~~~~~~~~~~~~^~~~
+wasm-rtos/wasm3/source/m3_api_wasi.c:269:1: note: in expansion of macro ‘m3ApiRawFunction’
+  269 | m3ApiRawFunction(m3_wasi_generic_environ_sizes_get)
+      | ^~~~~~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_api_wasi.c: In function ‘m3_wasi_generic_fd_prestat_dir_name’:
+wasm-rtos/wasm3/source/wasm3.h:386:93: warning: unused parameter ‘_ctx’ [-Wunused-parameter]
+  386 | # define m3ApiRawFunction(NAME)     const void * NAME (IM3Runtime runtime, IM3ImportContext _ctx, uint64_t * _sp, void * _mem)
+      |                                                                            ~~~~~~~~~~~~~~~~~^~~~
+wasm-rtos/wasm3/source/m3_api_wasi.c:285:1: note: in expansion of macro ‘m3ApiRawFunction’
+  285 | m3ApiRawFunction(m3_wasi_generic_fd_prestat_dir_name)
+      | ^~~~~~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_api_wasi.c: In function ‘m3_wasi_generic_fd_prestat_get’:
+wasm-rtos/wasm3/source/wasm3.h:386:93: warning: unused parameter ‘_ctx’ [-Wunused-parameter]
+  386 | # define m3ApiRawFunction(NAME)     const void * NAME (IM3Runtime runtime, IM3ImportContext _ctx, uint64_t * _sp, void * _mem)
+      |                                                                            ~~~~~~~~~~~~~~~~~^~~~
+wasm-rtos/wasm3/source/m3_api_wasi.c:300:1: note: in expansion of macro ‘m3ApiRawFunction’
+  300 | m3ApiRawFunction(m3_wasi_generic_fd_prestat_get)
+      | ^~~~~~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_api_wasi.c: In function ‘m3_wasi_generic_fd_fdstat_get’:
+wasm-rtos/wasm3/source/wasm3.h:386:93: warning: unused parameter ‘_ctx’ [-Wunused-parameter]
+  386 | # define m3ApiRawFunction(NAME)     const void * NAME (IM3Runtime runtime, IM3ImportContext _ctx, uint64_t * _sp, void * _mem)
+      |                                                                            ~~~~~~~~~~~~~~~~~^~~~
+wasm-rtos/wasm3/source/m3_api_wasi.c:315:1: note: in expansion of macro ‘m3ApiRawFunction’
+  315 | m3ApiRawFunction(m3_wasi_generic_fd_fdstat_get)
+      | ^~~~~~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_api_wasi.c: In function ‘m3_wasi_generic_fd_fdstat_set_flags’:
+wasm-rtos/wasm3/source/m3_api_wasi.c:377:46: warning: unused variable ‘flags’ [-Wunused-variable]
+  377 |     m3ApiGetArg      (__wasi_fdflags_t     , flags)
+      |                                              ^~~~~
+wasm-rtos/wasm3/source/m3_api_wasi.c:377:5: note: in expansion of macro ‘m3ApiGetArg’
+  377 |     m3ApiGetArg      (__wasi_fdflags_t     , flags)
+      |     ^~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_api_wasi.c:376:46: warning: unused variable ‘fd’ [-Wunused-variable]
+  376 |     m3ApiGetArg      (__wasi_fd_t          , fd)
+      |                                              ^~
+wasm-rtos/wasm3/source/wasm3.h:377:53: note: in definition of macro ‘m3ApiGetArg’
+  377 | # define m3ApiGetArg(TYPE, NAME)               TYPE NAME = \
+      |                                                     ^~~~
+wasm-rtos/wasm3/source/wasm3.h:386:67: warning: unused parameter ‘runtime’ [-Wunused-parameter]
+  386 | # define m3ApiRawFunction(NAME)     const void * NAME (IM3Runtime runtime, IM3ImportContext _ctx, uint64_t * _sp, void * _mem)
+      |                                                        ~~~~~~~~~~~^~~~~~~
+wasm-rtos/wasm3/source/m3_api_wasi.c:373:1: note: in expansion of macro ‘m3ApiRawFunction’
+  373 | m3ApiRawFunction(m3_wasi_generic_fd_fdstat_set_flags)
+      | ^~~~~~~~~~~~~~~~
+wasm-rtos/wasm3/source/wasm3.h:386:93: warning: unused parameter ‘_ctx’ [-Wunused-parameter]
+  386 | # define m3ApiRawFunction(NAME)     const void * NAME (IM3Runtime runtime, IM3ImportContext _ctx, uint64_t * _sp, void * _mem)
+      |                                                                            ~~~~~~~~~~~~~~~~~^~~~
+wasm-rtos/wasm3/source/m3_api_wasi.c:373:1: note: in expansion of macro ‘m3ApiRawFunction’
+  373 | m3ApiRawFunction(m3_wasi_generic_fd_fdstat_set_flags)
+      | ^~~~~~~~~~~~~~~~
+wasm-rtos/wasm3/source/wasm3.h:386:122: warning: unused parameter ‘_mem’ [-Wunused-parameter]
+  386 | # define m3ApiRawFunction(NAME)     const void * NAME (IM3Runtime runtime, IM3ImportContext _ctx, uint64_t * _sp, void * _mem)
+      |                                                                                                                   ~~~~~~~^~~~
+wasm-rtos/wasm3/source/m3_api_wasi.c:373:1: note: in expansion of macro ‘m3ApiRawFunction’
+  373 | m3ApiRawFunction(m3_wasi_generic_fd_fdstat_set_flags)
+      | ^~~~~~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_api_wasi.c: In function ‘m3_wasi_unstable_fd_seek’:
+wasm-rtos/wasm3/source/wasm3.h:386:93: warning: unused parameter ‘_ctx’ [-Wunused-parameter]
+  386 | # define m3ApiRawFunction(NAME)     const void * NAME (IM3Runtime runtime, IM3ImportContext _ctx, uint64_t * _sp, void * _mem)
+      |                                                                            ~~~~~~~~~~~~~~~~~^~~~
+wasm-rtos/wasm3/source/m3_api_wasi.c:384:1: note: in expansion of macro ‘m3ApiRawFunction’
+  384 | m3ApiRawFunction(m3_wasi_unstable_fd_seek)
+      | ^~~~~~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_api_wasi.c: In function ‘m3_wasi_snapshot_preview1_fd_seek’:
+wasm-rtos/wasm3/source/wasm3.h:386:93: warning: unused parameter ‘_ctx’ [-Wunused-parameter]
+  386 | # define m3ApiRawFunction(NAME)     const void * NAME (IM3Runtime runtime, IM3ImportContext _ctx, uint64_t * _sp, void * _mem)
+      |                                                                            ~~~~~~~~~~~~~~~~~^~~~
+wasm-rtos/wasm3/source/m3_api_wasi.c:414:1: note: in expansion of macro ‘m3ApiRawFunction’
+  414 | m3ApiRawFunction(m3_wasi_snapshot_preview1_fd_seek)
+      | ^~~~~~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_api_wasi.c: In function ‘m3_wasi_generic_path_open’:
+wasm-rtos/wasm3/source/m3_api_wasi.c:454:46: warning: unused variable ‘fs_rights_inheriting’ [-Wunused-variable]
+  454 |     m3ApiGetArg      (__wasi_rights_t      , fs_rights_inheriting)
+      |                                              ^~~~~~~~~~~~~~~~~~~~
+wasm-rtos/wasm3/source/wasm3.h:377:53: note: in definition of macro ‘m3ApiGetArg’
+  377 | # define m3ApiGetArg(TYPE, NAME)               TYPE NAME = \
+      |                                                     ^~~~
+wasm-rtos/wasm3/source/m3_api_wasi.c:449:46: warning: unused variable ‘dirflags’ [-Wunused-variable]
+  449 |     m3ApiGetArg      (__wasi_lookupflags_t , dirflags)
+      |                                              ^~~~~~~~
+wasm-rtos/wasm3/source/wasm3.h:377:53: note: in definition of macro ‘m3ApiGetArg’
+  377 | # define m3ApiGetArg(TYPE, NAME)               TYPE NAME = \
+      |                                                     ^~~~
+wasm-rtos/wasm3/source/wasm3.h:386:93: warning: unused parameter ‘_ctx’ [-Wunused-parameter]
+  386 | # define m3ApiRawFunction(NAME)     const void * NAME (IM3Runtime runtime, IM3ImportContext _ctx, uint64_t * _sp, void * _mem)
+      |                                                                            ~~~~~~~~~~~~~~~~~^~~~
+wasm-rtos/wasm3/source/m3_api_wasi.c:445:1: note: in expansion of macro ‘m3ApiRawFunction’
+  445 | m3ApiRawFunction(m3_wasi_generic_path_open)
+      | ^~~~~~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_api_wasi.c: In function ‘m3_wasi_generic_fd_read’:
+wasm-rtos/wasm3/source/wasm3.h:386:93: warning: unused parameter ‘_ctx’ [-Wunused-parameter]
+  386 | # define m3ApiRawFunction(NAME)     const void * NAME (IM3Runtime runtime, IM3ImportContext _ctx, uint64_t * _sp, void * _mem)
+      |                                                                            ~~~~~~~~~~~~~~~~~^~~~
+wasm-rtos/wasm3/source/m3_api_wasi.c:566:1: note: in expansion of macro ‘m3ApiRawFunction’
+  566 | m3ApiRawFunction(m3_wasi_generic_fd_read)
+      | ^~~~~~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_api_wasi.c: In function ‘m3_wasi_generic_fd_write’:
+wasm-rtos/wasm3/source/wasm3.h:386:93: warning: unused parameter ‘_ctx’ [-Wunused-parameter]
+  386 | # define m3ApiRawFunction(NAME)     const void * NAME (IM3Runtime runtime, IM3ImportContext _ctx, uint64_t * _sp, void * _mem)
+      |                                                                            ~~~~~~~~~~~~~~~~~^~~~
+wasm-rtos/wasm3/source/m3_api_wasi.c:605:1: note: in expansion of macro ‘m3ApiRawFunction’
+  605 | m3ApiRawFunction(m3_wasi_generic_fd_write)
+      | ^~~~~~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_api_wasi.c: In function ‘m3_wasi_generic_fd_close’:
+wasm-rtos/wasm3/source/wasm3.h:386:67: warning: unused parameter ‘runtime’ [-Wunused-parameter]
+  386 | # define m3ApiRawFunction(NAME)     const void * NAME (IM3Runtime runtime, IM3ImportContext _ctx, uint64_t * _sp, void * _mem)
+      |                                                        ~~~~~~~~~~~^~~~~~~
+wasm-rtos/wasm3/source/m3_api_wasi.c:644:1: note: in expansion of macro ‘m3ApiRawFunction’
+  644 | m3ApiRawFunction(m3_wasi_generic_fd_close)
+      | ^~~~~~~~~~~~~~~~
+wasm-rtos/wasm3/source/wasm3.h:386:93: warning: unused parameter ‘_ctx’ [-Wunused-parameter]
+  386 | # define m3ApiRawFunction(NAME)     const void * NAME (IM3Runtime runtime, IM3ImportContext _ctx, uint64_t * _sp, void * _mem)
+      |                                                                            ~~~~~~~~~~~~~~~~~^~~~
+wasm-rtos/wasm3/source/m3_api_wasi.c:644:1: note: in expansion of macro ‘m3ApiRawFunction’
+  644 | m3ApiRawFunction(m3_wasi_generic_fd_close)
+      | ^~~~~~~~~~~~~~~~
+wasm-rtos/wasm3/source/wasm3.h:386:122: warning: unused parameter ‘_mem’ [-Wunused-parameter]
+  386 | # define m3ApiRawFunction(NAME)     const void * NAME (IM3Runtime runtime, IM3ImportContext _ctx, uint64_t * _sp, void * _mem)
+      |                                                                                                                   ~~~~~~~^~~~
+wasm-rtos/wasm3/source/m3_api_wasi.c:644:1: note: in expansion of macro ‘m3ApiRawFunction’
+  644 | m3ApiRawFunction(m3_wasi_generic_fd_close)
+      | ^~~~~~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_api_wasi.c: In function ‘m3_wasi_generic_fd_datasync’:
+wasm-rtos/wasm3/source/wasm3.h:386:67: warning: unused parameter ‘runtime’ [-Wunused-parameter]
+  386 | # define m3ApiRawFunction(NAME)     const void * NAME (IM3Runtime runtime, IM3ImportContext _ctx, uint64_t * _sp, void * _mem)
+      |                                                        ~~~~~~~~~~~^~~~~~~
+wasm-rtos/wasm3/source/m3_api_wasi.c:653:1: note: in expansion of macro ‘m3ApiRawFunction’
+  653 | m3ApiRawFunction(m3_wasi_generic_fd_datasync)
+      | ^~~~~~~~~~~~~~~~
+wasm-rtos/wasm3/source/wasm3.h:386:93: warning: unused parameter ‘_ctx’ [-Wunused-parameter]
+  386 | # define m3ApiRawFunction(NAME)     const void * NAME (IM3Runtime runtime, IM3ImportContext _ctx, uint64_t * _sp, void * _mem)
+      |                                                                            ~~~~~~~~~~~~~~~~~^~~~
+wasm-rtos/wasm3/source/m3_api_wasi.c:653:1: note: in expansion of macro ‘m3ApiRawFunction’
+  653 | m3ApiRawFunction(m3_wasi_generic_fd_datasync)
+      | ^~~~~~~~~~~~~~~~
+wasm-rtos/wasm3/source/wasm3.h:386:122: warning: unused parameter ‘_mem’ [-Wunused-parameter]
+  386 | # define m3ApiRawFunction(NAME)     const void * NAME (IM3Runtime runtime, IM3ImportContext _ctx, uint64_t * _sp, void * _mem)
+      |                                                                                                                   ~~~~~~~^~~~
+wasm-rtos/wasm3/source/m3_api_wasi.c:653:1: note: in expansion of macro ‘m3ApiRawFunction’
+  653 | m3ApiRawFunction(m3_wasi_generic_fd_datasync)
+      | ^~~~~~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_api_wasi.c: In function ‘m3_wasi_generic_random_get’:
+wasm-rtos/wasm3/source/wasm3.h:386:93: warning: unused parameter ‘_ctx’ [-Wunused-parameter]
+  386 | # define m3ApiRawFunction(NAME)     const void * NAME (IM3Runtime runtime, IM3ImportContext _ctx, uint64_t * _sp, void * _mem)
+      |                                                                            ~~~~~~~~~~~~~~~~~^~~~
+wasm-rtos/wasm3/source/m3_api_wasi.c:670:1: note: in expansion of macro ‘m3ApiRawFunction’
+  670 | m3ApiRawFunction(m3_wasi_generic_random_get)
+      | ^~~~~~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_api_wasi.c: In function ‘m3_wasi_generic_clock_res_get’:
+wasm-rtos/wasm3/source/wasm3.h:386:93: warning: unused parameter ‘_ctx’ [-Wunused-parameter]
+  386 | # define m3ApiRawFunction(NAME)     const void * NAME (IM3Runtime runtime, IM3ImportContext _ctx, uint64_t * _sp, void * _mem)
+      |                                                                            ~~~~~~~~~~~~~~~~~^~~~
+wasm-rtos/wasm3/source/m3_api_wasi.c:711:1: note: in expansion of macro ‘m3ApiRawFunction’
+  711 | m3ApiRawFunction(m3_wasi_generic_clock_res_get)
+      | ^~~~~~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_api_wasi.c: In function ‘m3_wasi_generic_clock_time_get’:
+wasm-rtos/wasm3/source/m3_api_wasi.c:736:46: warning: unused variable ‘precision’ [-Wunused-variable]
+  736 |     m3ApiGetArg      (__wasi_timestamp_t   , precision)
+      |                                              ^~~~~~~~~
+wasm-rtos/wasm3/source/wasm3.h:377:53: note: in definition of macro ‘m3ApiGetArg’
+  377 | # define m3ApiGetArg(TYPE, NAME)               TYPE NAME = \
+      |                                                     ^~~~
+wasm-rtos/wasm3/source/wasm3.h:386:93: warning: unused parameter ‘_ctx’ [-Wunused-parameter]
+  386 | # define m3ApiRawFunction(NAME)     const void * NAME (IM3Runtime runtime, IM3ImportContext _ctx, uint64_t * _sp, void * _mem)
+      |                                                                            ~~~~~~~~~~~~~~~~~^~~~
+wasm-rtos/wasm3/source/m3_api_wasi.c:732:1: note: in expansion of macro ‘m3ApiRawFunction’
+  732 | m3ApiRawFunction(m3_wasi_generic_clock_time_get)
+      | ^~~~~~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_api_wasi.c: In function ‘m3_wasi_generic_proc_exit’:
+wasm-rtos/wasm3/source/wasm3.h:386:67: warning: unused parameter ‘runtime’ [-Wunused-parameter]
+  386 | # define m3ApiRawFunction(NAME)     const void * NAME (IM3Runtime runtime, IM3ImportContext _ctx, uint64_t * _sp, void * _mem)
+      |                                                        ~~~~~~~~~~~^~~~~~~
+wasm-rtos/wasm3/source/m3_api_wasi.c:753:1: note: in expansion of macro ‘m3ApiRawFunction’
+  753 | m3ApiRawFunction(m3_wasi_generic_proc_exit)
+      | ^~~~~~~~~~~~~~~~
+wasm-rtos/wasm3/source/wasm3.h:386:122: warning: unused parameter ‘_mem’ [-Wunused-parameter]
+  386 | # define m3ApiRawFunction(NAME)     const void * NAME (IM3Runtime runtime, IM3ImportContext _ctx, uint64_t * _sp, void * _mem)
+      |                                                                                                                   ~~~~~~~^~~~
+wasm-rtos/wasm3/source/m3_api_wasi.c:753:1: note: in expansion of macro ‘m3ApiRawFunction’
+  753 | m3ApiRawFunction(m3_wasi_generic_proc_exit)
+      | ^~~~~~~~~~~~~~~~
+In file included from wasm-rtos/wasm3/source/m3_compile.h:12,
+                 from wasm-rtos/wasm3/source/m3_env.h:13,
+                 from wasm-rtos/wasm3/source/m3_compile.c:11:
+wasm-rtos/wasm3/source/m3_exec.h: In function ‘op_CallRawFunction’:
+wasm-rtos/wasm3/source/m3_exec_defs.h:19:52: warning: unused parameter ‘_runtime’ [-Wunused-parameter]
+   19 | # define d_m3BaseOpSig                  IM3Runtime _runtime, pc_t _pc, m3stack_t _sp, M3MemoryHeader * _mem, m3reg_t _r0
+      |                                         ~~~~~~~~~~~^~~~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:26:41: note: in expansion of macro ‘d_m3BaseOpSig’
+   26 | # define d_m3ExpOpSig(...)              d_m3BaseOpSig, __VA_ARGS__
+      |                                         ^~~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:33:37: note: in expansion of macro ‘d_m3ExpOpSig’
+   33 | #   define d_m3OpSig                d_m3ExpOpSig            (f64 _fp0)
+      |                                     ^~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:56:75: note: in expansion of macro ‘d_m3OpSig’
+   56 | #    define d_m3Op(NAME)                M3_NO_UBSAN d_m3RetSig op_##NAME (d_m3OpSig)
+      |                                                                           ^~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec.h:735:1: note: in expansion of macro ‘d_m3Op’
+  735 | d_m3Op  (CallRawFunction)
+      | ^~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:19:118: warning: unused parameter ‘_r0’ [-Wunused-parameter]
+   19 | # define d_m3BaseOpSig                  IM3Runtime _runtime, pc_t _pc, m3stack_t _sp, M3MemoryHeader * _mem, m3reg_t _r0
+      |                                                                                                              ~~~~~~~~^~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:26:41: note: in expansion of macro ‘d_m3BaseOpSig’
+   26 | # define d_m3ExpOpSig(...)              d_m3BaseOpSig, __VA_ARGS__
+      |                                         ^~~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:33:37: note: in expansion of macro ‘d_m3ExpOpSig’
+   33 | #   define d_m3OpSig                d_m3ExpOpSig            (f64 _fp0)
+      |                                     ^~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:56:75: note: in expansion of macro ‘d_m3OpSig’
+   56 | #    define d_m3Op(NAME)                M3_NO_UBSAN d_m3RetSig op_##NAME (d_m3OpSig)
+      |                                                                           ^~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec.h:735:1: note: in expansion of macro ‘d_m3Op’
+  735 | d_m3Op  (CallRawFunction)
+      | ^~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:33:66: warning: unused parameter ‘_fp0’ [-Wunused-parameter]
+   33 | #   define d_m3OpSig                d_m3ExpOpSig            (f64 _fp0)
+      |                                                              ~~~~^~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:26:56: note: in definition of macro ‘d_m3ExpOpSig’
+   26 | # define d_m3ExpOpSig(...)              d_m3BaseOpSig, __VA_ARGS__
+      |                                                        ^~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:56:75: note: in expansion of macro ‘d_m3OpSig’
+   56 | #    define d_m3Op(NAME)                M3_NO_UBSAN d_m3RetSig op_##NAME (d_m3OpSig)
+      |                                                                           ^~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec.h:735:1: note: in expansion of macro ‘d_m3Op’
+  735 | d_m3Op  (CallRawFunction)
+      | ^~~~~~
+wasm-rtos/wasm3/source/m3_exec.h: In function ‘op_Return’:
+wasm-rtos/wasm3/source/m3_exec_defs.h:19:52: warning: unused parameter ‘_runtime’ [-Wunused-parameter]
+   19 | # define d_m3BaseOpSig                  IM3Runtime _runtime, pc_t _pc, m3stack_t _sp, M3MemoryHeader * _mem, m3reg_t _r0
+      |                                         ~~~~~~~~~~~^~~~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:26:41: note: in expansion of macro ‘d_m3BaseOpSig’
+   26 | # define d_m3ExpOpSig(...)              d_m3BaseOpSig, __VA_ARGS__
+      |                                         ^~~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:33:37: note: in expansion of macro ‘d_m3ExpOpSig’
+   33 | #   define d_m3OpSig                d_m3ExpOpSig            (f64 _fp0)
+      |                                     ^~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:56:75: note: in expansion of macro ‘d_m3OpSig’
+   56 | #    define d_m3Op(NAME)                M3_NO_UBSAN d_m3RetSig op_##NAME (d_m3OpSig)
+      |                                                                           ^~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec.h:1278:1: note: in expansion of macro ‘d_m3Op’
+ 1278 | d_m3Op  (Return)
+      | ^~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:19:67: warning: unused parameter ‘_pc’ [-Wunused-parameter]
+   19 | # define d_m3BaseOpSig                  IM3Runtime _runtime, pc_t _pc, m3stack_t _sp, M3MemoryHeader * _mem, m3reg_t _r0
+      |                                                              ~~~~~^~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:26:41: note: in expansion of macro ‘d_m3BaseOpSig’
+   26 | # define d_m3ExpOpSig(...)              d_m3BaseOpSig, __VA_ARGS__
+      |                                         ^~~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:33:37: note: in expansion of macro ‘d_m3ExpOpSig’
+   33 | #   define d_m3OpSig                d_m3ExpOpSig            (f64 _fp0)
+      |                                     ^~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:56:75: note: in expansion of macro ‘d_m3OpSig’
+   56 | #    define d_m3Op(NAME)                M3_NO_UBSAN d_m3RetSig op_##NAME (d_m3OpSig)
+      |                                                                           ^~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec.h:1278:1: note: in expansion of macro ‘d_m3Op’
+ 1278 | d_m3Op  (Return)
+      | ^~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:19:82: warning: unused parameter ‘_sp’ [-Wunused-parameter]
+   19 | # define d_m3BaseOpSig                  IM3Runtime _runtime, pc_t _pc, m3stack_t _sp, M3MemoryHeader * _mem, m3reg_t _r0
+      |                                                                        ~~~~~~~~~~^~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:26:41: note: in expansion of macro ‘d_m3BaseOpSig’
+   26 | # define d_m3ExpOpSig(...)              d_m3BaseOpSig, __VA_ARGS__
+      |                                         ^~~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:33:37: note: in expansion of macro ‘d_m3ExpOpSig’
+   33 | #   define d_m3OpSig                d_m3ExpOpSig            (f64 _fp0)
+      |                                     ^~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:56:75: note: in expansion of macro ‘d_m3OpSig’
+   56 | #    define d_m3Op(NAME)                M3_NO_UBSAN d_m3RetSig op_##NAME (d_m3OpSig)
+      |                                                                           ^~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec.h:1278:1: note: in expansion of macro ‘d_m3Op’
+ 1278 | d_m3Op  (Return)
+      | ^~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:19:104: warning: unused parameter ‘_mem’ [-Wunused-parameter]
+   19 | # define d_m3BaseOpSig                  IM3Runtime _runtime, pc_t _pc, m3stack_t _sp, M3MemoryHeader * _mem, m3reg_t _r0
+      |                                                                                       ~~~~~~~~~~~~~~~~~^~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:26:41: note: in expansion of macro ‘d_m3BaseOpSig’
+   26 | # define d_m3ExpOpSig(...)              d_m3BaseOpSig, __VA_ARGS__
+      |                                         ^~~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:33:37: note: in expansion of macro ‘d_m3ExpOpSig’
+   33 | #   define d_m3OpSig                d_m3ExpOpSig            (f64 _fp0)
+      |                                     ^~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:56:75: note: in expansion of macro ‘d_m3OpSig’
+   56 | #    define d_m3Op(NAME)                M3_NO_UBSAN d_m3RetSig op_##NAME (d_m3OpSig)
+      |                                                                           ^~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec.h:1278:1: note: in expansion of macro ‘d_m3Op’
+ 1278 | d_m3Op  (Return)
+      | ^~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:19:118: warning: unused parameter ‘_r0’ [-Wunused-parameter]
+   19 | # define d_m3BaseOpSig                  IM3Runtime _runtime, pc_t _pc, m3stack_t _sp, M3MemoryHeader * _mem, m3reg_t _r0
+      |                                                                                                              ~~~~~~~~^~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:26:41: note: in expansion of macro ‘d_m3BaseOpSig’
+   26 | # define d_m3ExpOpSig(...)              d_m3BaseOpSig, __VA_ARGS__
+      |                                         ^~~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:33:37: note: in expansion of macro ‘d_m3ExpOpSig’
+   33 | #   define d_m3OpSig                d_m3ExpOpSig            (f64 _fp0)
+      |                                     ^~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:56:75: note: in expansion of macro ‘d_m3OpSig’
+   56 | #    define d_m3Op(NAME)                M3_NO_UBSAN d_m3RetSig op_##NAME (d_m3OpSig)
+      |                                                                           ^~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec.h:1278:1: note: in expansion of macro ‘d_m3Op’
+ 1278 | d_m3Op  (Return)
+      | ^~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:33:66: warning: unused parameter ‘_fp0’ [-Wunused-parameter]
+   33 | #   define d_m3OpSig                d_m3ExpOpSig            (f64 _fp0)
+      |                                                              ~~~~^~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:26:56: note: in definition of macro ‘d_m3ExpOpSig’
+   26 | # define d_m3ExpOpSig(...)              d_m3BaseOpSig, __VA_ARGS__
+      |                                                        ^~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:56:75: note: in expansion of macro ‘d_m3OpSig’
+   56 | #    define d_m3Op(NAME)                M3_NO_UBSAN d_m3RetSig op_##NAME (d_m3OpSig)
+      |                                                                           ^~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec.h:1278:1: note: in expansion of macro ‘d_m3Op’
+ 1278 | d_m3Op  (Return)
+      | ^~~~~~
+wasm-rtos/wasm3/source/m3_exec.h: In function ‘op_ContinueLoop’:
+wasm-rtos/wasm3/source/m3_exec_defs.h:19:52: warning: unused parameter ‘_runtime’ [-Wunused-parameter]
+   19 | # define d_m3BaseOpSig                  IM3Runtime _runtime, pc_t _pc, m3stack_t _sp, M3MemoryHeader * _mem, m3reg_t _r0
+      |                                         ~~~~~~~~~~~^~~~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:26:41: note: in expansion of macro ‘d_m3BaseOpSig’
+   26 | # define d_m3ExpOpSig(...)              d_m3BaseOpSig, __VA_ARGS__
+      |                                         ^~~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:33:37: note: in expansion of macro ‘d_m3ExpOpSig’
+   33 | #   define d_m3OpSig                d_m3ExpOpSig            (f64 _fp0)
+      |                                     ^~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:56:75: note: in expansion of macro ‘d_m3OpSig’
+   56 | #    define d_m3Op(NAME)                M3_NO_UBSAN d_m3RetSig op_##NAME (d_m3OpSig)
+      |                                                                           ^~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec.h:1339:1: note: in expansion of macro ‘d_m3Op’
+ 1339 | d_m3Op  (ContinueLoop)
+      | ^~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:19:82: warning: unused parameter ‘_sp’ [-Wunused-parameter]
+   19 | # define d_m3BaseOpSig                  IM3Runtime _runtime, pc_t _pc, m3stack_t _sp, M3MemoryHeader * _mem, m3reg_t _r0
+      |                                                                        ~~~~~~~~~~^~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:26:41: note: in expansion of macro ‘d_m3BaseOpSig’
+   26 | # define d_m3ExpOpSig(...)              d_m3BaseOpSig, __VA_ARGS__
+      |                                         ^~~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:33:37: note: in expansion of macro ‘d_m3ExpOpSig’
+   33 | #   define d_m3OpSig                d_m3ExpOpSig            (f64 _fp0)
+      |                                     ^~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:56:75: note: in expansion of macro ‘d_m3OpSig’
+   56 | #    define d_m3Op(NAME)                M3_NO_UBSAN d_m3RetSig op_##NAME (d_m3OpSig)
+      |                                                                           ^~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec.h:1339:1: note: in expansion of macro ‘d_m3Op’
+ 1339 | d_m3Op  (ContinueLoop)
+      | ^~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:19:104: warning: unused parameter ‘_mem’ [-Wunused-parameter]
+   19 | # define d_m3BaseOpSig                  IM3Runtime _runtime, pc_t _pc, m3stack_t _sp, M3MemoryHeader * _mem, m3reg_t _r0
+      |                                                                                       ~~~~~~~~~~~~~~~~~^~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:26:41: note: in expansion of macro ‘d_m3BaseOpSig’
+   26 | # define d_m3ExpOpSig(...)              d_m3BaseOpSig, __VA_ARGS__
+      |                                         ^~~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:33:37: note: in expansion of macro ‘d_m3ExpOpSig’
+   33 | #   define d_m3OpSig                d_m3ExpOpSig            (f64 _fp0)
+      |                                     ^~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:56:75: note: in expansion of macro ‘d_m3OpSig’
+   56 | #    define d_m3Op(NAME)                M3_NO_UBSAN d_m3RetSig op_##NAME (d_m3OpSig)
+      |                                                                           ^~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec.h:1339:1: note: in expansion of macro ‘d_m3Op’
+ 1339 | d_m3Op  (ContinueLoop)
+      | ^~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:19:118: warning: unused parameter ‘_r0’ [-Wunused-parameter]
+   19 | # define d_m3BaseOpSig                  IM3Runtime _runtime, pc_t _pc, m3stack_t _sp, M3MemoryHeader * _mem, m3reg_t _r0
+      |                                                                                                              ~~~~~~~~^~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:26:41: note: in expansion of macro ‘d_m3BaseOpSig’
+   26 | # define d_m3ExpOpSig(...)              d_m3BaseOpSig, __VA_ARGS__
+      |                                         ^~~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:33:37: note: in expansion of macro ‘d_m3ExpOpSig’
+   33 | #   define d_m3OpSig                d_m3ExpOpSig            (f64 _fp0)
+      |                                     ^~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:56:75: note: in expansion of macro ‘d_m3OpSig’
+   56 | #    define d_m3Op(NAME)                M3_NO_UBSAN d_m3RetSig op_##NAME (d_m3OpSig)
+      |                                                                           ^~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec.h:1339:1: note: in expansion of macro ‘d_m3Op’
+ 1339 | d_m3Op  (ContinueLoop)
+      | ^~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:33:66: warning: unused parameter ‘_fp0’ [-Wunused-parameter]
+   33 | #   define d_m3OpSig                d_m3ExpOpSig            (f64 _fp0)
+      |                                                              ~~~~^~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:26:56: note: in definition of macro ‘d_m3ExpOpSig’
+   26 | # define d_m3ExpOpSig(...)              d_m3BaseOpSig, __VA_ARGS__
+      |                                                        ^~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:56:75: note: in expansion of macro ‘d_m3OpSig’
+   56 | #    define d_m3Op(NAME)                M3_NO_UBSAN d_m3RetSig op_##NAME (d_m3OpSig)
+      |                                                                           ^~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec.h:1339:1: note: in expansion of macro ‘d_m3Op’
+ 1339 | d_m3Op  (ContinueLoop)
+      | ^~~~~~
+wasm-rtos/wasm3/source/m3_exec.h: In function ‘op_Unsupported’:
+wasm-rtos/wasm3/source/m3_exec_defs.h:19:52: warning: unused parameter ‘_runtime’ [-Wunused-parameter]
+   19 | # define d_m3BaseOpSig                  IM3Runtime _runtime, pc_t _pc, m3stack_t _sp, M3MemoryHeader * _mem, m3reg_t _r0
+      |                                         ~~~~~~~~~~~^~~~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:26:41: note: in expansion of macro ‘d_m3BaseOpSig’
+   26 | # define d_m3ExpOpSig(...)              d_m3BaseOpSig, __VA_ARGS__
+      |                                         ^~~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:33:37: note: in expansion of macro ‘d_m3ExpOpSig’
+   33 | #   define d_m3OpSig                d_m3ExpOpSig            (f64 _fp0)
+      |                                     ^~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:56:75: note: in expansion of macro ‘d_m3OpSig’
+   56 | #    define d_m3Op(NAME)                M3_NO_UBSAN d_m3RetSig op_##NAME (d_m3OpSig)
+      |                                                                           ^~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec.h:1381:1: note: in expansion of macro ‘d_m3Op’
+ 1381 | d_m3Op  (Unsupported)
+      | ^~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:19:67: warning: unused parameter ‘_pc’ [-Wunused-parameter]
+   19 | # define d_m3BaseOpSig                  IM3Runtime _runtime, pc_t _pc, m3stack_t _sp, M3MemoryHeader * _mem, m3reg_t _r0
+      |                                                              ~~~~~^~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:26:41: note: in expansion of macro ‘d_m3BaseOpSig’
+   26 | # define d_m3ExpOpSig(...)              d_m3BaseOpSig, __VA_ARGS__
+      |                                         ^~~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:33:37: note: in expansion of macro ‘d_m3ExpOpSig’
+   33 | #   define d_m3OpSig                d_m3ExpOpSig            (f64 _fp0)
+      |                                     ^~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:56:75: note: in expansion of macro ‘d_m3OpSig’
+   56 | #    define d_m3Op(NAME)                M3_NO_UBSAN d_m3RetSig op_##NAME (d_m3OpSig)
+      |                                                                           ^~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec.h:1381:1: note: in expansion of macro ‘d_m3Op’
+ 1381 | d_m3Op  (Unsupported)
+      | ^~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:19:82: warning: unused parameter ‘_sp’ [-Wunused-parameter]
+   19 | # define d_m3BaseOpSig                  IM3Runtime _runtime, pc_t _pc, m3stack_t _sp, M3MemoryHeader * _mem, m3reg_t _r0
+      |                                                                        ~~~~~~~~~~^~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:26:41: note: in expansion of macro ‘d_m3BaseOpSig’
+   26 | # define d_m3ExpOpSig(...)              d_m3BaseOpSig, __VA_ARGS__
+      |                                         ^~~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:33:37: note: in expansion of macro ‘d_m3ExpOpSig’
+   33 | #   define d_m3OpSig                d_m3ExpOpSig            (f64 _fp0)
+      |                                     ^~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:56:75: note: in expansion of macro ‘d_m3OpSig’
+   56 | #    define d_m3Op(NAME)                M3_NO_UBSAN d_m3RetSig op_##NAME (d_m3OpSig)
+      |                                                                           ^~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec.h:1381:1: note: in expansion of macro ‘d_m3Op’
+ 1381 | d_m3Op  (Unsupported)
+      | ^~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:19:104: warning: unused parameter ‘_mem’ [-Wunused-parameter]
+   19 | # define d_m3BaseOpSig                  IM3Runtime _runtime, pc_t _pc, m3stack_t _sp, M3MemoryHeader * _mem, m3reg_t _r0
+      |                                                                                       ~~~~~~~~~~~~~~~~~^~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:26:41: note: in expansion of macro ‘d_m3BaseOpSig’
+   26 | # define d_m3ExpOpSig(...)              d_m3BaseOpSig, __VA_ARGS__
+      |                                         ^~~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:33:37: note: in expansion of macro ‘d_m3ExpOpSig’
+   33 | #   define d_m3OpSig                d_m3ExpOpSig            (f64 _fp0)
+      |                                     ^~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:56:75: note: in expansion of macro ‘d_m3OpSig’
+   56 | #    define d_m3Op(NAME)                M3_NO_UBSAN d_m3RetSig op_##NAME (d_m3OpSig)
+      |                                                                           ^~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec.h:1381:1: note: in expansion of macro ‘d_m3Op’
+ 1381 | d_m3Op  (Unsupported)
+      | ^~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:19:118: warning: unused parameter ‘_r0’ [-Wunused-parameter]
+   19 | # define d_m3BaseOpSig                  IM3Runtime _runtime, pc_t _pc, m3stack_t _sp, M3MemoryHeader * _mem, m3reg_t _r0
+      |                                                                                                              ~~~~~~~~^~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:26:41: note: in expansion of macro ‘d_m3BaseOpSig’
+   26 | # define d_m3ExpOpSig(...)              d_m3BaseOpSig, __VA_ARGS__
+      |                                         ^~~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:33:37: note: in expansion of macro ‘d_m3ExpOpSig’
+   33 | #   define d_m3OpSig                d_m3ExpOpSig            (f64 _fp0)
+      |                                     ^~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:56:75: note: in expansion of macro ‘d_m3OpSig’
+   56 | #    define d_m3Op(NAME)                M3_NO_UBSAN d_m3RetSig op_##NAME (d_m3OpSig)
+      |                                                                           ^~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec.h:1381:1: note: in expansion of macro ‘d_m3Op’
+ 1381 | d_m3Op  (Unsupported)
+      | ^~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:33:66: warning: unused parameter ‘_fp0’ [-Wunused-parameter]
+   33 | #   define d_m3OpSig                d_m3ExpOpSig            (f64 _fp0)
+      |                                                              ~~~~^~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:26:56: note: in definition of macro ‘d_m3ExpOpSig’
+   26 | # define d_m3ExpOpSig(...)              d_m3BaseOpSig, __VA_ARGS__
+      |                                                        ^~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:56:75: note: in expansion of macro ‘d_m3OpSig’
+   56 | #    define d_m3Op(NAME)                M3_NO_UBSAN d_m3RetSig op_##NAME (d_m3OpSig)
+      |                                                                           ^~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec.h:1381:1: note: in expansion of macro ‘d_m3Op’
+ 1381 | d_m3Op  (Unsupported)
+      | ^~~~~~
+wasm-rtos/wasm3/source/m3_exec.h: In function ‘op_Unreachable’:
+wasm-rtos/wasm3/source/m3_exec_defs.h:19:52: warning: unused parameter ‘_runtime’ [-Wunused-parameter]
+   19 | # define d_m3BaseOpSig                  IM3Runtime _runtime, pc_t _pc, m3stack_t _sp, M3MemoryHeader * _mem, m3reg_t _r0
+      |                                         ~~~~~~~~~~~^~~~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:26:41: note: in expansion of macro ‘d_m3BaseOpSig’
+   26 | # define d_m3ExpOpSig(...)              d_m3BaseOpSig, __VA_ARGS__
+      |                                         ^~~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:33:37: note: in expansion of macro ‘d_m3ExpOpSig’
+   33 | #   define d_m3OpSig                d_m3ExpOpSig            (f64 _fp0)
+      |                                     ^~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:56:75: note: in expansion of macro ‘d_m3OpSig’
+   56 | #    define d_m3Op(NAME)                M3_NO_UBSAN d_m3RetSig op_##NAME (d_m3OpSig)
+      |                                                                           ^~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec.h:1386:1: note: in expansion of macro ‘d_m3Op’
+ 1386 | d_m3Op  (Unreachable)
+      | ^~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:19:67: warning: unused parameter ‘_pc’ [-Wunused-parameter]
+   19 | # define d_m3BaseOpSig                  IM3Runtime _runtime, pc_t _pc, m3stack_t _sp, M3MemoryHeader * _mem, m3reg_t _r0
+      |                                                              ~~~~~^~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:26:41: note: in expansion of macro ‘d_m3BaseOpSig’
+   26 | # define d_m3ExpOpSig(...)              d_m3BaseOpSig, __VA_ARGS__
+      |                                         ^~~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:33:37: note: in expansion of macro ‘d_m3ExpOpSig’
+   33 | #   define d_m3OpSig                d_m3ExpOpSig            (f64 _fp0)
+      |                                     ^~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:56:75: note: in expansion of macro ‘d_m3OpSig’
+   56 | #    define d_m3Op(NAME)                M3_NO_UBSAN d_m3RetSig op_##NAME (d_m3OpSig)
+      |                                                                           ^~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec.h:1386:1: note: in expansion of macro ‘d_m3Op’
+ 1386 | d_m3Op  (Unreachable)
+      | ^~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:19:82: warning: unused parameter ‘_sp’ [-Wunused-parameter]
+   19 | # define d_m3BaseOpSig                  IM3Runtime _runtime, pc_t _pc, m3stack_t _sp, M3MemoryHeader * _mem, m3reg_t _r0
+      |                                                                        ~~~~~~~~~~^~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:26:41: note: in expansion of macro ‘d_m3BaseOpSig’
+   26 | # define d_m3ExpOpSig(...)              d_m3BaseOpSig, __VA_ARGS__
+      |                                         ^~~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:33:37: note: in expansion of macro ‘d_m3ExpOpSig’
+   33 | #   define d_m3OpSig                d_m3ExpOpSig            (f64 _fp0)
+      |                                     ^~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:56:75: note: in expansion of macro ‘d_m3OpSig’
+   56 | #    define d_m3Op(NAME)                M3_NO_UBSAN d_m3RetSig op_##NAME (d_m3OpSig)
+      |                                                                           ^~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec.h:1386:1: note: in expansion of macro ‘d_m3Op’
+ 1386 | d_m3Op  (Unreachable)
+      | ^~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:19:104: warning: unused parameter ‘_mem’ [-Wunused-parameter]
+   19 | # define d_m3BaseOpSig                  IM3Runtime _runtime, pc_t _pc, m3stack_t _sp, M3MemoryHeader * _mem, m3reg_t _r0
+      |                                                                                       ~~~~~~~~~~~~~~~~~^~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:26:41: note: in expansion of macro ‘d_m3BaseOpSig’
+   26 | # define d_m3ExpOpSig(...)              d_m3BaseOpSig, __VA_ARGS__
+      |                                         ^~~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:33:37: note: in expansion of macro ‘d_m3ExpOpSig’
+   33 | #   define d_m3OpSig                d_m3ExpOpSig            (f64 _fp0)
+      |                                     ^~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:56:75: note: in expansion of macro ‘d_m3OpSig’
+   56 | #    define d_m3Op(NAME)                M3_NO_UBSAN d_m3RetSig op_##NAME (d_m3OpSig)
+      |                                                                           ^~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec.h:1386:1: note: in expansion of macro ‘d_m3Op’
+ 1386 | d_m3Op  (Unreachable)
+      | ^~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:19:118: warning: unused parameter ‘_r0’ [-Wunused-parameter]
+   19 | # define d_m3BaseOpSig                  IM3Runtime _runtime, pc_t _pc, m3stack_t _sp, M3MemoryHeader * _mem, m3reg_t _r0
+      |                                                                                                              ~~~~~~~~^~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:26:41: note: in expansion of macro ‘d_m3BaseOpSig’
+   26 | # define d_m3ExpOpSig(...)              d_m3BaseOpSig, __VA_ARGS__
+      |                                         ^~~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:33:37: note: in expansion of macro ‘d_m3ExpOpSig’
+   33 | #   define d_m3OpSig                d_m3ExpOpSig            (f64 _fp0)
+      |                                     ^~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:56:75: note: in expansion of macro ‘d_m3OpSig’
+   56 | #    define d_m3Op(NAME)                M3_NO_UBSAN d_m3RetSig op_##NAME (d_m3OpSig)
+      |                                                                           ^~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec.h:1386:1: note: in expansion of macro ‘d_m3Op’
+ 1386 | d_m3Op  (Unreachable)
+      | ^~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:33:66: warning: unused parameter ‘_fp0’ [-Wunused-parameter]
+   33 | #   define d_m3OpSig                d_m3ExpOpSig            (f64 _fp0)
+      |                                                              ~~~~^~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:26:56: note: in definition of macro ‘d_m3ExpOpSig’
+   26 | # define d_m3ExpOpSig(...)              d_m3BaseOpSig, __VA_ARGS__
+      |                                                        ^~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:56:75: note: in expansion of macro ‘d_m3OpSig’
+   56 | #    define d_m3Op(NAME)                M3_NO_UBSAN d_m3RetSig op_##NAME (d_m3OpSig)
+      |                                                                           ^~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec.h:1386:1: note: in expansion of macro ‘d_m3Op’
+ 1386 | d_m3Op  (Unreachable)
+      | ^~~~~~
+wasm-rtos/wasm3/source/m3_exec.h: In function ‘op_End’:
+wasm-rtos/wasm3/source/m3_exec_defs.h:19:52: warning: unused parameter ‘_runtime’ [-Wunused-parameter]
+   19 | # define d_m3BaseOpSig                  IM3Runtime _runtime, pc_t _pc, m3stack_t _sp, M3MemoryHeader * _mem, m3reg_t _r0
+      |                                         ~~~~~~~~~~~^~~~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:26:41: note: in expansion of macro ‘d_m3BaseOpSig’
+   26 | # define d_m3ExpOpSig(...)              d_m3BaseOpSig, __VA_ARGS__
+      |                                         ^~~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:33:37: note: in expansion of macro ‘d_m3ExpOpSig’
+   33 | #   define d_m3OpSig                d_m3ExpOpSig            (f64 _fp0)
+      |                                     ^~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:56:75: note: in expansion of macro ‘d_m3OpSig’
+   56 | #    define d_m3Op(NAME)                M3_NO_UBSAN d_m3RetSig op_##NAME (d_m3OpSig)
+      |                                                                           ^~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec.h:1393:1: note: in expansion of macro ‘d_m3Op’
+ 1393 | d_m3Op  (End)
+      | ^~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:19:67: warning: unused parameter ‘_pc’ [-Wunused-parameter]
+   19 | # define d_m3BaseOpSig                  IM3Runtime _runtime, pc_t _pc, m3stack_t _sp, M3MemoryHeader * _mem, m3reg_t _r0
+      |                                                              ~~~~~^~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:26:41: note: in expansion of macro ‘d_m3BaseOpSig’
+   26 | # define d_m3ExpOpSig(...)              d_m3BaseOpSig, __VA_ARGS__
+      |                                         ^~~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:33:37: note: in expansion of macro ‘d_m3ExpOpSig’
+   33 | #   define d_m3OpSig                d_m3ExpOpSig            (f64 _fp0)
+      |                                     ^~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:56:75: note: in expansion of macro ‘d_m3OpSig’
+   56 | #    define d_m3Op(NAME)                M3_NO_UBSAN d_m3RetSig op_##NAME (d_m3OpSig)
+      |                                                                           ^~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec.h:1393:1: note: in expansion of macro ‘d_m3Op’
+ 1393 | d_m3Op  (End)
+      | ^~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:19:82: warning: unused parameter ‘_sp’ [-Wunused-parameter]
+   19 | # define d_m3BaseOpSig                  IM3Runtime _runtime, pc_t _pc, m3stack_t _sp, M3MemoryHeader * _mem, m3reg_t _r0
+      |                                                                        ~~~~~~~~~~^~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:26:41: note: in expansion of macro ‘d_m3BaseOpSig’
+   26 | # define d_m3ExpOpSig(...)              d_m3BaseOpSig, __VA_ARGS__
+      |                                         ^~~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:33:37: note: in expansion of macro ‘d_m3ExpOpSig’
+   33 | #   define d_m3OpSig                d_m3ExpOpSig            (f64 _fp0)
+      |                                     ^~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:56:75: note: in expansion of macro ‘d_m3OpSig’
+   56 | #    define d_m3Op(NAME)                M3_NO_UBSAN d_m3RetSig op_##NAME (d_m3OpSig)
+      |                                                                           ^~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec.h:1393:1: note: in expansion of macro ‘d_m3Op’
+ 1393 | d_m3Op  (End)
+      | ^~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:19:104: warning: unused parameter ‘_mem’ [-Wunused-parameter]
+   19 | # define d_m3BaseOpSig                  IM3Runtime _runtime, pc_t _pc, m3stack_t _sp, M3MemoryHeader * _mem, m3reg_t _r0
+      |                                                                                       ~~~~~~~~~~~~~~~~~^~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:26:41: note: in expansion of macro ‘d_m3BaseOpSig’
+   26 | # define d_m3ExpOpSig(...)              d_m3BaseOpSig, __VA_ARGS__
+      |                                         ^~~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:33:37: note: in expansion of macro ‘d_m3ExpOpSig’
+   33 | #   define d_m3OpSig                d_m3ExpOpSig            (f64 _fp0)
+      |                                     ^~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:56:75: note: in expansion of macro ‘d_m3OpSig’
+   56 | #    define d_m3Op(NAME)                M3_NO_UBSAN d_m3RetSig op_##NAME (d_m3OpSig)
+      |                                                                           ^~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec.h:1393:1: note: in expansion of macro ‘d_m3Op’
+ 1393 | d_m3Op  (End)
+      | ^~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:19:118: warning: unused parameter ‘_r0’ [-Wunused-parameter]
+   19 | # define d_m3BaseOpSig                  IM3Runtime _runtime, pc_t _pc, m3stack_t _sp, M3MemoryHeader * _mem, m3reg_t _r0
+      |                                                                                                              ~~~~~~~~^~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:26:41: note: in expansion of macro ‘d_m3BaseOpSig’
+   26 | # define d_m3ExpOpSig(...)              d_m3BaseOpSig, __VA_ARGS__
+      |                                         ^~~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:33:37: note: in expansion of macro ‘d_m3ExpOpSig’
+   33 | #   define d_m3OpSig                d_m3ExpOpSig            (f64 _fp0)
+      |                                     ^~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:56:75: note: in expansion of macro ‘d_m3OpSig’
+   56 | #    define d_m3Op(NAME)                M3_NO_UBSAN d_m3RetSig op_##NAME (d_m3OpSig)
+      |                                                                           ^~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec.h:1393:1: note: in expansion of macro ‘d_m3Op’
+ 1393 | d_m3Op  (End)
+      | ^~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:33:66: warning: unused parameter ‘_fp0’ [-Wunused-parameter]
+   33 | #   define d_m3OpSig                d_m3ExpOpSig            (f64 _fp0)
+      |                                                              ~~~~^~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:26:56: note: in definition of macro ‘d_m3ExpOpSig’
+   26 | # define d_m3ExpOpSig(...)              d_m3BaseOpSig, __VA_ARGS__
+      |                                                        ^~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec_defs.h:56:75: note: in expansion of macro ‘d_m3OpSig’
+   56 | #    define d_m3Op(NAME)                M3_NO_UBSAN d_m3RetSig op_##NAME (d_m3OpSig)
+      |                                                                           ^~~~~~~~~
+wasm-rtos/wasm3/source/m3_exec.h:1393:1: note: in expansion of macro ‘d_m3Op’
+ 1393 | d_m3Op  (End)
+      | ^~~~~~
+wasm-rtos/wasm3/source/m3_compile.c: In function ‘Pop’:
+wasm-rtos/wasm3/source/m3_compile.c:618:23: warning: comparison is always false due to limited range of data type [-Wtype-limits]
+  618 |         else if (slot < 0 || slot >= o->slotMaxAllocatedIndexPlusOne) {
+      |                       ^
+wasm-rtos/wasm3/source/m3_compile.c: In function ‘Compile_Const_i32’:
+wasm-rtos/wasm3/source/m3_compile.c:1174:60: warning: unused parameter ‘i_opcode’ [-Wunused-parameter]
+ 1174 | M3Result  Compile_Const_i32  (IM3Compilation o, m3opcode_t i_opcode)
+      |                                                 ~~~~~~~~~~~^~~~~~~~
+wasm-rtos/wasm3/source/m3_compile.c: In function ‘Compile_Const_i64’:
+wasm-rtos/wasm3/source/m3_compile.c:1185:60: warning: unused parameter ‘i_opcode’ [-Wunused-parameter]
+ 1185 | M3Result  Compile_Const_i64  (IM3Compilation o, m3opcode_t i_opcode)
+      |                                                 ~~~~~~~~~~~^~~~~~~~
+wasm-rtos/wasm3/source/m3_compile.c: In function ‘Compile_Const_f32’:
+wasm-rtos/wasm3/source/m3_compile.c:1198:60: warning: unused parameter ‘i_opcode’ [-Wunused-parameter]
+ 1198 | M3Result  Compile_Const_f32  (IM3Compilation o, m3opcode_t i_opcode)
+      |                                                 ~~~~~~~~~~~^~~~~~~~
+wasm-rtos/wasm3/source/m3_compile.c: In function ‘Compile_Const_f64’:
+wasm-rtos/wasm3/source/m3_compile.c:1211:60: warning: unused parameter ‘i_opcode’ [-Wunused-parameter]
+ 1211 | M3Result  Compile_Const_f64  (IM3Compilation o, m3opcode_t i_opcode)
+      |                                                 ~~~~~~~~~~~^~~~~~~~
+wasm-rtos/wasm3/source/m3_compile.c: In function ‘Compile_Return’:
+wasm-rtos/wasm3/source/m3_compile.c:1252:57: warning: unused parameter ‘i_opcode’ [-Wunused-parameter]
+ 1252 | M3Result  Compile_Return  (IM3Compilation o, m3opcode_t i_opcode)
+      |                                              ~~~~~~~~~~~^~~~~~~~
+wasm-rtos/wasm3/source/m3_compile.c: In function ‘ValidateBlockEnd’:
+wasm-rtos/wasm3/source/m3_compile.c:1272:45: warning: unused parameter ‘o’ [-Wunused-parameter]
+ 1272 | M3Result  ValidateBlockEnd  (IM3Compilation o)
+      |                              ~~~~~~~~~~~~~~~^
+wasm-rtos/wasm3/source/m3_compile.c: In function ‘Compile_End’:
+wasm-rtos/wasm3/source/m3_compile.c:1290:54: warning: unused parameter ‘i_opcode’ [-Wunused-parameter]
+ 1290 | M3Result  Compile_End  (IM3Compilation o, m3opcode_t i_opcode)
+      |                                           ~~~~~~~~~~~^~~~~~~~
+wasm-rtos/wasm3/source/m3_compile.c: In function ‘Compile_GetLocal’:
+wasm-rtos/wasm3/source/m3_compile.c:1343:59: warning: unused parameter ‘i_opcode’ [-Wunused-parameter]
+ 1343 | M3Result  Compile_GetLocal  (IM3Compilation o, m3opcode_t i_opcode)
+      |                                                ~~~~~~~~~~~^~~~~~~~
+wasm-rtos/wasm3/source/m3_compile.c: In function ‘Compile_BranchTable’:
+wasm-rtos/wasm3/source/m3_compile.c:1553:62: warning: unused parameter ‘i_opcode’ [-Wunused-parameter]
+ 1553 | M3Result  Compile_BranchTable  (IM3Compilation o, m3opcode_t i_opcode)
+      |                                                   ~~~~~~~~~~~^~~~~~~~
+wasm-rtos/wasm3/source/m3_compile.c: In function ‘Compile_Call’:
+wasm-rtos/wasm3/source/m3_compile.c:1680:55: warning: unused parameter ‘i_opcode’ [-Wunused-parameter]
+ 1680 | M3Result  Compile_Call  (IM3Compilation o, m3opcode_t i_opcode)
+      |                                            ~~~~~~~~~~~^~~~~~~~
+wasm-rtos/wasm3/source/m3_compile.c: In function ‘Compile_CallIndirect’:
+wasm-rtos/wasm3/source/m3_compile.c:1725:63: warning: unused parameter ‘i_opcode’ [-Wunused-parameter]
+ 1725 | M3Result  Compile_CallIndirect  (IM3Compilation o, m3opcode_t i_opcode)
+      |                                                    ~~~~~~~~~~~^~~~~~~~
+wasm-rtos/wasm3/source/m3_compile.c: In function ‘Compile_Memory_Size’:
+wasm-rtos/wasm3/source/m3_compile.c:1756:62: warning: unused parameter ‘i_opcode’ [-Wunused-parameter]
+ 1756 | M3Result  Compile_Memory_Size  (IM3Compilation o, m3opcode_t i_opcode)
+      |                                                   ~~~~~~~~~~~^~~~~~~~
+wasm-rtos/wasm3/source/m3_compile.c: In function ‘Compile_Memory_Grow’:
+wasm-rtos/wasm3/source/m3_compile.c:1773:62: warning: unused parameter ‘i_opcode’ [-Wunused-parameter]
+ 1773 | M3Result  Compile_Memory_Grow  (IM3Compilation o, m3opcode_t i_opcode)
+      |                                                   ~~~~~~~~~~~^~~~~~~~
+wasm-rtos/wasm3/source/m3_compile.c: In function ‘Compile_Select’:
+wasm-rtos/wasm3/source/m3_compile.c:2004:57: warning: unused parameter ‘i_opcode’ [-Wunused-parameter]
+ 2004 | M3Result  Compile_Select  (IM3Compilation o, m3opcode_t i_opcode)
+      |                                              ~~~~~~~~~~~^~~~~~~~
+wasm-rtos/wasm3/source/m3_compile.c: In function ‘Compile_Drop’:
+wasm-rtos/wasm3/source/m3_compile.c:2084:55: warning: unused parameter ‘i_opcode’ [-Wunused-parameter]
+ 2084 | M3Result  Compile_Drop  (IM3Compilation o, m3opcode_t i_opcode)
+      |                                            ~~~~~~~~~~~^~~~~~~~
+wasm-rtos/wasm3/source/m3_compile.c: In function ‘Compile_Nop’:
+wasm-rtos/wasm3/source/m3_compile.c:2091:40: warning: unused parameter ‘o’ [-Wunused-parameter]
+ 2091 | M3Result  Compile_Nop  (IM3Compilation o, m3opcode_t i_opcode)
+      |                         ~~~~~~~~~~~~~~~^
+wasm-rtos/wasm3/source/m3_compile.c:2091:54: warning: unused parameter ‘i_opcode’ [-Wunused-parameter]
+ 2091 | M3Result  Compile_Nop  (IM3Compilation o, m3opcode_t i_opcode)
+      |                                           ~~~~~~~~~~~^~~~~~~~
+wasm-rtos/wasm3/source/m3_compile.c: In function ‘Compile_Unreachable’:
+wasm-rtos/wasm3/source/m3_compile.c:2097:62: warning: unused parameter ‘i_opcode’ [-Wunused-parameter]
+ 2097 | M3Result  Compile_Unreachable  (IM3Compilation o, m3opcode_t i_opcode)
+      |                                                   ~~~~~~~~~~~^~~~~~~~
+wasm-rtos/wasm3/source/m3_core.c: In function ‘m3_Abort’:
+wasm-rtos/wasm3/source/m3_core.c:15:27: warning: unused parameter ‘message’ [-Wunused-parameter]
+   15 | void m3_Abort(const char* message) {
+      |               ~~~~~~~~~~~~^~~~~~~
+wasm-rtos/wasm3/source/m3_env.c: In function ‘_FreeModule’:
+wasm-rtos/wasm3/source/m3_env.c:224:50: warning: unused parameter ‘i_info’ [-Wunused-parameter]
+  224 | void *  _FreeModule  (IM3Module i_module, void * i_info)
+      |                                           ~~~~~~~^~~~~~
+wasm-rtos/wasm3/source/m3_env.c: In function ‘m3_GetMemory’:
+wasm-rtos/wasm3/source/m3_env.c:1300:90: warning: unused parameter ‘i_memoryIndex’ [-Wunused-parameter]
+ 1300 | uint8_t *  m3_GetMemory  (IM3Runtime i_runtime, uint32_t * o_memorySizeInBytes, uint32_t i_memoryIndex)
+      |                                                                                 ~~~~~~~~~^~~~~~~~~~~~~
+wasm-rtos/wasm3/source/m3_env.c: In function ‘m3_GetBacktrace’:
+wasm-rtos/wasm3/source/m3_env.c:1325:49: warning: unused parameter ‘i_runtime’ [-Wunused-parameter]
+ 1325 | M3BacktraceInfo *  m3_GetBacktrace  (IM3Runtime i_runtime)
+      |                                      ~~~~~~~~~~~^~~~~~~~~
+wasm-rtos/wasm3/source/m3_env.c: In function ‘SnapshotGetModule’:
+wasm-rtos/wasm3/source/m3_env.c:1377:5: warning: this ‘for’ clause does not guard... [-Wmisleading-indentation]
+ 1377 |     for (IM3Module m = runtime ? runtime->modules : NULL; m; m = m->next, index--) if (index == 0) return m; return NULL;
+      |     ^~~
+wasm-rtos/wasm3/source/m3_env.c:1377:110: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘for’
+ 1377 |     for (IM3Module m = runtime ? runtime->modules : NULL; m; m = m->next, index--) if (index == 0) return m; return NULL;
+      |                                                                                                              ^~~~~~
+wasm-rtos/wasm3/source/m3_function.c: In function ‘Function_FreeCompiledCode’:
+wasm-rtos/wasm3/source/m3_function.c:113:46: warning: unused parameter ‘i_function’ [-Wunused-parameter]
+  113 | void  Function_FreeCompiledCode (IM3Function i_function)
+      |                                  ~~~~~~~~~~~~^~~~~~~~~~
+wasm-rtos/wasm3/source/m3_parse.c: In function ‘ParseType_Table’:
+wasm-rtos/wasm3/source/m3_parse.c:14:39: warning: unused parameter ‘io_module’ [-Wunused-parameter]
+   14 | M3Result  ParseType_Table  (IM3Module io_module, bytes_t i_bytes, cbytes_t i_end)
+      |                             ~~~~~~~~~~^~~~~~~~~
+wasm-rtos/wasm3/source/m3_parse.c:14:58: warning: unused parameter ‘i_bytes’ [-Wunused-parameter]
+   14 | M3Result  ParseType_Table  (IM3Module io_module, bytes_t i_bytes, cbytes_t i_end)
+      |                                                  ~~~~~~~~^~~~~~~
+wasm-rtos/wasm3/source/m3_parse.c:14:76: warning: unused parameter ‘i_end’ [-Wunused-parameter]
+   14 | M3Result  ParseType_Table  (IM3Module io_module, bytes_t i_bytes, cbytes_t i_end)
+      |                                                                   ~~~~~~~~~^~~~~
+wasm-rtos/wasm3/source/m3_parse.c: In function ‘ParseSection_Code’:
+wasm-rtos/wasm3/source/m3_parse.c:366:24: warning: unused variable ‘ptr’ [-Wunused-variable]
+  366 |             const u8 * ptr = i_bytes;
+      |                        ^~~
+/usr/bin/ld: /tmp/ccyY0KcW.o: in function `main':
+main.c:(.text+0x9): undefined reference to `test_runner_main'
+collect2: error: ld returned 1 exit status
