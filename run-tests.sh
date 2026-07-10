@@ -27,7 +27,7 @@ for dir in tests/*; do
     build_log="$dir/.build.log"
 
     echo "=== $name ==="
-    : > "$build_log"
+    rm -f "$wasm" "$runner" "$build_log"
     : > "$log"
 
     if [ ! -f "$main" ]; then
@@ -63,6 +63,12 @@ for dir in tests/*; do
         fi
     fi
 
+    if [ ! -s "$wasm" ]; then
+        echo "FAIL generated WASM is missing or empty: $wasm" | tee "$log"
+        failed=1
+        continue
+    fi
+
     if ! "$CC_BIN" -std=c11 -Wall -Wextra -D_GNU_SOURCE -D_POSIX_C_SOURCE=200809L -Dd_m3HasWASI \
         -Iwasm-rtos \
         "$main" wasm-rtos/os.c wasm-rtos/hal.c wasm-rtos/wasm3/source/*.c \
@@ -73,6 +79,11 @@ for dir in tests/*; do
     fi
 
     if ! (cd "$dir" && "./$name.runner"); then
+        failed=1
+    fi
+
+    if [ ! -s "$log" ]; then
+        echo "FAIL generated log is missing or empty: $log"
         failed=1
     fi
 
