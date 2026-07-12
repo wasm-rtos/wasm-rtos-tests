@@ -29,7 +29,24 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ github.head_ref || github.ref_name }}
-          submodules: recursive
+          fetch-depth: 0
+          submodules: false
+
+      - name: Update wasm-rtos and nested wasm3 submodules
+        run: |
+          git submodule sync --recursive
+          git submodule update --init --remote --recursive
+          git submodule status --recursive
+
+          test -f wasm-rtos/os.c
+          test -f wasm-rtos/wasm3/source/wasm3.h
+
+          echo "wasm-rtos commit: $(git -C wasm-rtos rev-parse HEAD)"
+          echo "wasm3 commit: $(git -C wasm-rtos/wasm3 rev-parse HEAD)"
+
+          if ! git -C wasm-rtos diff --quiet -- wasm3; then
+            echo "::warning::The nested wasm3 checkout is newer than the gitlink recorded by wasm-rtos. It is used by this test run, but must be committed in the wasm-rtos repository to become permanent."
+          fi
 
       - name: Install toolchain
         run: |
@@ -81,14 +98,34 @@ jobs:
 
           exit "$failed"
 
-      - name: Commit regenerated artifacts to branch
-        if: always() && steps.run_tests.outcome == 'success' && steps.verify_artifacts.outcome == 'failure'
+      - name: Commit updated submodule and regenerated artifacts to branch
+        if: always() && github.event_name == 'push' && steps.run_tests.outcome == 'success'
         run: |
-          branch="${{ github.head_ref || github.ref_name }}"
+          branch="${{ github.ref_name }}"
+
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -f tests/*/*.wasm tests/*/*.log
-          git commit -m "Regenerate isolated test artifacts"
+
+          git add wasm-rtos
+
+          if [ "${{ steps.verify_artifacts.outcome }}" = "failure" ]; then
+            git add -f tests/*/*.wasm tests/*/*.log
+          fi
+
+          if git diff --cached --quiet; then
+            echo "No submodule pointer or generated artifacts changed"
+            exit 0
+          fi
+
+          if git diff --cached --quiet -- wasm-rtos; then
+            commit_message="Regenerate isolated test artifacts"
+          elif git diff --cached --quiet -- tests; then
+            commit_message="Update wasm-rtos submodule"
+          else
+            commit_message="Update wasm-rtos submodule and test artifacts"
+          fi
+
+          git commit -m "$commit_message"
           git push origin "HEAD:$branch"
 
       - name: Upload generated WASM files and logs
