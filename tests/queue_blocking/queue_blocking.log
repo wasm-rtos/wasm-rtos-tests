@@ -1,0 +1,85 @@
+PASS initialize OS
+PASS load blocking queue test module
+PASS create direct-handoff queue
+PASS create high-priority receiver
+PASS empty queue blocks receiver
+PASS receiver enters WAITING
+PASS create low-priority sender
+PASS sender directly hands off item
+PASS handoff wakes receiver
+PASS higher-priority wake preempts sender
+PASS direct handoff does not consume queue storage
+PASS high-priority receiver resumes first
+PASS blocked receive returns handed-off value
+PASS preempted sender finishes
+PASS blocked-send import returns success
+PASS delete queue task
+PASS delete queue task
+PASS create full-queue scenario
+PASS fill queue before blocking sender
+PASS create high-priority blocked sender
+PASS full queue blocks sender
+PASS sender enters WAITING
+PASS create low-priority receiver
+PASS receiver frees queue slot
+PASS freed slot wakes blocked sender
+PASS woken sender preempts lower-priority receiver
+PASS blocked sender fills newly freed slot
+PASS high-priority sender resumes first
+PASS blocked sender returns success
+PASS preempted receiver finishes
+PASS receiver gets oldest queued item
+PASS sender item remains next in FIFO order
+PASS delete queue task
+PASS delete queue task
+PASS create priority-order queue
+PASS create low-priority waiter
+PASS low-priority waiter blocks
+PASS create high-priority waiter
+PASS high-priority waiter blocks
+PASS send one item to competing waiters
+PASS highest-priority receiver wakes first
+PASS high-priority receiver gets first item
+PASS send item to remaining waiter
+PASS low-priority receiver gets second item
+PASS delete queue task
+PASS delete queue task
+PASS create equal-priority FIFO queue
+PASS create first equal-priority waiter
+PASS first equal-priority waiter blocks
+PASS create second equal-priority waiter
+PASS second equal-priority waiter blocks
+PASS send two direct-handoff values
+PASS resume both equal-priority waiters
+PASS equal-priority waiters wake in FIFO wait order
+PASS delete queue task
+PASS delete queue task
+PASS create timeout queue
+PASS create receive-timeout task
+PASS receive-timeout task blocks
+PASS receiver remains blocked before deadline
+PASS receiver wakes exactly at deadline
+PASS receive wait returns timeout
+PASS delete queue task
+PASS fill timeout queue
+PASS create send-timeout task
+PASS send-timeout task blocks
+PASS sender remains blocked before deadline
+PASS sender wakes exactly at deadline
+PASS send wait returns timeout
+PASS timed-out sender does not modify queue
+PASS delete queue task
+PASS create deletion queue
+PASS create waiter for deleted queue
+PASS deleted-queue waiter blocks
+PASS queue deletion wakes receiver
+PASS deleted queue returns not-found status
+PASS delete queue task
+PASS create sender-deletion queue
+PASS fill sender-deletion queue
+PASS create sender for deleted queue
+PASS deleted-queue sender blocks
+PASS queue deletion wakes sender
+PASS deleted queue returns not-found to sender
+PASS delete queue task
+PASS OS is clean

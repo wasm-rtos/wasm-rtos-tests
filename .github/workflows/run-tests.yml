@@ -35,7 +35,13 @@ jobs:
       - name: Update wasm-rtos and nested wasm3 submodules
         run: |
           git submodule sync --recursive
-          git submodule update --init --remote --recursive
+          if [ "${{ github.event_name }}" = "push" ]; then
+            git submodule update --init --remote wasm-rtos
+          else
+            git submodule update --init wasm-rtos
+          fi
+          git -C wasm-rtos submodule sync --recursive
+          git -C wasm-rtos submodule update --init --recursive
           git submodule status --recursive
 
           test -f wasm-rtos/os.c
@@ -43,10 +49,6 @@ jobs:
 
           echo "wasm-rtos commit: $(git -C wasm-rtos rev-parse HEAD)"
           echo "wasm3 commit: $(git -C wasm-rtos/wasm3 rev-parse HEAD)"
-
-          if ! git -C wasm-rtos diff --quiet -- wasm3; then
-            echo "::warning::The nested wasm3 checkout is newer than the gitlink recorded by wasm-rtos. It is used by this test run, but must be committed in the wasm-rtos repository to become permanent."
-          fi
 
       - name: Install toolchain
         run: |
@@ -57,7 +59,7 @@ jobs:
         id: run_tests
         run: bash ./run-tests.sh
 
-      - name: Verify required artifacts are tracked and current
+      - name: Check required artifacts are tracked and current
         id: verify_artifacts
         if: steps.run_tests.outcome == 'success'
         run: |
@@ -96,7 +98,15 @@ jobs:
             failed=1
           fi
 
-          exit "$failed"
+          if [ "$failed" -eq 0 ]; then
+            echo "stale=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "stale=true" >> "$GITHUB_OUTPUT"
+          fi
+
+          if [ "$failed" -ne 0 ] && [ "${{ github.event_name }}" != "push" ]; then
+            exit 1
+          fi
 
       - name: Commit updated submodule and regenerated artifacts to branch
         if: always() && github.event_name == 'push' && steps.run_tests.outcome == 'success'
@@ -108,7 +118,7 @@ jobs:
 
           git add wasm-rtos
 
-          if [ "${{ steps.verify_artifacts.outcome }}" = "failure" ]; then
+          if [ "${{ steps.verify_artifacts.outputs.stale }}" = "true" ]; then
             git add -f tests/*/*.wasm tests/*/*.log
           fi
 
