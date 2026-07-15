@@ -1,0 +1,91 @@
+PASS initialize OS
+PASS load software timer test module
+PASS reset OS for timer scenario
+PASS create WASM timer API task
+PASS WASM creates and starts one-shot timer
+PASS WASM timer task waits for notification
+PASS WASM change-period import sets nearest deadline
+PASS WASM timer does not fire early
+PASS WASM timer fires at exact deadline
+PASS WASM timer imports return notification value
+PASS WASM deletes completed timer
+PASS delete timer task
+PASS reset OS for timer scenario
+PASS create timer timeout-tie task
+PASS notification task waits with timeout
+PASS task timeout contributes nearest wakeup
+PASS create host one-shot timer
+PASS timer ID resolves to handle
+PASS new timer is inactive with requested period
+PASS start host one-shot timer
+PASS one-shot timer waits until exact deadline
+PASS timer notification wins an equal timeout deadline
+PASS one-shot timer becomes inactive before notification resumes
+PASS one-shot notification reaches WASM task
+PASS dead notification target releases its timers
+PASS delete timer task
+PASS reset OS for timer scenario
+PASS create timer-control waiter
+PASS timer-control waiter blocks
+PASS create controllable timer
+PASS start controllable timer
+PASS reset restarts timer from current time
+PASS reset timer remains pending before new deadline
+PASS change period restarts active timer
+PASS stop removes timer from nearest wakeup
+PASS stopped timer does not notify task
+PASS restart stopped timer
+PASS restarted timer uses changed period
+PASS restarted timer delivers notification
+PASS delete timer task
+PASS reset OS for timer scenario
+PASS create auto-reload notification task
+PASS auto-reload task waits for first period
+PASS start auto-reload increment timer
+PASS late tick coalesces elapsed timer periods
+PASS auto-reload keeps original phase after late tick
+PASS task consumes one coalesced notification and waits again
+PASS phase-preserved timer does not fire early
+PASS phase-preserved timer fires at next boundary
+PASS auto-reload delivers one notification per update
+PASS task exit removes its auto-reload timer
+PASS delete timer task
+PASS reset OS for timer scenario
+PASS create deletable timer target
+PASS deletable timer target blocks
+PASS create timer owned by deletable target
+PASS delete timer task
+PASS task deletion removes timers and wakeups
+PASS reset OS for timer scenario
+PASS advance logical time near uint32 wraparound
+PASS create wraparound timer target
+PASS wraparound timer target blocks
+PASS start timer across tick wraparound
+PASS wrapped timer remains pending before deadline
+PASS wrapped timer fires at modular deadline
+PASS wrapped timer delivers notification
+PASS delete timer task
+PASS reset OS for timer scenario
+PASS reject incomplete tickless clock port
+PASS register tickless clock and establish baseline
+PASS create tickless timer target
+PASS tickless target blocks
+PASS start timer through tickless port
+PASS hardware alarm receives nearest deadline
+PASS stopping nearest timer cancels hardware alarm
+PASS restarting timer rearms hardware alarm
+PASS scheduler polls absolute clock without periodic os_tick
+PASS early hardware wake rearms remaining deadline
+PASS hardware wake advances absolute time and expires timer
+PASS tickless timer resumes target task
+PASS tickless port has no stale alarm after completion
+PASS delete timer task
+PASS clear tickless clock port
+PASS reset OS for timer scenario
+PASS register clock-only polling fallback
+PASS create polled-clock timer target
+PASS polled-clock target blocks
+PASS start timer without hardware alarm
+PASS polling fallback tracks absolute time before deadline
+PASS polling fallback fires timer without os_tick call
+PASS delete timer task
