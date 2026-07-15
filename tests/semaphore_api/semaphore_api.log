@@ -1,0 +1,30 @@
+PASS initialize OS
+PASS load semaphore test module
+PASS create binary semaphore
+PASS create semaphore waiter
+PASS waiter attempts take
+PASS empty semaphore blocks task
+PASS waiting task counter increments
+PASS give semaphore to waiter
+PASS give wakes highest-priority waiter
+PASS give transfers token directly
+PASS resumed waiter exits
+PASS blocked take returns success after resume
+PASS create timeout waiter
+PASS timeout waiter blocks
+PASS waiter remains blocked before timeout
+PASS waiter wakes exactly at timeout
+PASS kernel records timeout status
+PASS timeout waiter resumes
+PASS blocked take returns timeout to WASM
+PASS give stores token without waiter
+PASS semaphore count increments
+PASS give detects full semaphore
+PASS create immediate taker
+PASS immediate taker runs
+PASS available token is taken without blocking
+PASS take consumes stored token
+PASS delete waiter
+PASS delete timeout task
+PASS delete immediate task
+PASS OS is clean

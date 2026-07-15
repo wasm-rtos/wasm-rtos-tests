@@ -1,0 +1,27 @@
+PASS initialize OS
+PASS load event group test module
+PASS create event group
+PASS create wait-all task
+PASS event waiter blocks
+PASS wait-all task enters WAITING
+PASS set first event bit
+PASS wait-all task stays blocked with one bit
+PASS set second bit and clear matched bits on exit
+PASS all requested bits wake task
+PASS clear-on-exit clears requested bits
+PASS waiter receives pre-clear bit snapshot
+PASS event waiter resumes
+PASS WASM wait returns matched event bits
+PASS create event timeout task
+PASS event timeout task blocks
+PASS event task remains blocked before deadline
+PASS event task wakes at deadline
+PASS event timeout status is recorded
+PASS event timeout task resumes
+PASS timed-out wait returns current event bits
+PASS set unrelated bit
+PASS clear returns previous event bits
+PASS event bit is cleared
+PASS delete event waiter
+PASS delete event timeout task
+PASS OS is clean
