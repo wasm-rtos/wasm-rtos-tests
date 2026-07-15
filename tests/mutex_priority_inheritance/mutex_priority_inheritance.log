@@ -1,0 +1,31 @@
+PASS initialize OS
+PASS load mutex test module
+PASS create mutex
+PASS create low-priority owner
+PASS low task locks and yields
+PASS low task owns mutex
+PASS low task is ready after yield
+PASS create medium-priority task
+PASS create high-priority waiter
+PASS high task blocks on mutex
+PASS high task waits for mutex
+PASS owner base priority is unchanged
+PASS owner inherits waiter priority
+PASS inherited owner runs before medium task
+PASS medium task does not cause priority inversion
+PASS low task is preempted after releasing mutex
+PASS mutex ownership transfers to highest waiter
+PASS high waiter becomes ready
+PASS high waiter resumes
+PASS high waiter exits after unlock
+PASS blocked mutex call returns success after resume
+PASS mutex is released
+PASS medium task finally runs
+PASS medium task exits normally
+PASS preempted low-priority task finishes
+PASS low task exits after higher priorities complete
+PASS all mutex test tasks return success
+PASS delete low task
+PASS delete medium task
+PASS delete high task
+PASS OS is clean

@@ -1,0 +1,36 @@
+PASS initialize OS
+PASS load notification test module
+PASS create notification waiter
+PASS notification waiter blocks
+PASS notification wait enters WAITING
+PASS create WASM notification sender
+PASS WASM sender notifies waiter
+PASS task notification import succeeds
+PASS notification wakes waiter
+PASS kernel records notification value
+PASS notification waiter resumes
+PASS wait returns status and writes value to WASM memory
+PASS clear-on-exit consumes notification bits
+PASS create notification take task
+PASS preload notification count
+PASS notification take runs
+PASS notify take returns count before decrement
+PASS counting take decrements and consumes pending state
+PASS create pending notification task
+PASS preload pending notification bits
+PASS task consumes already-pending notification
+PASS clear-on-entry preserves unread pending bits
+PASS notify wait consumes state without clear-on-exit
+PASS create notification timeout task
+PASS notification timeout task blocks
+PASS notification task waits before deadline
+PASS notification task wakes at deadline
+PASS notification timeout status is recorded
+PASS notification timeout resumes
+PASS notify wait returns timeout to WASM
+PASS delete waiter
+PASS delete sender
+PASS delete taker
+PASS delete pending notification task
+PASS delete notification timeout task
+PASS OS is clean
