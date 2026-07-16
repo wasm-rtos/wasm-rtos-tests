@@ -18,6 +18,12 @@ PASS wrapped deadline does not fire early
 PASS wrapped deadline fires at the exact tick
 PASS delete task
 PASS reset OS
+PASS create periodic task for large lateness
+PASS large-lateness periodic task starts first period
+PASS large elapsed delta readies periodic task
+PASS lateness above INT32_MAX cannot strand periodic catch-up
+PASS delete task
+PASS reset OS
 PASS create ready task for negative abort test
 PASS abort rejects a task that is not waiting
 PASS delete task
