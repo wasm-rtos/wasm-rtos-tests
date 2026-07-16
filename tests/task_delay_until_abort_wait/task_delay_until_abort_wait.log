@@ -1,0 +1,63 @@
+PASS load task delay/abort WASM
+PASS initialize OS
+PASS reset OS
+PASS create periodic task
+PASS first delay uses the absolute 10 ms phase
+PASS late first deadline wakes periodic task
+PASS late execution keeps the original phase without drift
+PASS on-time execution advances by one fixed period
+PASS missed third period wakes at the late host time
+PASS missed period catches up to the next phase boundary
+PASS periodic task finishes exactly on the fourth boundary
+PASS delete task
+PASS reset OS
+PASS move clock near uint32 wraparound
+PASS create wraparound periodic task
+PASS delay-until deadline crosses tick wraparound
+PASS wrapped deadline does not fire early
+PASS wrapped deadline fires at the exact tick
+PASS delete task
+PASS reset OS
+PASS create periodic task for large lateness
+PASS large-lateness periodic task starts first period
+PASS large elapsed delta readies periodic task
+PASS lateness above INT32_MAX cannot strand periodic catch-up
+PASS delete task
+PASS reset OS
+PASS create ready task for negative abort test
+PASS abort rejects a task that is not waiting
+PASS delete task
+PASS create delay-until abort task
+PASS delay-until task blocks on absolute deadline
+PASS abort removes delay deadline and readies task
+PASS blocked delay-until import resumes with ABORTED
+PASS abort rejects a dead task
+PASS delete task
+PASS reset OS
+PASS create legacy delay task
+PASS legacy delay task blocks
+PASS create WASM abort controller
+PASS common os_task_abort_wait import wakes target
+PASS void legacy delay resumes after abort
+PASS delete task
+PASS delete task
+PASS reset OS
+PASS create semaphore waiter
+PASS semaphore task waits forever
+PASS abort wakes synchronization waiter
+PASS semaphore take resumes with ABORTED
+PASS delete task
+PASS reset OS
+PASS create mutex for inheritance abort
+PASS create low-priority mutex owner
+PASS owner locks mutex and delays
+PASS create high-priority mutex waiter
+PASS blocked waiter raises owner priority
+PASS aborting mutex wait removes inherited priority
+PASS mutex lock resumes with ABORTED
+PASS delete task
+PASS delete task
+PASS reset OS
+PASS create invalid-period task
+PASS zero delay-until period is rejected
+PASS delete task
