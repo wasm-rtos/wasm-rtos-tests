@@ -66,6 +66,32 @@ PASS wrapped timer fires at modular deadline
 PASS wrapped timer delivers notification
 PASS delete timer task
 PASS reset OS for timer scenario
+PASS create large-delta timer target
+PASS large-delta timer target blocks
+PASS start timer before large tick delta
+PASS large tick delta advances full logical time
+PASS large tick delta expires one-shot timer
+PASS large-delta timer notification reaches task
+PASS delete timer task
+PASS reset OS for timer scenario
+PASS create READY task for timer snapshot guard
+PASS attach inactive timer to READY task
+PASS reject snapshot size while timer is attached
+PASS reject snapshot save while timer is attached
+PASS delete timer task
+PASS reset OS for timer scenario
+PASS register clock for stale-deadline regression
+PASS create clock-sync timer target
+PASS clock-sync timer target blocks
+PASS create timer before stale clock interval
+PASS timer start synchronizes clock before deadline
+PASS immediate poll does not expire synchronized timer
+PASS period change synchronizes clock before restart
+PASS restarted timer remains pending before synchronized deadline
+PASS synchronized timer expires at new deadline
+PASS synchronized timer notification reaches task
+PASS delete timer task
+PASS reset OS for timer scenario
 PASS reject incomplete tickless clock port
 PASS register tickless clock and establish baseline
 PASS create tickless timer target

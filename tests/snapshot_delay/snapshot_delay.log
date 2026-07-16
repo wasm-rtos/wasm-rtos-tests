@@ -3,14 +3,18 @@ PASS load snapshot_delay.wasm
 PASS create source task
 PASS run source until delay
 PASS source is WAITING
-PASS get snapshot size
+PASS reject snapshot size while task is WAITING
+PASS reject snapshot save while task is WAITING
+PASS delay completion makes source READY
+PASS get snapshot size after wait completes
 PASS allocate snapshot
-PASS save snapshot
-PASS create restore task
-PASS load snapshot
-PASS schedule restored task
-PASS restored task reaches DEAD
-PASS restored task returns 21
-PASS delete restored task
-PASS delete source task
+PASS save snapshot after wait completes
+PASS delete snapshot source task
+PASS create blocked snapshot target
+PASS run snapshot target until delay
+PASS reject snapshot load without corrupting active wait
+PASS schedule unmodified target task
+PASS unmodified target reaches DEAD
+PASS unmodified target returns 21
+PASS delete blocked snapshot target
 PASS clean OS state

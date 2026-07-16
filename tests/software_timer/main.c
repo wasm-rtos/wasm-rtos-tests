@@ -393,6 +393,150 @@ static void test_target_delete_and_wraparound(WasmBinary* wasm)
     delete_task(&task);
 }
 
+static void test_large_tick_delta(WasmBinary* wasm)
+{
+    OsTaskHandle task = NULL;
+    OsTimerHandle timer = NULL;
+    uint32_t delta_ms = (uint32_t)INT32_MAX + 6U;
+
+    reset_os();
+    expect(create_task(
+               &task,
+               wasm,
+               "app_main_wait_forever",
+               "large_tick_delta",
+               0U,
+               OS_TASK_PRIORITY_NORMAL) == OS_STATUS_OK,
+           "create large-delta timer target");
+    expect(os_schedule() == OS_STATUS_OK,
+           "large-delta timer target blocks");
+    expect(os_timer_create(
+               &timer,
+               5U,
+               0U,
+               task,
+               0x44U,
+               OS_NOTIFY_SET_VALUE_WITH_OVERWRITE) == OS_STATUS_OK &&
+               os_timer_start(timer) == OS_STATUS_OK,
+           "start timer before large tick delta");
+
+    os_tick(delta_ms);
+    expect(os_get_tick_ms() == delta_ms,
+           "large tick delta advances full logical time");
+    expect(os_task_get_state(task) == OS_TASK_READY &&
+               !os_timer_is_active(timer),
+           "large tick delta expires one-shot timer");
+    expect(os_schedule() == OS_STATUS_OK &&
+               os_task_get_exit_code(task) == 0x44U,
+           "large-delta timer notification reaches task");
+    delete_task(&task);
+}
+
+static void test_snapshot_timer_guard(WasmBinary* wasm)
+{
+    OsTaskHandle task = NULL;
+    OsTimerHandle timer = NULL;
+    uint8_t snapshot_byte = 0U;
+    uint32_t snapshot_size = 0U;
+    uint32_t written = 0U;
+
+    reset_os();
+    expect(create_task(
+               &task,
+               wasm,
+               "app_main_wait_forever",
+               "timer_snapshot_guard",
+               0U,
+               OS_TASK_PRIORITY_NORMAL) == OS_STATUS_OK,
+           "create READY task for timer snapshot guard");
+    expect(os_timer_create(
+               &timer,
+               5U,
+               0U,
+               task,
+               0x45U,
+               OS_NOTIFY_SET_VALUE_WITH_OVERWRITE) == OS_STATUS_OK,
+           "attach inactive timer to READY task");
+    expect(os_task_get_snapshot_size(task, &snapshot_size) == OS_STATUS_BUSY,
+           "reject snapshot size while timer is attached");
+    expect(os_task_save_snapshot(
+               task,
+               &snapshot_byte,
+               sizeof(snapshot_byte),
+               &written) == OS_STATUS_BUSY,
+           "reject snapshot save while timer is attached");
+    delete_task(&task);
+}
+
+static void test_clock_sync_before_timer_deadline(WasmBinary* wasm)
+{
+    FakeClock clock = {0};
+    OsClockPort port;
+    OsTaskHandle task = NULL;
+    OsTimerHandle timer = NULL;
+
+    reset_os();
+    clock.now_ms = 3000U;
+    port.now_ms = fake_now_ms;
+    port.arm_wakeup = fake_arm_wakeup;
+    port.cancel_wakeup = fake_cancel_wakeup;
+    port.context = &clock;
+    expect(os_clock_port_set(&port) == OS_STATUS_OK,
+           "register clock for stale-deadline regression");
+    expect(create_task(
+               &task,
+               wasm,
+               "app_main_wait_forever",
+               "clock_sync_target",
+               0U,
+               OS_TASK_PRIORITY_NORMAL) == OS_STATUS_OK,
+           "create clock-sync timer target");
+    expect(os_schedule() == OS_STATUS_OK,
+           "clock-sync timer target blocks");
+    expect(os_timer_create(
+               &timer,
+               5U,
+               0U,
+               task,
+               0x55U,
+               OS_NOTIFY_SET_VALUE_WITH_OVERWRITE) == OS_STATUS_OK,
+           "create timer before stale clock interval");
+
+    clock.now_ms = 3100U;
+    expect(os_timer_start(timer) == OS_STATUS_OK &&
+               os_get_tick_ms() == 100U &&
+               os_task_get_state(task) == OS_TASK_WAITING &&
+               os_timer_is_active(timer) &&
+               clock.last_delay_ms == 5U,
+           "timer start synchronizes clock before deadline");
+    expect(os_clock_poll() == OS_STATUS_OK &&
+               os_task_get_state(task) == OS_TASK_WAITING &&
+               os_get_next_wakeup_ms() == 5U,
+           "immediate poll does not expire synchronized timer");
+
+    clock.now_ms = 3102U;
+    expect(os_timer_change_period(timer, 5U) == OS_STATUS_OK &&
+               os_get_tick_ms() == 102U &&
+               os_get_next_wakeup_ms() == 5U &&
+               clock.last_delay_ms == 5U,
+           "period change synchronizes clock before restart");
+    clock.now_ms = 3106U;
+    expect(os_clock_poll() == OS_STATUS_OK &&
+               os_task_get_state(task) == OS_TASK_WAITING &&
+               os_get_next_wakeup_ms() == 1U,
+           "restarted timer remains pending before synchronized deadline");
+    clock.armed = 0U;
+    clock.now_ms = 3107U;
+    expect(os_clock_wakeup() == OS_STATUS_OK &&
+               os_task_get_state(task) == OS_TASK_READY,
+           "synchronized timer expires at new deadline");
+    expect(os_schedule() == OS_STATUS_OK &&
+               os_task_get_exit_code(task) == 0x55U,
+           "synchronized timer notification reaches task");
+    delete_task(&task);
+    os_clock_port_clear();
+}
+
 static void test_tickless_clock_port(WasmBinary* wasm)
 {
     FakeClock clock = {0};
@@ -544,6 +688,9 @@ int main(void)
         test_timer_controls(&wasm);
         test_auto_reload_coalescing(&wasm);
         test_target_delete_and_wraparound(&wasm);
+        test_large_tick_delta(&wasm);
+        test_snapshot_timer_guard(&wasm);
+        test_clock_sync_before_timer_deadline(&wasm);
         test_tickless_clock_port(&wasm);
         test_polled_clock_fallback(&wasm);
     }
