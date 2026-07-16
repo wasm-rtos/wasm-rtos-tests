@@ -176,6 +176,33 @@ static void test_wraparound(WasmBinary* wasm)
     delete_task(&task);
 }
 
+static void test_lateness_above_int32(WasmBinary* wasm)
+{
+    OsTaskHandle task = NULL;
+    const uint32_t late_tick_ms = (uint32_t)INT32_MAX + 100U;
+
+    reset_os();
+    expect(create_task(
+               &task,
+               wasm,
+               "app_main_periodic",
+               "periodic_large_lateness",
+               0U,
+               OS_TASK_PRIORITY_NORMAL) == OS_STATUS_OK,
+           "create periodic task for large lateness");
+    expect(os_schedule() == OS_STATUS_OK &&
+               os_task_get_state(task) == OS_TASK_WAITING,
+           "large-lateness periodic task starts first period");
+    os_tick(late_tick_ms);
+    expect(os_task_get_state(task) == OS_TASK_READY,
+           "large elapsed delta readies periodic task");
+    expect(os_schedule() == OS_STATUS_OK &&
+               os_task_get_state(task) == OS_TASK_DEAD &&
+               os_task_get_exit_code(task) == late_tick_ms,
+           "lateness above INT32_MAX cannot strand periodic catch-up");
+    delete_task(&task);
+}
+
 static void test_abort_delay_until(WasmBinary* wasm)
 {
     OsTaskHandle task = NULL;
@@ -363,6 +390,7 @@ int main(void)
         expect(os_init() == OS_STATUS_OK, "initialize OS");
         test_periodic_phase_and_missed_period(&wasm);
         test_wraparound(&wasm);
+        test_lateness_above_int32(&wasm);
         test_abort_delay_until(&wasm);
         test_abort_delay_from_wasm(&wasm);
         test_abort_synchronization_waits(&wasm);
