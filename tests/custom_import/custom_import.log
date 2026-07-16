@@ -5,5 +5,20 @@ PASS task reaches DEAD
 PASS task returned normally
 PASS guest observed 37 + 42 = 79
 PASS delete task
+PASS create empty queue for native wait safety
+PASS create task for native wait safety
+PASS native-buffer receive does not suspend custom import
+PASS blocking receive rejects transient native buffer
+PASS rejected native wait leaves task running
+PASS guest observes safe native-buffer rejection
+PASS delete native wait safety task
+PASS register clock for delayed custom import
+PASS create task for delayed custom import
+PASS custom import delays after clock advances
+PASS delay synchronizes clock before deadline
+PASS immediate clock poll does not expire synchronized delay
+PASS synchronized delay wakes at exact deadline
+PASS task resumes after synchronized custom-import delay
+PASS delete delayed custom-import task
 PASS OS has no remaining tasks
 PASS custom_import
