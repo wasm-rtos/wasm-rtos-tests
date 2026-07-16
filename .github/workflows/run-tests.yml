@@ -35,7 +35,8 @@ jobs:
       - name: Update wasm-rtos and nested wasm3 submodules
         run: |
           git submodule sync --recursive
-          if [ "${{ github.event_name }}" = "push" ]; then
+          if [ "${{ github.event_name }}" = "push" ] &&
+             [ "${{ github.ref_name }}" = "main" ]; then
             git submodule update --init --remote wasm-rtos
           else
             git submodule update --init wasm-rtos
