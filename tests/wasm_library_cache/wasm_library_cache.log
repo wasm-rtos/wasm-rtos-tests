@@ -1,0 +1,48 @@
+PASS initialize OS
+PASS register phase import
+PASS register math library
+PASS register scale library
+PASS register startup library
+PASS register mutable library metadata
+PASS registration validates then releases source bytes
+PASS set cache capacity for two libraries
+PASS create app with standard WASM imports
+PASS task creation does not load libraries
+PASS first library import yields before lazy loading
+PASS fuel-sliced math library call completes
+PASS only the called math library is resident
+PASS snapshot rejects a task with resident libraries
+PASS bound library cannot be unregistered
+PASS second library call completes
+PASS multiple libraries remain resident when capacity allows
+PASS explicit eviction fully unloads an inactive library
+PASS app returns correct results from both libraries
+PASS task exit unloads its remaining libraries
+PASS delete first task
+PASS reduce cache capacity to one library
+PASS create LRU app
+PASS LRU app loads math first
+PASS LRU app loads scale second
+PASS loading scale evicts least-recently-used math
+PASS LRU app still returns normally
+PASS delete LRU task
+PASS set undersized cache limit
+PASS create cache-full app without loading libraries
+PASS cache-full app reaches first lazy import
+PASS undersized cache fails deterministically on first call
+PASS delete cache-full task
+PASS restore one-library cache limit
+PASS create app for a library start function
+PASS library start function is fuel-sliced and runs exactly once
+PASS explicit eviction preserves a pinned library
+PASS failed shrink leaves the pinned cache unchanged
+PASS start-function app returns normally
+PASS start-function task unloads its library on exit
+PASS delete start-function task
+PASS create app against validated library metadata
+PASS changed library app reaches its lazy import
+PASS changed source signature is rejected at load time
+PASS delete changed-library task
+PASS every acquired source is released with matching bytes
+PASS unregister unused libraries
+PASS wasm_library_cache
