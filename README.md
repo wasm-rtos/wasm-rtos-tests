@@ -22,6 +22,16 @@ Each test directory contains:
 - `<test_name>.wasm` — the generated WebAssembly module;
 - `<test_name>.log` — the log generated when the local `main.c` runs the module.
 
+A test may also contain one or more real WebAssembly library fixtures:
+
+- `<library_name>_dll.c` — a separately compiled library module;
+- `<library_name>_dll.wasm` — its generated WebAssembly file.
+
+Library exports should use Clang's `export_name` attribute. `run-tests.sh`
+automatically compiles every `*_dll.c` beside the primary guest, so a test can
+exercise a genuine `app.wasm` to `library.wasm` call without embedding the
+library as a native byte array.
+
 There is no repository-level `main.c`, `build/`, or `logs/` directory.
 
 ## Isolation rules
@@ -50,10 +60,11 @@ For every directory under `tests/`, the script:
 
 1. verifies that `main.c` and `<test_name>.c` exist;
 2. compiles `<test_name>.c` into `<test_name>.wasm`;
-3. compiles the directory's standalone `main.c` into a temporary native runner;
-4. executes the runner from inside the test directory;
-5. leaves `<test_name>.log` in that directory;
-6. removes the temporary native runner.
+3. compiles any `*_dll.c` fixtures into separate `*_dll.wasm` modules;
+4. compiles the directory's standalone `main.c` into a temporary native runner;
+5. executes the runner from inside the test directory;
+6. leaves `<test_name>.log` in that directory;
+7. removes the temporary native runner.
 
 A missing file, build failure, failed assertion, or non-zero runner exit code fails the complete run.
 
