@@ -91,6 +91,21 @@ jobs:
               echo "FAIL required log artifact is not tracked: $log"
               failed=1
             fi
+
+            for dll_source in "$dir"/*_dll.c; do
+              [ -f "$dll_source" ] || continue
+              dll_wasm="${dll_source%.c}.wasm"
+
+              if [ ! -s "$dll_wasm" ]; then
+                echo "FAIL required DLL WASM artifact is missing or empty: $dll_wasm"
+                failed=1
+              fi
+
+              if ! git ls-files --error-unmatch "$dll_wasm" >/dev/null 2>&1; then
+                echo "FAIL required DLL WASM artifact is not tracked: $dll_wasm"
+                failed=1
+              fi
+            done
           done
 
           if ! git diff --quiet -- 'tests/**/*.wasm' 'tests/**/*.log'; then
