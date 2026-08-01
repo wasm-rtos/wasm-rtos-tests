@@ -1,0 +1,24 @@
+PASS load source Wasm module
+PASS create compiler environment
+PASS allocate storage buffer
+PASS parse source Wasm module
+PASS compile and write relocatable .m3c image
+PASS writer uses generic storage callbacks
+PASS writer respects non-zero storage offset
+PASS parse standalone .m3c image
+PASS create runtime for cached module
+PASS load cached module and release source Wasm copy
+PASS link host import without persisting callback pointers
+PASS load cached function on first lookup
+PASS function metacode is read lazily from storage
+PASS cached function suspends when fuel is exhausted
+PASS query snapshot size for cached function
+PASS allocate snapshot buffer
+PASS save cached function snapshot
+PASS restore cached function snapshot
+PASS resume cached function to completion
+PASS cached function calls host import and returns expected value
+PASS writer reports non-empty image size
+PASS parse image before lazy function integrity check
+PASS reject corrupted function before execution
+PASS m3c_roundtrip

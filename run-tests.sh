@@ -69,7 +69,12 @@ for dir in tests/*; do
         continue
     fi
 
-    if ! "$CC_BIN" -std=c11 -Wall -Wextra -D_GNU_SOURCE -D_POSIX_C_SOURCE=200809L -Dd_m3HasWASI \
+    native_flags=(-Dd_m3HasWASI)
+    if [ "$name" = "m3c_roundtrip" ]; then
+        native_flags+=(-Dd_m3HasM3C=1)
+    fi
+
+    if ! "$CC_BIN" -std=c11 -Wall -Wextra -D_GNU_SOURCE -D_POSIX_C_SOURCE=200809L "${native_flags[@]}" \
         -Iwasm-rtos \
         "$main" wasm-rtos/os.c wasm-rtos/hal.c wasm-rtos/wasm3/source/*.c \
         -lm -o "$runner" >>"$build_log" 2>&1; then
