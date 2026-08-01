@@ -6,6 +6,7 @@ cd "$ROOT"
 
 CC_BIN="${CC:-cc}"
 WASM_CC="${WASM_CC:-clang}"
+WASM_LD="${WASM_LD:-wasm-ld}"
 failed=0
 found=0
 
@@ -42,7 +43,45 @@ for dir in tests/*; do
         continue
     fi
 
-    if grep -Eq '#include <(stdio|stdlib|wasi)|__wasi_|proc_exit|fd_write' "$source" || [[ "$name" == wasi_* ]]; then
+    if [ "$name" = "dylink0" ]; then
+        library_source="$dir/library.c"
+        app_object="$dir/dylink0.o"
+        library_object="$dir/library.o"
+        library_wasm="$dir/libdylink0.so"
+        if [ ! -f "$library_source" ]; then
+            echo "FAIL missing $library_source" | tee "$log"
+            failed=1
+            continue
+        fi
+
+        pic_flags=()
+        if "$WASM_LD" --help 2>&1 | grep -q -- '--experimental-pic'; then
+            pic_flags+=(--experimental-pic)
+        fi
+
+        if ! "$WASM_CC" --target=wasm32 -nostdlib -fPIC -O0 -c \
+                "$library_source" -o "$library_object" >"$build_log" 2>&1 \
+            || ! "$WASM_LD" -m wasm32 "${pic_flags[@]}" --shared --no-entry \
+                --unresolved-symbols=import-dynamic \
+                --export=library_add --export=library_name \
+                --export=library_fill --export=library_apply \
+                --export=library_increment \
+                -o "$library_wasm" "$library_object" >>"$build_log" 2>&1 \
+            || ! "$WASM_CC" --target=wasm32 -nostdlib -fPIC -O0 -c \
+                "$source" -o "$app_object" >>"$build_log" 2>&1 \
+            || ! "$WASM_LD" -m wasm32 "${pic_flags[@]}" --pie --no-entry \
+                --export=app_main --export=app_name_char \
+                --export=app_struct --export=app_callback \
+                --export=app_counter \
+                -o "$wasm" "$app_object" "$library_wasm" \
+                >>"$build_log" 2>&1; then
+            { echo "FAIL building dylink.0 C modules"; cat "$build_log"; } | tee "$log"
+            rm -f "$app_object" "$library_object" "$library_wasm"
+            failed=1
+            continue
+        fi
+        rm -f "$app_object" "$library_object"
+    elif grep -Eq '#include <(stdio|stdlib|wasi)|__wasi_|proc_exit|fd_write' "$source" || [[ "$name" == wasi_* ]]; then
         if ! "$WASM_CC" --target=wasm32-wasi -O0 -o "$wasm" "$source" >"$build_log" 2>&1; then
             { echo "FAIL building $wasm"; cat "$build_log"; } | tee "$log"
             failed=1
@@ -72,6 +111,8 @@ for dir in tests/*; do
     native_flags=(-Dd_m3HasWASI)
     if [ "$name" = "m3c_roundtrip" ]; then
         native_flags+=(-Dd_m3HasM3C=1)
+    elif [ "$name" = "dylink0" ]; then
+        native_flags+=(-Dd_m3HasDylink=1 -Dd_m3HasM3C=1)
     fi
 
     if ! "$CC_BIN" -std=c11 -Wall -Wextra -D_GNU_SOURCE -D_POSIX_C_SOURCE=200809L "${native_flags[@]}" \
@@ -93,6 +134,9 @@ for dir in tests/*; do
     fi
 
     rm -f "$runner" "$build_log"
+    if [ "$name" = "dylink0" ]; then
+        rm -f "$dir/libdylink0.so"
+    fi
 done
 
 if [ "$found" -eq 0 ]; then
