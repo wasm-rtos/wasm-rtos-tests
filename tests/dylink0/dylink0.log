@@ -1,0 +1,24 @@
+PASS load PIE app artifact
+PASS load shared library artifact
+PASS create dylink environment
+PASS create dylink runtime
+PASS parse app Wasm
+PASS link Wasm app and library
+PASS find app function that imports library code
+PASS fuel resume crosses a direct Wasm library call
+PASS library returns const char pointer through shared memory
+PASS app passes a struct pointer to the library
+PASS library calls an app function pointer through the shared table
+PASS library mutable data remains in the shared memory link group
+PASS write app .m3c image with unresolved Wasm imports
+PASS write library .m3c image with dylink relocations
+PASS create dylink runtime
+PASS parse app from .m3c
+PASS link .m3c app and library
+PASS find app function that imports library code
+PASS fuel resume crosses a direct Wasm library call
+PASS library returns const char pointer through shared memory
+PASS app passes a struct pointer to the library
+PASS library calls an app function pointer through the shared table
+PASS library mutable data remains in the shared memory link group
+PASS dylink0
