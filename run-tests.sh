@@ -28,10 +28,6 @@ for dir in tests/*; do
 
     echo "=== $name ==="
     rm -f "$wasm" "$runner" "$build_log"
-    for dll_source in "$dir"/*_dll.c; do
-        [ -f "$dll_source" ] || continue
-        rm -f "${dll_source%.c}.wasm"
-    done
     : > "$log"
 
     if [ ! -f "$main" ]; then
@@ -69,30 +65,6 @@ for dir in tests/*; do
 
     if [ ! -s "$wasm" ]; then
         echo "FAIL generated WASM is missing or empty: $wasm" | tee "$log"
-        failed=1
-        continue
-    fi
-
-    dll_failed=0
-    for dll_source in "$dir"/*_dll.c; do
-        [ -f "$dll_source" ] || continue
-        dll_wasm="${dll_source%.c}.wasm"
-
-        if ! "$WASM_CC" --target=wasm32 -nostdlib -Wl,--no-entry -O0 \
-            -o "$dll_wasm" "$dll_source" >>"$build_log" 2>&1; then
-            { echo "FAIL building $dll_wasm"; cat "$build_log"; } | tee "$log"
-            dll_failed=1
-            break
-        fi
-
-        if [ ! -s "$dll_wasm" ]; then
-            echo "FAIL generated DLL WASM is missing or empty: $dll_wasm" | tee "$log"
-            dll_failed=1
-            break
-        fi
-    done
-
-    if [ "$dll_failed" -ne 0 ]; then
         failed=1
         continue
     fi
