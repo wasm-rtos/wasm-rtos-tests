@@ -36,9 +36,9 @@ PASS both apps mutate one shared resident-library counter
 PASS open another application after previous contexts closed
 PASS run the reopened link group application
 PASS resident library state survives all applications closing
-FAIL create an application that will be cancelled mid-slice
-FAIL suspend the cancellable application on fuel exhaustion
-FAIL delete a live dynamically linked task
+PASS create an application that will be cancelled mid-slice
+PASS suspend the cancellable application on fuel exhaustion
+PASS delete a live dynamically linked task
 PASS reuse released program resources for another task
 PASS run a task after deleting a suspended context
 PASS deleting an application keeps shared library state intact
@@ -53,4 +53,4 @@ PASS library returns const char pointer through shared memory
 PASS app passes a struct pointer to the library
 PASS library calls an app function pointer through the shared table
 PASS library mutable data remains in the shared memory link group
-FAIL dylink0
+PASS dylink0
