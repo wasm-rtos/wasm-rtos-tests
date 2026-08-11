@@ -40,6 +40,13 @@ int app_callback(void)
 
 int app_counter(void)
 {
+    volatile int work = 0;
+    int index;
+
+    /* Force several RTOS fuel slices before entering the shared library. */
+    for (index = 0; index < 50000; ++index)
+        work += index & 1;
+
     library_increment();
-    return library_increment();
+    return library_increment() + (work == -1);
 }

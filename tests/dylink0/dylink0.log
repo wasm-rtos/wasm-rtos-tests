@@ -10,6 +10,19 @@ PASS library returns const char pointer through shared memory
 PASS app passes a struct pointer to the library
 PASS library calls an app function pointer through the shared table
 PASS library mutable data remains in the shared memory link group
+PASS initialize RTOS resident link group
+PASS register one resident Wasm library
+PASS query resident library registry
+PASS create first PIE task
+PASS create second PIE task from the same app bytes
+PASS reject task-local snapshot of shared library state
+PASS seal and place the resident link group
+PASS reject library registration after placement
+PASS reject a PIE task after the group is sealed
+PASS run both linked tasks to completion
+PASS fuel switches between independent program contexts
+PASS both linked tasks return normally
+PASS both apps mutate one shared resident-library counter
 PASS write app .m3c image with unresolved Wasm imports
 PASS write library .m3c image with dylink relocations
 PASS create dylink runtime
