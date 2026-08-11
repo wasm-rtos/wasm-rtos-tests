@@ -1,3 +1,4 @@
+#include "os.h"
 #include "wasm3/source/m3_dylink.h"
 #include "wasm3/source/m3_env.h"
 #include "wasm3/source/m3_m3c.h"
@@ -245,6 +246,104 @@ static int write_m3c(IM3Environment environment, WasmBinary * binary,
     return result == m3Err_none;
 }
 
+static void run_os_resident_group(WasmBinary * app, WasmBinary * library)
+{
+    OsWasmLibraryHandle registered = NULL;
+    OsWasmLibraryHandle rejected = NULL;
+    OsTaskHandle first = NULL;
+    OsTaskHandle second = NULL;
+    OsTaskHandle late = NULL;
+    OsValue firstValue = {0};
+    OsValue secondValue = {0};
+    OsStatus status;
+    uint32_t snapshotSize = 0U;
+    uint32_t iteration;
+    uint32_t firstResult = 0U;
+    uint32_t secondResult = 0U;
+
+    expect(os_init() == OS_STATUS_OK, "initialize RTOS resident link group");
+    status = os_wasm_library_register(&registered, "libdylink0.so",
+                                      library->bytes, library->size);
+    expect(status == OS_STATUS_OK && registered != NULL,
+           "register one resident Wasm library");
+    expect(os_wasm_library_get_count() == 1U &&
+               os_wasm_library_find("libdylink0.so") == registered &&
+               os_wasm_library_get_id(registered) != 0U &&
+               strcmp(os_wasm_library_get_name(registered),
+                      "libdylink0.so") == 0,
+           "query resident library registry");
+
+    status = os_task_create(&first, app->bytes, app->size, "app_counter",
+                            "resident-a", 64U * 1024U,
+                            OS_TASK_PRIORITY_NORMAL);
+    expect(status == OS_STATUS_OK && first != NULL,
+           "create first PIE task");
+    status = os_task_create(&second, app->bytes, app->size, "app_counter",
+                            "resident-b", 64U * 1024U,
+                            OS_TASK_PRIORITY_NORMAL);
+    expect(status == OS_STATUS_OK && second != NULL,
+           "create second PIE task from the same app bytes");
+
+    if (first != NULL)
+    {
+        expect(os_task_get_snapshot_size(first, &snapshotSize) ==
+                   OS_STATUS_UNSUPPORTED,
+               "reject task-local snapshot of shared library state");
+    }
+
+    status = os_wasm_link_group_seal();
+    expect(status == OS_STATUS_OK && os_wasm_link_group_is_sealed(),
+           "seal and place the resident link group");
+    status = os_wasm_library_register(&rejected, "late.so",
+                                      library->bytes, library->size);
+    expect(status == OS_STATUS_BUSY && rejected == NULL,
+           "reject library registration after placement");
+    status = os_task_create(&late, app->bytes, app->size, "app_counter",
+                            "late-task", 64U * 1024U,
+                            OS_TASK_PRIORITY_NORMAL);
+    expect(status == OS_STATUS_BUSY && late == NULL,
+           "reject a PIE task after the group is sealed");
+
+    status = OS_STATUS_OK;
+    for (iteration = 0U;
+         status == OS_STATUS_OK && iteration < 2000U &&
+             first != NULL && second != NULL &&
+             (os_task_get_state(first) != OS_TASK_DEAD ||
+              os_task_get_state(second) != OS_TASK_DEAD);
+         ++iteration)
+    {
+        status = os_schedule();
+    }
+    expect(status == OS_STATUS_OK && first != NULL && second != NULL &&
+               os_task_get_state(first) == OS_TASK_DEAD &&
+               os_task_get_state(second) == OS_TASK_DEAD,
+           "run both linked tasks to completion");
+    if (first != NULL && second != NULL)
+    {
+        expect(os_task_get_run_count(first) > 1U &&
+                   os_task_get_run_count(second) > 1U,
+               "fuel switches between independent program contexts");
+        expect(os_task_get_exit_reason(first) == OS_TASK_EXIT_RETURNED &&
+                   os_task_get_exit_reason(second) == OS_TASK_EXIT_RETURNED,
+               "both linked tasks return normally");
+        status = os_task_get_return_value(first, &firstValue);
+        if (status == OS_STATUS_OK && firstValue.type == OS_VALUE_TYPE_I32)
+            firstResult = firstValue.value.i32;
+        status = os_task_get_return_value(second, &secondValue);
+        if (status == OS_STATUS_OK && secondValue.type == OS_VALUE_TYPE_I32)
+            secondResult = secondValue.value.i32;
+        expect(firstValue.type == OS_VALUE_TYPE_I32 &&
+                   secondValue.type == OS_VALUE_TYPE_I32 &&
+                   ((firstResult == 4U &&
+                     (secondResult == 2U || secondResult == 3U)) ||
+                    (secondResult == 4U &&
+                     (firstResult == 2U || firstResult == 3U))),
+               "both apps mutate one shared resident-library counter");
+    }
+
+    os_shutdown();
+}
+
 int main(void)
 {
     WasmBinary app = {0};
@@ -269,6 +368,7 @@ int main(void)
     resolver.libraryM3C = &libraryM3C;
     resolver.useM3C = 0;
     run_group(environment, &app, &appM3C, &resolver);
+    run_os_resident_group(&app, &library);
 
     expect(write_m3c(environment, &app, &appM3C),
            "write app .m3c image with unresolved Wasm imports");
