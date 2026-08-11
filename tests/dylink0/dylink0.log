@@ -10,19 +10,38 @@ PASS library returns const char pointer through shared memory
 PASS app passes a struct pointer to the library
 PASS library calls an app function pointer through the shared table
 PASS library mutable data remains in the shared memory link group
+PASS prepare dynamically extendable dylink group
+PASS create group with one dynamic program
+PASS add a program after the group is running
+PASS run first dynamically linked program
+PASS run second program against the same resident library
+PASS remove one program without unloading its dependency
+PASS remaining context survives removal of the first program
+PASS group remains alive with no application contexts
+PASS add a program after the group became empty
+PASS resident library state survives close and reopen
+PASS remove the reopened program
 PASS initialize RTOS resident link group
 PASS register one resident Wasm library
 PASS query resident library registry
 PASS create first PIE task
-PASS create second PIE task from the same app bytes
 PASS reject task-local snapshot of shared library state
 PASS seal and place the resident link group
 PASS reject library registration after placement
-PASS reject a PIE task after the group is sealed
+PASS create a PIE task after the scheduler group is sealed
 PASS run both linked tasks to completion
 PASS fuel switches between independent program contexts
 PASS both linked tasks return normally
 PASS both apps mutate one shared resident-library counter
+PASS open another application after previous contexts closed
+PASS run the reopened link group application
+PASS resident library state survives all applications closing
+FAIL create an application that will be cancelled mid-slice
+FAIL suspend the cancellable application on fuel exhaustion
+FAIL delete a live dynamically linked task
+PASS reuse released program resources for another task
+PASS run a task after deleting a suspended context
+PASS deleting an application keeps shared library state intact
 PASS write app .m3c image with unresolved Wasm imports
 PASS write library .m3c image with dylink relocations
 PASS create dylink runtime
@@ -34,4 +53,4 @@ PASS library returns const char pointer through shared memory
 PASS app passes a struct pointer to the library
 PASS library calls an app function pointer through the shared table
 PASS library mutable data remains in the shared memory link group
-PASS dylink0
+FAIL dylink0

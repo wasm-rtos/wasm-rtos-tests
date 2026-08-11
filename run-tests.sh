@@ -72,7 +72,7 @@ for dir in tests/*; do
             || ! "$WASM_LD" -m wasm32 "${pic_flags[@]}" --pie --no-entry \
                 --export=app_main --export=app_name_char \
                 --export=app_struct --export=app_callback \
-                --export=app_counter \
+                --export=app_counter --export=app_work_only \
                 -o "$wasm" "$app_object" "$library_wasm" \
                 >>"$build_log" 2>&1; then
             { echo "FAIL building dylink.0 C modules"; cat "$build_log"; } | tee "$log"
