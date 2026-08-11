@@ -50,3 +50,14 @@ int app_counter(void)
     library_increment();
     return library_increment() + (work == -1);
 }
+
+int app_work_only(void)
+{
+    volatile int work = 0;
+    int index;
+
+    for (index = 0; index < 50000; ++index)
+        work += index & 1;
+
+    return work;
+}

@@ -232,6 +232,127 @@ static int run_group(IM3Environment environment, WasmBinary * app,
     return 1;
 }
 
+static int call_context_no_args(IM3DylinkContext context, const char * name,
+                                uint32_t expected)
+{
+    IM3Module module = m3_DylinkGetContextModule(context);
+    IM3Function function = NULL;
+    uint32_t value = UINT32_MAX;
+    M3Result result = m3_DylinkActivateContext(context);
+    if (!result)
+        result = m3_FindFunctionInModule(&function, module, name);
+    if (!result)
+        result = m3_CallV(function);
+    if (!result)
+        result = m3_GetResultsV(function, &value);
+    return result == m3Err_none && value == expected;
+}
+
+static void run_dynamic_group(IM3Environment environment, WasmBinary * app,
+                              ResolverContext * resolver)
+{
+    IM3Runtime runtime = m3_NewRuntime(environment, 64U * 1024U, NULL);
+    IM3Module firstModule = NULL;
+    IM3Module secondModule = NULL;
+    IM3Module thirdModule = NULL;
+    IM3DylinkContext first = NULL;
+    IM3DylinkContext second = NULL;
+    IM3DylinkContext third = NULL;
+    M3DylinkProgram program;
+    M3DylinkOptions options = {resolver, resolve_library, NULL, 16U * 1024U};
+    M3Result result = runtime != NULL
+        ? m3_ParseModule(environment, &firstModule, app->bytes, app->size)
+        : m3Err_mallocFailed;
+
+    expect(runtime != NULL && result == m3Err_none && firstModule != NULL,
+           "prepare dynamically extendable dylink group");
+    if (!runtime || result || !firstModule)
+    {
+        if (runtime)
+            m3_FreeRuntime(runtime);
+        return;
+    }
+
+    memset(&program, 0, sizeof(program));
+    program.name = "dynamic-a";
+    program.module = firstModule;
+    program.nativeStackSize = 64U * 1024U;
+    program.linearStackSize = 16U * 1024U;
+    result = m3_DylinkLoadGroup(runtime, &program, 1U, &options, &first);
+    expect(result == m3Err_none && first != NULL &&
+               m3_DylinkGetProgramCount(runtime) == 1U,
+           "create group with one dynamic program");
+    if (result || !first)
+    {
+        if (firstModule != NULL && firstModule->runtime == runtime)
+            firstModule = NULL;
+        m3_FreeRuntime(runtime);
+        if (firstModule != NULL)
+            m3_FreeModule(firstModule);
+        return;
+    }
+    firstModule = NULL;
+
+    result = m3_ParseModule(environment, &secondModule, app->bytes, app->size);
+    if (!result)
+    {
+        memset(&program, 0, sizeof(program));
+        program.name = "dynamic-b";
+        program.module = secondModule;
+        program.nativeStackSize = 64U * 1024U;
+        program.linearStackSize = 16U * 1024U;
+        result = m3_DylinkAddProgram(runtime, &program, &options, &second);
+    }
+    if (result == m3Err_none)
+        secondModule = NULL;
+    expect(result == m3Err_none && second != NULL &&
+               m3_DylinkGetProgramCount(runtime) == 2U,
+           "add a program after the group is running");
+    expect(first != NULL && call_context_no_args(first, "app_counter", 2U),
+           "run first dynamically linked program");
+    expect(second != NULL && call_context_no_args(second, "app_counter", 4U),
+           "run second program against the same resident library");
+
+    result = first != NULL ? m3_DylinkRemoveProgram(first)
+                           : m3Err_dylinkUnsupported;
+    first = NULL;
+    expect(result == m3Err_none && m3_DylinkGetProgramCount(runtime) == 1U,
+           "remove one program without unloading its dependency");
+    expect(second != NULL && call_context_no_args(second, "app_counter", 6U),
+           "remaining context survives removal of the first program");
+    result = second != NULL ? m3_DylinkRemoveProgram(second)
+                            : m3Err_dylinkUnsupported;
+    second = NULL;
+    expect(result == m3Err_none && m3_DylinkGetProgramCount(runtime) == 0U,
+           "group remains alive with no application contexts");
+
+    result = m3_ParseModule(environment, &thirdModule, app->bytes, app->size);
+    if (!result)
+    {
+        memset(&program, 0, sizeof(program));
+        program.name = "dynamic-c";
+        program.module = thirdModule;
+        program.nativeStackSize = 64U * 1024U;
+        program.linearStackSize = 16U * 1024U;
+        result = m3_DylinkAddProgram(runtime, &program, &options, &third);
+    }
+    if (result == m3Err_none)
+        thirdModule = NULL;
+    expect(result == m3Err_none && third != NULL &&
+               m3_DylinkGetProgramCount(runtime) == 1U,
+           "add a program after the group became empty");
+    expect(third != NULL && call_context_no_args(third, "app_counter", 8U),
+           "resident library state survives close and reopen");
+    if (third != NULL)
+        expect(m3_DylinkRemoveProgram(third) == m3Err_none,
+               "remove the reopened program");
+    if (secondModule != NULL)
+        m3_FreeModule(secondModule);
+    if (thirdModule != NULL)
+        m3_FreeModule(thirdModule);
+    m3_FreeRuntime(runtime);
+}
+
 static int write_m3c(IM3Environment environment, WasmBinary * binary,
                      MemoryStorage * output)
 {
@@ -252,9 +373,13 @@ static void run_os_resident_group(WasmBinary * app, WasmBinary * library)
     OsWasmLibraryHandle rejected = NULL;
     OsTaskHandle first = NULL;
     OsTaskHandle second = NULL;
-    OsTaskHandle late = NULL;
+    OsTaskHandle third = NULL;
+    OsTaskHandle cancelled = NULL;
+    OsTaskHandle reopened = NULL;
     OsValue firstValue = {0};
     OsValue secondValue = {0};
+    OsValue thirdValue = {0};
+    OsValue reopenedValue = {0};
     OsStatus status;
     uint32_t snapshotSize = 0U;
     uint32_t iteration;
@@ -278,12 +403,6 @@ static void run_os_resident_group(WasmBinary * app, WasmBinary * library)
                             OS_TASK_PRIORITY_NORMAL);
     expect(status == OS_STATUS_OK && first != NULL,
            "create first PIE task");
-    status = os_task_create(&second, app->bytes, app->size, "app_counter",
-                            "resident-b", 64U * 1024U,
-                            OS_TASK_PRIORITY_NORMAL);
-    expect(status == OS_STATUS_OK && second != NULL,
-           "create second PIE task from the same app bytes");
-
     if (first != NULL)
     {
         expect(os_task_get_snapshot_size(first, &snapshotSize) ==
@@ -298,11 +417,11 @@ static void run_os_resident_group(WasmBinary * app, WasmBinary * library)
                                       library->bytes, library->size);
     expect(status == OS_STATUS_BUSY && rejected == NULL,
            "reject library registration after placement");
-    status = os_task_create(&late, app->bytes, app->size, "app_counter",
-                            "late-task", 64U * 1024U,
+    status = os_task_create(&second, app->bytes, app->size, "app_counter",
+                            "resident-b", 64U * 1024U,
                             OS_TASK_PRIORITY_NORMAL);
-    expect(status == OS_STATUS_BUSY && late == NULL,
-           "reject a PIE task after the group is sealed");
+    expect(status == OS_STATUS_OK && second != NULL,
+           "create a PIE task after the scheduler group is sealed");
 
     status = OS_STATUS_OK;
     for (iteration = 0U;
@@ -341,6 +460,68 @@ static void run_os_resident_group(WasmBinary * app, WasmBinary * library)
                "both apps mutate one shared resident-library counter");
     }
 
+    status = os_task_create(&third, app->bytes, app->size, "app_counter",
+                            "resident-c", 64U * 1024U,
+                            OS_TASK_PRIORITY_NORMAL);
+    expect(status == OS_STATUS_OK && third != NULL,
+           "open another application after previous contexts closed");
+    for (iteration = 0U;
+         status == OS_STATUS_OK && iteration < 2000U && third != NULL &&
+             os_task_get_state(third) != OS_TASK_DEAD;
+         ++iteration)
+    {
+        status = os_schedule();
+    }
+    expect(status == OS_STATUS_OK && third != NULL &&
+               os_task_get_state(third) == OS_TASK_DEAD,
+           "run the reopened link group application");
+    if (third != NULL)
+    {
+        status = os_task_get_return_value(third, &thirdValue);
+        expect(status == OS_STATUS_OK &&
+                   thirdValue.type == OS_VALUE_TYPE_I32 &&
+                   thirdValue.value.i32 == 6U,
+               "resident library state survives all applications closing");
+    }
+
+    status = os_task_create(&cancelled, app->bytes, app->size,
+                            "app_work_only", "resident-cancelled",
+                            64U * 1024U, OS_TASK_PRIORITY_NORMAL);
+    expect(status == OS_STATUS_OK && cancelled != NULL,
+           "create an application that will be cancelled mid-slice");
+    if (status == OS_STATUS_OK && cancelled != NULL)
+        status = os_schedule();
+    expect(status == OS_STATUS_OK && cancelled != NULL &&
+               os_task_get_state(cancelled) == OS_TASK_READY,
+           "suspend the cancellable application on fuel exhaustion");
+    expect(cancelled != NULL && os_task_delete(cancelled) == OS_STATUS_OK,
+           "delete a live dynamically linked task");
+    cancelled = NULL;
+
+    status = os_task_create(&reopened, app->bytes, app->size, "app_counter",
+                            "resident-reopened", 64U * 1024U,
+                            OS_TASK_PRIORITY_NORMAL);
+    expect(status == OS_STATUS_OK && reopened != NULL,
+           "reuse released program resources for another task");
+    for (iteration = 0U;
+         status == OS_STATUS_OK && iteration < 2000U && reopened != NULL &&
+             os_task_get_state(reopened) != OS_TASK_DEAD;
+         ++iteration)
+    {
+        status = os_schedule();
+    }
+    expect(status == OS_STATUS_OK && reopened != NULL &&
+               os_task_get_state(reopened) == OS_TASK_DEAD,
+           "run a task after deleting a suspended context");
+    if (reopened != NULL)
+    {
+        status = os_task_get_return_value(reopened, &reopenedValue);
+        expect(status == OS_STATUS_OK &&
+                   reopenedValue.type == OS_VALUE_TYPE_I32 &&
+                   reopenedValue.value.i32 == 8U,
+               "deleting an application keeps shared library state intact");
+    }
+
     os_shutdown();
 }
 
@@ -368,6 +549,7 @@ int main(void)
     resolver.libraryM3C = &libraryM3C;
     resolver.useM3C = 0;
     run_group(environment, &app, &appM3C, &resolver);
+    run_dynamic_group(environment, &app, &resolver);
     run_os_resident_group(&app, &library);
 
     expect(write_m3c(environment, &app, &appM3C),
