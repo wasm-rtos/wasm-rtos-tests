@@ -1,0 +1,8 @@
+PASS initialize OS
+PASS kernel is built without processes
+PASS load proc_disabled.wasm
+PASS program that imports spawn is rejected at load
+PASS failed creation returns null task
+PASS diagnostic phase is check_imports
+PASS diagnostic names the unavailable process import
+PASS clean OS state
