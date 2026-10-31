@@ -1,0 +1,10 @@
+PASS initialize OS
+PASS load entry_detect_app_main.wasm
+PASS create task with a NULL entry name
+PASS detected app_main returns
+PASS detected app_main returned 5
+PASS delete NULL-entry task
+PASS create task with an empty entry name
+PASS empty entry name also runs app_main
+PASS delete empty-entry task
+PASS clean OS state
