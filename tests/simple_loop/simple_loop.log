@@ -3,7 +3,6 @@ PASS load simple_loop.wasm
 PASS create loop task
 PASS run scheduler slice
 PASS run scheduler slice
-PASS run scheduler slice
 PASS finite loop reaches DEAD
 PASS finite loop returned normally
 PASS finite loop returned zero

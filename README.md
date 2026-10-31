@@ -57,6 +57,25 @@ For every directory under `tests/`, the script:
 
 A missing file, build failure, failed assertion, or non-zero runner exit code fails the complete run.
 
+The script runs under Bash 3.2 or newer, so it also works with the default shell on macOS. The toolchain is selected through environment variables:
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `CC` | `cc` | native compiler for the test runners |
+| `WASM_CC` | `clang` | clang with the `wasm32` target |
+| `WASM_LD` | `wasm-ld` | WebAssembly linker |
+| `WASI_TARGET` | auto | target triple for WASI guests; `wasm32-wasip1` when it links, otherwise the legacy `wasm32-wasi` |
+| `WASI_SYSROOT` | unset | WASI sysroot, when clang does not find one by default |
+
+On macOS with Homebrew (`brew install llvm lld wasi-libc wasi-runtimes`), Apple clang has no WebAssembly backend, so point the script at the Homebrew toolchain:
+
+```bash
+WASM_CC=/opt/homebrew/opt/llvm/bin/clang \
+WASM_LD=/opt/homebrew/bin/wasm-ld \
+WASI_SYSROOT=/opt/homebrew/share/wasi-sysroot \
+bash ./run-tests.sh
+```
+
 ## GitHub Actions
 
 `.github/workflows/run-tests.yml` runs `run-tests.sh` automatically for pushes, pull requests, and manual workflow dispatches.
