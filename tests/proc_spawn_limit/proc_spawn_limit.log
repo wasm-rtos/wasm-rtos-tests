@@ -1,0 +1,7 @@
+PASS initialize OS
+PASS load proc_spawn_limit.wasm
+PASS create parent task
+PASS parent finishes
+PASS exactly 16 spawns succeed, then OS_STATUS_LIMIT_REACHED
+PASS all 16 spawned processes keep running after the parent
+PASS clean OS state
