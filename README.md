@@ -64,7 +64,7 @@ The script runs under Bash 3.2 or newer, so it also works with the default shell
 | `CC` | `cc` | native compiler for the test runners |
 | `WASM_CC` | `clang` | clang with the `wasm32` target |
 | `WASM_LD` | `wasm-ld` | WebAssembly linker |
-| `WASI_TARGET` | `wasm32-wasip1` | target triple for WASI guests |
+| `WASI_TARGET` | auto | target triple for WASI guests; `wasm32-wasip1` when it links, otherwise the legacy `wasm32-wasi` |
 | `WASI_SYSROOT` | unset | WASI sysroot, when clang does not find one by default |
 
 On macOS with Homebrew (`brew install llvm lld wasi-libc wasi-runtimes`), Apple clang has no WebAssembly backend, so point the script at the Homebrew toolchain:

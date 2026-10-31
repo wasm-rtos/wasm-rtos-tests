@@ -7,11 +7,25 @@ cd "$ROOT"
 CC_BIN="${CC:-cc}"
 WASM_CC="${WASM_CC:-clang}"
 WASM_LD="${WASM_LD:-wasm-ld}"
-WASI_TARGET="${WASI_TARGET:-wasm32-wasip1}"
-wasi_flags=(--target="$WASI_TARGET")
+wasi_sysroot_flags=()
 if [ -n "${WASI_SYSROOT:-}" ]; then
-    wasi_flags+=(--sysroot="$WASI_SYSROOT")
+    wasi_sysroot_flags+=(--sysroot="$WASI_SYSROOT")
 fi
+
+# Prefer the current wasm32-wasip1 triple; fall back to the legacy
+# wasm32-wasi name when the installed runtime libraries only use it.
+if [ -z "${WASI_TARGET:-}" ]; then
+    probe_dir="$(mktemp -d)"
+    printf 'int main(void) { return 0; }\n' > "$probe_dir/probe.c"
+    WASI_TARGET=wasm32-wasi
+    if "$WASM_CC" --target=wasm32-wasip1 ${wasi_sysroot_flags[@]+"${wasi_sysroot_flags[@]}"} \
+            -o "$probe_dir/probe.wasm" "$probe_dir/probe.c" >/dev/null 2>&1; then
+        WASI_TARGET=wasm32-wasip1
+    fi
+    rm -rf "$probe_dir"
+fi
+wasi_flags=(--target="$WASI_TARGET" ${wasi_sysroot_flags[@]+"${wasi_sysroot_flags[@]}"})
+echo "WASI target: $WASI_TARGET"
 failed=0
 found=0
 
