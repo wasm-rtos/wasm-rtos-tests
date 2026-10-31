@@ -29,6 +29,13 @@ echo "WASI target: $WASI_TARGET"
 failed=0
 found=0
 
+# SANITIZE=1 builds the native runners with AddressSanitizer and
+# UndefinedBehaviorSanitizer; memory errors then fail the test.
+sanitize_flags=()
+if [ "${SANITIZE:-0}" = "1" ]; then
+    sanitize_flags=(-g -O1 -fno-omit-frame-pointer -fsanitize=address,undefined -fno-sanitize-recover=undefined)
+fi
+
 if [ -d tests/support ]; then
     echo "FAIL tests/support is forbidden; every test must be self-contained"
     exit 1
@@ -137,9 +144,11 @@ for dir in tests/*; do
         native_flags+=(-Dd_m3HasDylink=1 -Dd_m3HasM3C=1)
     elif [ "$name" = "proc_disabled" ]; then
         native_flags+=(-DOS_HAS_PROCESSES=0)
+    elif [ "$name" = "preempt_memory_grow" ]; then
+        native_flags+=(-DOS_TASK_SLICE_FUEL=1ULL)
     fi
 
-    if ! "$CC_BIN" -std=c11 -Wall -Wextra -D_GNU_SOURCE -D_POSIX_C_SOURCE=200809L "${native_flags[@]}" \
+    if ! "$CC_BIN" ${sanitize_flags[@]+"${sanitize_flags[@]}"} -std=c11 -Wall -Wextra -D_GNU_SOURCE -D_POSIX_C_SOURCE=200809L "${native_flags[@]}" \
         -Iwasm-rtos \
         "$main" wasm-rtos/*.c wasm-rtos/wasm3/source/*.c \
         -lm -o "$runner" >>"$build_log" 2>&1; then
