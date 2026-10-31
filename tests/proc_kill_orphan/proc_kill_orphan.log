@@ -1,0 +1,33 @@
+PASS initialize OS
+PASS load proc_kill_orphan.wasm
+PASS create parent task
+PASS parent finishes
+PASS kill, wait and spawn checks inside the parent passed
+PASS killed and collected child was reclaimed
+PASS dead host-created parent stays until deleted
+PASS only the orphan is still alive
+PASS child of a dead parent is orphaned
+PASS orphan keeps running
+PASS clean OS state
+PASS initialize OS
+PASS load proc_kill_orphan.wasm
+PASS create parent task
+PASS parent finishes
+PASS kill, wait and spawn checks inside the parent passed
+PASS killed and collected child was reclaimed
+PASS dead host-created parent stays until deleted
+PASS only the orphan is still alive
+PASS child of a dead parent is orphaned
+PASS orphan keeps running
+PASS clean OS state
+PASS initialize OS
+PASS load proc_kill_orphan.wasm
+PASS create parent task
+PASS parent finishes
+PASS kill, wait and spawn checks inside the parent passed
+PASS killed and collected child was reclaimed
+PASS dead host-created parent stays until deleted
+PASS only the orphan is still alive
+PASS child of a dead parent is orphaned
+PASS orphan keeps running
+PASS clean OS state
