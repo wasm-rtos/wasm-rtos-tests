@@ -66,6 +66,7 @@ The script runs under Bash 3.2 or newer, so it also works with the default shell
 | `WASM_LD` | `wasm-ld` | WebAssembly linker |
 | `WASI_TARGET` | auto | target triple for WASI guests; `wasm32-wasip1` when it links, otherwise the legacy `wasm32-wasi` |
 | `WASI_SYSROOT` | unset | WASI sysroot, when clang does not find one by default |
+| `SANITIZE` | `0` | `1` builds the native runners with AddressSanitizer and UndefinedBehaviorSanitizer |
 
 On macOS with Homebrew (`brew install llvm lld wasi-libc wasi-runtimes`), Apple clang has no WebAssembly backend, so point the script at the Homebrew toolchain:
 

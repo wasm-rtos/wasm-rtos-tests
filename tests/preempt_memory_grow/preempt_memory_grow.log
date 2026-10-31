@@ -1,0 +1,8 @@
+PASS initialize OS
+PASS kernel preempts after every unit of work
+PASS load preempt_memory_grow.wasm
+PASS create task
+PASS task returns without a trap
+PASS checksum matches an uninterrupted run
+PASS delete task
+PASS clean OS state
