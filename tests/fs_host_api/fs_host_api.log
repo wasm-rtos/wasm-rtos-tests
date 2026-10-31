@@ -1,0 +1,31 @@
+PASS initialize OS
+PASS load fs_host_api.wasm
+PASS image with a bad header checksum is rejected
+PASS image size must be whole blocks
+PASS truncated entry data is rejected
+PASS main image is valid
+PASS extra image is valid
+PASS mount at /
+PASS second mount at / is refused
+PASS relative mount path is refused
+PASS mount at /extra/ (normalized)
+PASS stat a file
+PASS stat normalizes the path
+PASS stat an implied directory
+PASS macOS metadata entries are hidden
+PASS stat a missing path
+PASS root lists files, directories and mount points once, in order
+PASS read_dir on a file
+PASS driver opens a file
+PASS file data is served in place without a copy
+PASS unmount /extra
+PASS unmounted path is gone
+PASS second unmount reports not found
+PASS fill the mount table
+PASS fill the mount table
+PASS fill the mount table
+PASS fill the mount table
+PASS fill the mount table
+PASS fill the mount table
+PASS fill the mount table
+PASS ninth mount is refused

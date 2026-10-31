@@ -141,7 +141,7 @@ for dir in tests/*; do
 
     if ! "$CC_BIN" -std=c11 -Wall -Wextra -D_GNU_SOURCE -D_POSIX_C_SOURCE=200809L "${native_flags[@]}" \
         -Iwasm-rtos \
-        "$main" wasm-rtos/os.c wasm-rtos/hal.c wasm-rtos/wasm3/source/*.c \
+        "$main" wasm-rtos/*.c wasm-rtos/wasm3/source/*.c \
         -lm -o "$runner" >>"$build_log" 2>&1; then
         { echo "FAIL building $runner"; cat "$build_log"; } | tee "$log"
         failed=1

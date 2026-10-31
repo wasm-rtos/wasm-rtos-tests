@@ -1,0 +1,8 @@
+PASS initialize OS
+PASS load preempt_nested_loop.wasm
+PASS create task
+PASS the loop was preempted many times
+PASS task returns without a trap
+PASS checksum matches an uninterrupted run
+PASS delete task
+PASS clean OS state
