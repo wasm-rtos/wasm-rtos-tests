@@ -135,6 +135,8 @@ for dir in tests/*; do
         native_flags+=(-Dd_m3HasM3C=1)
     elif [ "$name" = "dylink0" ]; then
         native_flags+=(-Dd_m3HasDylink=1 -Dd_m3HasM3C=1)
+    elif [ "$name" = "proc_disabled" ]; then
+        native_flags+=(-DOS_HAS_PROCESSES=0)
     fi
 
     if ! "$CC_BIN" -std=c11 -Wall -Wextra -D_GNU_SOURCE -D_POSIX_C_SOURCE=200809L "${native_flags[@]}" \
