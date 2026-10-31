@@ -11,29 +11,3 @@ PASS delete process
 PASS spawn rejects missing bytes
 PASS spawn rejects a NULL argument
 PASS clean OS state
-PASS initialize OS
-PASS load proc_spawn_argv.wasm
-PASS host spawns a WASI program with argv
-PASS process is named after argv[0]
-PASS host-spawned process has no parent
-PASS priority 0 picks the normal priority
-PASS process finishes
-PASS program saw argv exactly as passed
-PASS host-spawned process is kept until the host deletes it
-PASS delete process
-PASS spawn rejects missing bytes
-PASS spawn rejects a NULL argument
-PASS clean OS state
-PASS initialize OS
-PASS load proc_spawn_argv.wasm
-PASS host spawns a WASI program with argv
-PASS process is named after argv[0]
-PASS host-spawned process has no parent
-PASS priority 0 picks the normal priority
-PASS process finishes
-PASS program saw argv exactly as passed
-PASS host-spawned process is kept until the host deletes it
-PASS delete process
-PASS spawn rejects missing bytes
-PASS spawn rejects a NULL argument
-PASS clean OS state

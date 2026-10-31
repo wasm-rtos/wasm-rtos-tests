@@ -9,25 +9,3 @@ PASS collected children were reclaimed
 PASS host-created parent stays until deleted
 PASS delete parent
 PASS clean OS state
-PASS initialize OS
-PASS load proc_spawn_wait.wasm
-PASS create parent task
-PASS parent finishes
-PASS every check inside the parent passed
-PASS both children ran next to the parent
-PASS parent blocked in wait while the slow child slept
-PASS collected children were reclaimed
-PASS host-created parent stays until deleted
-PASS delete parent
-PASS clean OS state
-PASS initialize OS
-PASS load proc_spawn_wait.wasm
-PASS create parent task
-PASS parent finishes
-PASS every check inside the parent passed
-PASS both children ran next to the parent
-PASS parent blocked in wait while the slow child slept
-PASS collected children were reclaimed
-PASS host-created parent stays until deleted
-PASS delete parent
-PASS clean OS state
