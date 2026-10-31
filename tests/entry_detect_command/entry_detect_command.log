@@ -1,0 +1,7 @@
+PASS initialize OS
+PASS load entry_detect_command.wasm
+PASS create WASI command without naming the entry point
+PASS task reaches DEAD
+PASS main return value becomes exit code 3
+PASS delete task
+PASS clean OS state

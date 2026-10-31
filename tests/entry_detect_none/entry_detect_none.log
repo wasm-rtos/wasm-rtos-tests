@@ -1,0 +1,7 @@
+PASS initialize OS
+PASS load entry_detect_none.wasm
+PASS module without a known entry point is rejected
+PASS failed creation returns null task
+PASS diagnostic phase is find_function
+PASS diagnostic lists the accepted entry points
+PASS clean OS state
