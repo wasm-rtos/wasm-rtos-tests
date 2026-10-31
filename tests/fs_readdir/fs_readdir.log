@@ -7,21 +7,3 @@ PASS load fs_readdir.wasm
 PASS create WASI program
 PASS program finishes
 PASS program listed files, implied directories and mount points
-PASS initialize OS
-PASS main image is valid
-PASS extra image is valid
-PASS mount main image at /
-PASS mount extra image at /extra
-PASS load fs_readdir.wasm
-PASS create WASI program
-PASS program finishes
-PASS program listed files, implied directories and mount points
-PASS initialize OS
-PASS main image is valid
-PASS extra image is valid
-PASS mount main image at /
-PASS mount extra image at /extra
-PASS load fs_readdir.wasm
-PASS create WASI program
-PASS program finishes
-PASS program listed files, implied directories and mount points
