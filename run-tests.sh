@@ -7,6 +7,11 @@ cd "$ROOT"
 CC_BIN="${CC:-cc}"
 WASM_CC="${WASM_CC:-clang}"
 WASM_LD="${WASM_LD:-wasm-ld}"
+WASI_TARGET="${WASI_TARGET:-wasm32-wasip1}"
+wasi_flags=(--target="$WASI_TARGET")
+if [ -n "${WASI_SYSROOT:-}" ]; then
+    wasi_flags+=(--sysroot="$WASI_SYSROOT")
+fi
 failed=0
 found=0
 
@@ -61,7 +66,7 @@ for dir in tests/*; do
 
         if ! "$WASM_CC" --target=wasm32 -nostdlib -fPIC -O0 -c \
                 "$library_source" -o "$library_object" >"$build_log" 2>&1 \
-            || ! "$WASM_LD" -m wasm32 "${pic_flags[@]}" --shared --no-entry \
+            || ! "$WASM_LD" -m wasm32 ${pic_flags[@]+"${pic_flags[@]}"} --shared --no-entry \
                 --unresolved-symbols=import-dynamic \
                 --export=library_add --export=library_name \
                 --export=library_fill --export=library_apply \
@@ -69,7 +74,7 @@ for dir in tests/*; do
                 -o "$library_wasm" "$library_object" >>"$build_log" 2>&1 \
             || ! "$WASM_CC" --target=wasm32 -nostdlib -fPIC -O0 -c \
                 "$source" -o "$app_object" >>"$build_log" 2>&1 \
-            || ! "$WASM_LD" -m wasm32 "${pic_flags[@]}" --pie --no-entry \
+            || ! "$WASM_LD" -m wasm32 ${pic_flags[@]+"${pic_flags[@]}"} --pie --no-entry \
                 --export=app_main --export=app_name_char \
                 --export=app_struct --export=app_callback \
                 --export=app_counter --export=app_work_only \
@@ -82,13 +87,16 @@ for dir in tests/*; do
         fi
         rm -f "$app_object" "$library_object"
     elif grep -Eq '#include <(stdio|stdlib|wasi)|__wasi_|proc_exit|fd_write' "$source" || [[ "$name" == wasi_* ]]; then
-        if ! "$WASM_CC" --target=wasm32-wasi -O0 -o "$wasm" "$source" >"$build_log" 2>&1; then
+        if ! "$WASM_CC" "${wasi_flags[@]}" -O0 -o "$wasm" "$source" >"$build_log" 2>&1; then
             { echo "FAIL building $wasm"; cat "$build_log"; } | tee "$log"
             failed=1
             continue
         fi
     else
-        mapfile -t exports < <(grep -Eo 'app_main[A-Za-z0-9_]*[[:space:]]*\(' "$source" | sed -E 's/[[:space:]]*\($//' | sort -u)
+        exports=()
+        while IFS= read -r export_name; do
+            exports+=("$export_name")
+        done < <(grep -Eo 'app_main[A-Za-z0-9_]*[[:space:]]*\(' "$source" | sed -E 's/[[:space:]]*\($//' | sort -u)
         [ "${#exports[@]}" -gt 0 ] || exports=(app_main)
         export_flags=()
         for export_name in "${exports[@]}"; do
