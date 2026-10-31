@@ -1,0 +1,15 @@
+PASS initialize OS with nothing mounted
+PASS load fs_sandbox.wasm
+PASS create WASI program
+PASS program finishes
+PASS program cannot open files from the host working directory
+PASS initialize OS with nothing mounted
+PASS load fs_sandbox.wasm
+PASS create WASI program
+PASS program finishes
+PASS program cannot open files from the host working directory
+PASS initialize OS with nothing mounted
+PASS load fs_sandbox.wasm
+PASS create WASI program
+PASS program finishes
+PASS program cannot open files from the host working directory

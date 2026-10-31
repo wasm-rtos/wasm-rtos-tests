@@ -1,0 +1,27 @@
+PASS initialize OS
+PASS main image is valid
+PASS extra image is valid
+PASS mount main image at /
+PASS mount extra image at /extra
+PASS load fs_tar_read.wasm
+PASS create WASI program
+PASS program finishes
+PASS program read files, seeked, statted and got ENOENT/EROFS as expected
+PASS initialize OS
+PASS main image is valid
+PASS extra image is valid
+PASS mount main image at /
+PASS mount extra image at /extra
+PASS load fs_tar_read.wasm
+PASS create WASI program
+PASS program finishes
+PASS program read files, seeked, statted and got ENOENT/EROFS as expected
+PASS initialize OS
+PASS main image is valid
+PASS extra image is valid
+PASS mount main image at /
+PASS mount extra image at /extra
+PASS load fs_tar_read.wasm
+PASS create WASI program
+PASS program finishes
+PASS program read files, seeked, statted and got ENOENT/EROFS as expected
