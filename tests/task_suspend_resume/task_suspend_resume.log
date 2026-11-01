@@ -1,0 +1,29 @@
+PASS initialize OS
+PASS load task_suspend_resume.wasm
+PASS create two spinning tasks
+PASS both tasks share the processor
+PASS suspend a ready task
+PASS task is SUSPENDED
+PASS suspending twice is harmless
+PASS suspended task gets no slices
+PASS the other task keeps running
+PASS resume makes the task READY
+PASS resumed task runs again
+PASS resuming a task that is not suspended changes nothing
+PASS NULL task is rejected
+PASS create sleeping task
+PASS task waits in its 1000 ms delay
+PASS suspend the delayed task
+PASS the old deadline does not wake a suspended task
+PASS resume the task
+PASS delay ended at resume, after 2100 ms
+PASS create queue
+PASS receiver blocks on the empty queue
+PASS suspend the blocked receiver
+PASS send while the receiver is suspended
+PASS the suspended receiver does not take the item
+PASS resume the receiver
+PASS its receive returns BUSY
+PASS the item is still queued
+PASS dead task reports TASK_DEAD
+PASS OS is clean

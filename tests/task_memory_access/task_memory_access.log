@@ -1,0 +1,15 @@
+PASS initialize OS
+PASS register env.host_publish
+PASS load task_memory_access.wasm
+PASS create task
+PASS task published its buffer and sleeps
+PASS read the guest buffer
+PASS host sees the guest's initial bytes
+PASS write the guest buffer
+PASS read past linear memory is rejected
+PASS address overflow is rejected
+PASS NULL buffer is rejected
+PASS an empty read needs no buffer
+PASS NULL task is rejected
+PASS guest sees the bytes the host wrote
+PASS OS is clean

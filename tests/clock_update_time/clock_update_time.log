@@ -1,0 +1,21 @@
+PASS initialize OS
+PASS load clock_update_time.wasm
+PASS kernel time starts at 0
+PASS the first update only sets the baseline
+PASS task sleeps 100 ms
+PASS advance by the 60 ms difference
+PASS task still sleeps before its deadline
+PASS the same timestamp does not advance time
+PASS reach the deadline
+PASS task wakes at its deadline
+PASS task slept exactly 100 ms
+PASS os_tick advances time
+PASS after os_tick the next update sets a new baseline
+PASS then updates advance again
+PASS baseline just before the clock wraps
+PASS task sleeps 50 ms
+PASS a wrapped clock advances by 32 ms
+PASS task still sleeps
+PASS task wakes 50 ms after it slept
+PASS task slept exactly 50 ms across the wrap
+PASS OS is clean

@@ -5,23 +5,35 @@ PASS typed return task reaches DEAD
 PASS read return value
 PASS return type matches
 PASS i32 value
+PASS one return value
+PASS an empty buffer is too small and reports the count
+PASS read every return value
 PASS delete task
 PASS create typed return task
 PASS typed return task reaches DEAD
 PASS read return value
 PASS return type matches
 PASS i64 value
+PASS one return value
+PASS an empty buffer is too small and reports the count
+PASS read every return value
 PASS delete task
 PASS create typed return task
 PASS typed return task reaches DEAD
 PASS read return value
 PASS return type matches
 PASS f32 value
+PASS one return value
+PASS an empty buffer is too small and reports the count
+PASS read every return value
 PASS delete task
 PASS create typed return task
 PASS typed return task reaches DEAD
 PASS read return value
 PASS return type matches
 PASS f64 value
+PASS one return value
+PASS an empty buffer is too small and reports the count
+PASS read every return value
 PASS delete task
 PASS OS is clean

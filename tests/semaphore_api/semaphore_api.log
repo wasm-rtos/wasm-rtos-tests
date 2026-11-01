@@ -1,6 +1,8 @@
 PASS initialize OS
 PASS load semaphore test module
 PASS create binary semaphore
+PASS binary semaphore has max count 1
+PASS find semaphore by id
 PASS create semaphore waiter
 PASS waiter attempts take
 PASS empty semaphore blocks task

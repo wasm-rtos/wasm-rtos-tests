@@ -1,0 +1,16 @@
+PASS initialize OS
+PASS register host imports
+PASS load host_yield_preempt.wasm
+PASS yield outside a task is rejected
+PASS create task that yields 3 times
+PASS each yield ends a slice: 3 yields + 1 return = 4 slices
+PASS task finished all rounds
+PASS create task that requests preemption 3 times
+PASS each request ends a slice: 4 slices
+PASS task finished all rounds
+PASS create counting task
+PASS task published its counter
+PASS a full slice makes progress
+PASS a pending preemption cuts the next slice short
+PASS the request is used up: the following slice is full again
+PASS OS is clean

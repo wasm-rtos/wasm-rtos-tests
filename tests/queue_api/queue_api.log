@@ -8,4 +8,9 @@ PASS queue API task reaches DEAD
 PASS queue API task returned normally
 PASS queue API task returned zero
 PASS delete queue API task
+PASS create host queue with 3 slots
+PASS empty queue has 3 free slots
+PASS a sent item takes a slot
+PASS a received item frees it
+PASS NULL queue has no space
 PASS OS is clean

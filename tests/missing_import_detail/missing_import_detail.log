@@ -3,6 +3,7 @@ PASS load missing_import_detail.wasm
 PASS module with unreachable missing imports is rejected at load
 PASS failed creation returns null task
 PASS diagnostic phase is check_imports
+PASS diagnostic names the task
 PASS diagnostic names a missing env import
 PASS diagnostic names one of the missing imports
 PASS diagnostic counts the other missing import

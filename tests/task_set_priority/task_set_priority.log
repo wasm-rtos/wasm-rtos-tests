@@ -1,0 +1,16 @@
+PASS initialize OS
+PASS load task_set_priority.wasm
+PASS create a normal and a high priority task
+PASS only the high priority task runs
+PASS raise the other task above it
+PASS new priority is reported
+PASS now only the raised task runs
+PASS give both the same priority
+PASS equal priorities take turns
+PASS lower a task to idle
+PASS the idle task waits while another task is ready
+PASS change the priority of a task that has not run
+PASS it runs and finishes
+PASS dead task reports TASK_DEAD
+PASS NULL task is rejected
+PASS OS is clean

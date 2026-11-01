@@ -1,6 +1,7 @@
 PASS initialize OS
 PASS load event group test module
 PASS create event group
+PASS find event group by id
 PASS create wait-all task
 PASS event waiter blocks
 PASS wait-all task enters WAITING

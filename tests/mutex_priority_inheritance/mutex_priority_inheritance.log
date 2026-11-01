@@ -1,6 +1,7 @@
 PASS initialize OS
 PASS load mutex test module
 PASS create mutex
+PASS find mutex by id
 PASS create low-priority owner
 PASS low task locks and yields
 PASS low task owns mutex
