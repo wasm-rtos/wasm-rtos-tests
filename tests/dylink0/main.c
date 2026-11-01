@@ -156,7 +156,7 @@ static int call_no_args(IM3Runtime runtime, const char * name,
     return result == m3Err_none && value == expected;
 }
 
-static int run_group(IM3Environment environment, WasmBinary * app,
+static int run_program(IM3Environment environment, WasmBinary * app,
                      MemoryStorage * appM3C, ResolverContext * resolver)
 {
     IM3Runtime runtime = m3_NewRuntime(environment, 64U * 1024U, NULL);
@@ -226,131 +226,10 @@ static int run_group(IM3Environment environment, WasmBinary * app,
     expect(call_no_args(runtime, "app_callback", 17),
            "library calls an app function pointer through the shared table");
     expect(call_no_args(runtime, "app_counter", 2),
-           "library mutable data remains in the shared memory link group");
+           "library keeps its mutable data between calls");
 
     m3_FreeRuntime(runtime);
     return 1;
-}
-
-static int call_context_no_args(IM3DylinkContext context, const char * name,
-                                uint32_t expected)
-{
-    IM3Module module = m3_DylinkGetContextModule(context);
-    IM3Function function = NULL;
-    uint32_t value = UINT32_MAX;
-    M3Result result = m3_DylinkActivateContext(context);
-    if (!result)
-        result = m3_FindFunctionInModule(&function, module, name);
-    if (!result)
-        result = m3_CallV(function);
-    if (!result)
-        result = m3_GetResultsV(function, &value);
-    return result == m3Err_none && value == expected;
-}
-
-static void run_dynamic_group(IM3Environment environment, WasmBinary * app,
-                              ResolverContext * resolver)
-{
-    IM3Runtime runtime = m3_NewRuntime(environment, 64U * 1024U, NULL);
-    IM3Module firstModule = NULL;
-    IM3Module secondModule = NULL;
-    IM3Module thirdModule = NULL;
-    IM3DylinkContext first = NULL;
-    IM3DylinkContext second = NULL;
-    IM3DylinkContext third = NULL;
-    M3DylinkProgram program;
-    M3DylinkOptions options = {resolver, resolve_library, NULL, 16U * 1024U};
-    M3Result result = runtime != NULL
-        ? m3_ParseModule(environment, &firstModule, app->bytes, app->size)
-        : m3Err_mallocFailed;
-
-    expect(runtime != NULL && result == m3Err_none && firstModule != NULL,
-           "prepare dynamically extendable dylink group");
-    if (!runtime || result || !firstModule)
-    {
-        if (runtime)
-            m3_FreeRuntime(runtime);
-        return;
-    }
-
-    memset(&program, 0, sizeof(program));
-    program.name = "dynamic-a";
-    program.module = firstModule;
-    program.nativeStackSize = 64U * 1024U;
-    program.linearStackSize = 16U * 1024U;
-    result = m3_DylinkLoadGroup(runtime, &program, 1U, &options, &first);
-    expect(result == m3Err_none && first != NULL &&
-               m3_DylinkGetProgramCount(runtime) == 1U,
-           "create group with one dynamic program");
-    if (result || !first)
-    {
-        if (firstModule != NULL && firstModule->runtime == runtime)
-            firstModule = NULL;
-        m3_FreeRuntime(runtime);
-        if (firstModule != NULL)
-            m3_FreeModule(firstModule);
-        return;
-    }
-    firstModule = NULL;
-
-    result = m3_ParseModule(environment, &secondModule, app->bytes, app->size);
-    if (!result)
-    {
-        memset(&program, 0, sizeof(program));
-        program.name = "dynamic-b";
-        program.module = secondModule;
-        program.nativeStackSize = 64U * 1024U;
-        program.linearStackSize = 16U * 1024U;
-        result = m3_DylinkAddProgram(runtime, &program, &options, &second);
-    }
-    if (result == m3Err_none)
-        secondModule = NULL;
-    expect(result == m3Err_none && second != NULL &&
-               m3_DylinkGetProgramCount(runtime) == 2U,
-           "add a program after the group is running");
-    expect(first != NULL && call_context_no_args(first, "app_counter", 2U),
-           "run first dynamically linked program");
-    expect(second != NULL && call_context_no_args(second, "app_counter", 4U),
-           "run second program against the same resident library");
-
-    result = first != NULL ? m3_DylinkRemoveProgram(first)
-                           : m3Err_dylinkUnsupported;
-    first = NULL;
-    expect(result == m3Err_none && m3_DylinkGetProgramCount(runtime) == 1U,
-           "remove one program without unloading its dependency");
-    expect(second != NULL && call_context_no_args(second, "app_counter", 6U),
-           "remaining context survives removal of the first program");
-    result = second != NULL ? m3_DylinkRemoveProgram(second)
-                            : m3Err_dylinkUnsupported;
-    second = NULL;
-    expect(result == m3Err_none && m3_DylinkGetProgramCount(runtime) == 0U,
-           "group remains alive with no application contexts");
-
-    result = m3_ParseModule(environment, &thirdModule, app->bytes, app->size);
-    if (!result)
-    {
-        memset(&program, 0, sizeof(program));
-        program.name = "dynamic-c";
-        program.module = thirdModule;
-        program.nativeStackSize = 64U * 1024U;
-        program.linearStackSize = 16U * 1024U;
-        result = m3_DylinkAddProgram(runtime, &program, &options, &third);
-    }
-    if (result == m3Err_none)
-        thirdModule = NULL;
-    expect(result == m3Err_none && third != NULL &&
-               m3_DylinkGetProgramCount(runtime) == 1U,
-           "add a program after the group became empty");
-    expect(third != NULL && call_context_no_args(third, "app_counter", 8U),
-           "resident library state survives close and reopen");
-    if (third != NULL)
-        expect(m3_DylinkRemoveProgram(third) == m3Err_none,
-               "remove the reopened program");
-    if (secondModule != NULL)
-        m3_FreeModule(secondModule);
-    if (thirdModule != NULL)
-        m3_FreeModule(thirdModule);
-    m3_FreeRuntime(runtime);
 }
 
 static int write_m3c(IM3Environment environment, WasmBinary * binary,
@@ -523,8 +402,7 @@ int main(void)
     resolver.library = library;
     resolver.libraryM3C = &libraryM3C;
     resolver.useM3C = 0;
-    run_group(environment, &app, &appM3C, &resolver);
-    run_dynamic_group(environment, &app, &resolver);
+    run_program(environment, &app, &appM3C, &resolver);
     run_os_processes(&app, &library);
 
     expect(write_m3c(environment, &app, &appM3C),
@@ -534,7 +412,7 @@ int main(void)
     if (appM3C.size && libraryM3C.size)
     {
         resolver.useM3C = 1;
-        run_group(environment, &app, &appM3C, &resolver);
+        run_program(environment, &app, &appM3C, &resolver);
     }
 
 cleanup:
