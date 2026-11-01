@@ -1,0 +1,16 @@
+PASS initialize OS
+PASS load snapshot_portable.wasm
+PASS reference run finishes
+PASS every slice was saved and loaded into a new task
+PASS the program moved many times, stopped at many different places
+PASS the moved program computes what the uninterrupted one did
+PASS zero runs keep snapshots far smaller than memory
+PASS take one more snapshot
+PASS save it
+PASS another program refuses the snapshot
+PASS and still runs as it was created
+PASS a truncated snapshot is refused
+PASS the same task then loads the whole one
+PASS a task that has state refuses another load
+PASS it finishes with the right answer
+PASS OS is clean

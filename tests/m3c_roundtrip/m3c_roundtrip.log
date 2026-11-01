@@ -15,7 +15,7 @@ PASS cached function suspends when fuel is exhausted
 PASS query snapshot size for cached function
 PASS allocate snapshot buffer
 PASS save cached function snapshot
-PASS restore cached function snapshot
+PASS restore cached function snapshot, or refuse without the source
 PASS resume cached function to completion
 PASS cached function calls host import and returns expected value
 PASS writer reports non-empty image size
