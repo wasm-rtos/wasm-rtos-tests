@@ -148,6 +148,8 @@ for dir in tests/*; do
         native_flags+=(-DOS_TASK_SLICE_FUEL=1ULL)
     elif [ "$name" = "task_memory_usage" ]; then
         native_flags+=(-Dd_m3HasHeapAccounting=1)
+    elif [ "$name" = "native_stack_budget" ]; then
+        native_flags+=(-DOS_NATIVE_STACK_BUDGET=8192U -DOS_TASK_SLICE_FUEL=100000000ULL)
     fi
 
     if ! "$CC_BIN" ${sanitize_flags[@]+"${sanitize_flags[@]}"} -std=c11 -Wall -Wextra -D_GNU_SOURCE -D_POSIX_C_SOURCE=200809L "${native_flags[@]}" \
