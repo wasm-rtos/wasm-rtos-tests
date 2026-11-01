@@ -70,6 +70,8 @@ int main(void)
            "module with unreachable missing imports is rejected at load");
         ok(t == NULL, "failed creation returns null task");
         ok(strcmp(os_get_last_error_phase(), "check_imports") == 0, "diagnostic phase is check_imports");
+        ok(os_get_last_error_task_name() != NULL && strcmp(os_get_last_error_task_name(), "missing_import_detail") == 0,
+           "diagnostic names the task");
         result = os_get_last_error_result();
         printf("result: %s\n", result ? result : "(null)");
         ok(result != NULL && strncmp(result, "missing import env.", 19) == 0, "diagnostic names a missing env import");
