@@ -1,5 +1,4 @@
 #include "os.h"
-#include "hal.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -73,7 +72,6 @@ int main(void)
     OsTaskHandle t = NULL;
     uint32_t i;
     l = fopen("proc_kill_orphan.log", "a");
-    hal_init();
     ok(os_init() == OS_STATUS_OK, "initialize OS");
     ok(load(&b), "load proc_kill_orphan.wasm");
     if (b.d)
@@ -110,7 +108,6 @@ int main(void)
     delete_all_tasks();
     ok(os_get_task_count() == 0U, "clean OS state");
     os_shutdown();
-    hal_shutdown();
     if (l)
         fclose(l);
     return f ? 1 : 0;

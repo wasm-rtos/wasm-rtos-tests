@@ -1,5 +1,4 @@
 #include "os.h"
-#include "hal.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -62,7 +61,6 @@ int main(void)
     Bin b = {0};
     OsTaskHandle t = NULL;
     l = fopen("missing_import_detail.log", "a");
-    hal_init();
     ok(os_init() == OS_STATUS_OK, "initialize OS");
     ok(load(&b), "load missing_import_detail.wasm");
     if (b.d)
@@ -83,7 +81,6 @@ int main(void)
     }
     ok(os_get_task_count() == 0U, "clean OS state");
     os_shutdown();
-    hal_shutdown();
     if (l)
         fclose(l);
     return f ? 1 : 0;

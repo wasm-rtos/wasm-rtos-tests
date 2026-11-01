@@ -1,5 +1,4 @@
 #include "os.h"
-#include "hal.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -74,7 +73,6 @@ int main(void)
     g_log = fopen("get_time_once.log", "w");
     if (!g_log)
         return 1;
-    hal_init();
     expect(os_init() == OS_STATUS_OK, "initialize OS");
     os_tick(1234U);
     expect(os_get_tick_ms() == 1234U, "host tick advanced to 1234 ms");
@@ -96,7 +94,6 @@ int main(void)
     }
     expect(os_get_task_count() == 0U, "OS is clean");
     os_shutdown();
-    hal_shutdown();
     fclose(g_log);
     return g_failures == 0 ? 0 : 1;
 }

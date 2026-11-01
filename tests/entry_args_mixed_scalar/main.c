@@ -1,5 +1,4 @@
 #include "os.h"
-#include "hal.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -75,7 +74,6 @@ int main(void)
     g_log = fopen("entry_args_mixed_scalar.log", "w");
     if (!g_log)
         return 1;
-    hal_init();
     expect(os_init() == OS_STATUS_OK, "initialize OS");
     expect(load_wasm(&wasm), "load entry_args_mixed_scalar.wasm");
     if (wasm.bytes)
@@ -102,7 +100,6 @@ int main(void)
     }
     expect(os_get_task_count() == 0U, "OS is clean");
     os_shutdown();
-    hal_shutdown();
     fclose(g_log);
     return g_failures == 0 ? 0 : 1;
 }

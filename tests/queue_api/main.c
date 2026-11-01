@@ -1,5 +1,4 @@
 #include "os.h"
-#include "hal.h"
 #include "wasm3/source/m3_env.h"
 #include <stdint.h>
 #include <stdio.h>
@@ -88,7 +87,6 @@ int main(void)
     uint32_t iteration;
 
     log_file = fopen("queue_api.log", "w");
-    hal_init();
     expect(os_init() == OS_STATUS_OK, "initialize OS");
     expect(os_host_import_register("env", "os_queue_create", "i(ii)", queue_create_import) == OS_STATUS_OK,
            "register queue create import");
@@ -116,7 +114,6 @@ int main(void)
 
     expect(os_get_task_count() == 0U, "OS is clean");
     os_shutdown();
-    hal_shutdown();
     if (log_file != NULL)
         fclose(log_file);
     return failures == 0 ? 0 : 1;

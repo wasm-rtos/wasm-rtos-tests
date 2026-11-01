@@ -1,5 +1,4 @@
 #include "os.h"
-#include "hal.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -54,7 +53,6 @@ int main(void)
     OsTaskHandle t = NULL;
     uint32_t i;
     l = fopen("wasi_puts.log", "a");
-    hal_init();
     ok(os_init() == OS_STATUS_OK, "initialize OS");
     ok(load(&b), "load wasi_puts.wasm");
     if (b.d)

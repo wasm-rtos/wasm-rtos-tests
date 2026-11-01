@@ -1,5 +1,4 @@
 #include "os.h"
-#include "hal.h"
 #include "wasm3/source/m3_env.h"
 
 #include <stdarg.h>
@@ -170,7 +169,6 @@ int main(void)
         return 1;
     }
 
-    hal_init();
     expect(os_init() == OS_STATUS_OK, "initialize OS");
 
     status = os_host_import_register("env", "host_test_value", "i(i)", host_test_value);
@@ -277,7 +275,6 @@ int main(void)
 
     log_message("%s custom_import", g_failures == 0 ? "PASS" : "FAIL");
     os_shutdown();
-    hal_shutdown();
     fclose(g_log);
 
     return g_failures == 0 ? 0 : 1;

@@ -1,5 +1,4 @@
 #include "os.h"
-#include "hal.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -60,7 +59,6 @@ int main(void)
     /* A wrong resume can loop forever; fail instead of hanging CI. */
     alarm(60);
     l = fopen("preempt_nested_loop.log", "a");
-    hal_init();
     ok(os_init() == OS_STATUS_OK, "initialize OS");
     ok(load(&b), "load preempt_nested_loop.wasm");
     if (b.d)
@@ -86,7 +84,6 @@ int main(void)
     }
     ok(os_get_task_count() == 0U, "clean OS state");
     os_shutdown();
-    hal_shutdown();
     if (l)
         fclose(l);
     return f ? 1 : 0;

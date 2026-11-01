@@ -1,6 +1,5 @@
 #include "os.h"
 #include "fs.h"
-#include "hal.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -74,7 +73,6 @@ int main(void)
 {
     Bin b = {0};
     l = fopen("fs_sandbox.log", "a");
-    hal_init();
     ok(os_init() == OS_STATUS_OK, "initialize OS with nothing mounted");
     ok(load(&b), "load fs_sandbox.wasm");
     if (b.d)
@@ -83,7 +81,6 @@ int main(void)
         free(b.d);
     }
     os_shutdown();
-    hal_shutdown();
     if (l)
         fclose(l);
     return f ? 1 : 0;

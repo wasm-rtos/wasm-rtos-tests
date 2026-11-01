@@ -1,5 +1,4 @@
 #include "os.h"
-#include "hal.h"
 
 #include <stdint.h>
 #include <stdio.h>
@@ -677,7 +676,6 @@ int main(void)
         return 1;
     }
 
-    hal_init();
     expect(os_init() == OS_STATUS_OK, "initialize OS");
     expect(load_wasm(&wasm), "load software timer test module");
 
@@ -697,7 +695,6 @@ int main(void)
 
     free(wasm.bytes);
     os_shutdown();
-    hal_shutdown();
     fclose(g_log);
     return g_failures == 0 ? 0 : 1;
 }

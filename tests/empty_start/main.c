@@ -1,5 +1,4 @@
 #include "os.h"
-#include "hal.h"
 
 #include <stdarg.h>
 #include <stdint.h>
@@ -87,7 +86,6 @@ int main(void)
         return 1;
     }
 
-    hal_init();
     expect(os_init() == OS_STATUS_OK, "initialize OS");
 
     if (load_wasm(&wasm))
@@ -114,7 +112,6 @@ int main(void)
 
     log_message("%s empty_start", g_failures == 0 ? "PASS" : "FAIL");
     os_shutdown();
-    hal_shutdown();
     fclose(g_log);
 
     return g_failures == 0 ? 0 : 1;

@@ -1,6 +1,5 @@
 #include "os.h"
 #include "fs.h"
-#include "hal.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -105,7 +104,6 @@ int main(void)
 
     copy_driver.map = NULL;
     l = fopen("proc_spawn_path.log", "a");
-    hal_init();
     ok(os_init() == OS_STATUS_OK, "initialize OS");
     ok(load(&b), "load proc_spawn_path.wasm");
     if (b.d)
@@ -164,7 +162,6 @@ int main(void)
     ok(os_fs_unmount("/") == OS_STATUS_OK, "every image was released");
 
     os_shutdown();
-    hal_shutdown();
     free(image);
     free(b.d);
     if (l)
