@@ -83,6 +83,8 @@ bash ./run-tests.sh
 
 The workflow installs the native and WASI toolchains, builds and executes every isolated test, and uploads the complete `tests/` directory as the `isolated-tests` artifact. The artifact contains the generated `.wasm` modules and `.log` files.
 
+The committed `.wasm` and `.log` files always come from CI's toolchain: after every push to `main` the workflow regenerates them and commits any change, together with the latest `wasm-rtos` submodule. Pull requests only have to pass the tests; their artifacts may be stale or missing, and CI never commits to their branches.
+
 The workflow does not maintain a central list of tests. Adding a correctly structured directory automatically adds that test to CI.
 
 ## Adding a test

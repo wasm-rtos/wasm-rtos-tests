@@ -60,66 +60,48 @@ jobs:
         id: run_tests
         run: bash ./run-tests.sh
 
-      - name: Check required artifacts are tracked and current
+      # The runner must produce every artifact. Committed copies are refreshed
+      # by the main branch only: pull requests and other branches never get
+      # bot commits, so their checks need no manual approval.
+      - name: Check generated artifacts
         id: verify_artifacts
         if: steps.run_tests.outcome == 'success'
         run: |
           failed=0
+          refresh=0
 
           for dir in tests/*; do
             [ -d "$dir" ] || continue
             name="$(basename "$dir")"
-            wasm="$dir/$name.wasm"
-            log="$dir/$name.log"
-
-            if [ ! -s "$wasm" ]; then
-              echo "FAIL required WASM artifact is missing or empty: $wasm"
-              failed=1
-            fi
-
-            if [ ! -s "$log" ]; then
-              echo "FAIL required log artifact is missing or empty: $log"
-              failed=1
-            fi
-
-            if ! git ls-files --error-unmatch "$wasm" >/dev/null 2>&1; then
-              echo "FAIL required WASM artifact is not tracked: $wasm"
-              failed=1
-            fi
-
-            if ! git ls-files --error-unmatch "$log" >/dev/null 2>&1; then
-              echo "FAIL required log artifact is not tracked: $log"
-              failed=1
-            fi
+            for artifact in "$dir/$name.wasm" "$dir/$name.log"; do
+              if [ ! -s "$artifact" ]; then
+                echo "FAIL required artifact is missing or empty: $artifact"
+                failed=1
+              elif ! git ls-files --error-unmatch "$artifact" >/dev/null 2>&1; then
+                echo "::notice::$artifact is not committed yet; main will add it"
+                refresh=1
+              fi
+            done
           done
 
           if ! git diff --quiet -- 'tests/**/*.wasm' 'tests/**/*.log'; then
-            echo "FAIL committed WASM or log artifacts are stale"
+            echo "::notice::Committed WASM or log artifacts differ from this build; main will refresh them"
             git status --short -- tests
-            failed=1
+            refresh=1
           fi
 
-          if [ "$failed" -eq 0 ]; then
-            echo "stale=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "stale=true" >> "$GITHUB_OUTPUT"
-          fi
+          echo "refresh=$refresh" >> "$GITHUB_OUTPUT"
+          exit "$failed"
 
-          if [ "$failed" -ne 0 ] && [ "${{ github.event_name }}" != "push" ]; then
-            exit 1
-          fi
-
-      - name: Commit updated submodule and regenerated artifacts to branch
-        if: always() && github.event_name == 'push' && steps.run_tests.outcome == 'success'
+      - name: Commit updated submodule and regenerated artifacts to main
+        if: github.event_name == 'push' && github.ref_name == 'main' && steps.verify_artifacts.outcome == 'success'
         run: |
-          branch="${{ github.ref_name }}"
-
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           git add wasm-rtos
 
-          if [ "${{ steps.verify_artifacts.outputs.stale }}" = "true" ]; then
+          if [ "${{ steps.verify_artifacts.outputs.refresh }}" = "1" ]; then
             git add -f tests/*/*.wasm tests/*/*.log
           fi
 
@@ -137,7 +119,7 @@ jobs:
           fi
 
           git commit -m "$commit_message"
-          git push origin "HEAD:$branch"
+          git push origin "HEAD:main"
 
       - name: Upload generated WASM files and logs
         if: always()
