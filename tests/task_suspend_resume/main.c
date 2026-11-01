@@ -82,7 +82,6 @@ int main(void)
     OsTaskHandle sleeper = NULL;
     OsTaskHandle receiver = NULL;
     OsQueueHandle queue = NULL;
-    OsValue arg;
     uint32_t item = 7U;
     uint32_t runs = 0U;
 
@@ -131,16 +130,15 @@ int main(void)
 
     /* A suspended receiver gives up its wait: it does not take items meanwhile. */
     ok(os_queue_create(&queue, sizeof(uint32_t), 1U) == OS_STATUS_OK, "create queue");
-    arg.type = OS_VALUE_TYPE_I32;
-    arg.value.i32 = os_queue_get_id(queue);
-    receiver = create(&b, "app_main_receive", "receiver", &arg, 1U);
+    ok(os_queue_set_name(queue, "inbox") == OS_STATUS_OK, "name the queue");
+    receiver = create(&b, "app_main_receive", "receiver", NULL, 0U);
     os_schedule();
     ok(receiver && os_task_get_state(receiver) == OS_TASK_WAITING, "receiver blocks on the empty queue");
     ok(os_task_suspend(receiver) == OS_STATUS_OK, "suspend the blocked receiver");
     ok(os_queue_send(queue, &item) == OS_STATUS_OK, "send while the receiver is suspended");
     ok(os_queue_get_count(queue) == 1U, "the suspended receiver does not take the item");
     ok(os_task_resume(receiver) == OS_STATUS_OK, "resume the receiver");
-    ok(run_to_result(receiver) == (int32_t)OS_STATUS_BUSY, "its receive returns BUSY");
+    ok(run_to_result(receiver) == -9, "its receive returns -WR_EBUSY");
     ok(os_queue_get_count(queue) == 1U, "the item is still queued");
 
     /* Dead tasks cannot be suspended or resumed. */

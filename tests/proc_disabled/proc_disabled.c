@@ -1,5 +1,4 @@
-__attribute__((import_module("wasm-rtos:proc"), import_name("spawn")))
-int proc_spawn(const void* bytes, unsigned length, const char* const* argv, unsigned argc, unsigned priority);
+#include <wasm-rtos.h>
 
 /* (module (func (export "app_main") (result i32) i32.const 42)) */
 static const unsigned char child[] = {
@@ -10,7 +9,10 @@ static const unsigned char child[] = {
     0x0a, 0x06, 0x01, 0x04, 0x00, 0x41, 0x2a, 0x0b
 };
 
+/* Without processes the program still loads; spawning is unsupported. */
 int app_main(void)
 {
-    return proc_spawn(child, sizeof(child), 0, 0U, 0U);
+    if (wr_self() <= 0 || wr_parent() != 0)
+        return 1;
+    return wr_spawn(child, sizeof(child), 0, 0U, 0U, 0U);
 }

@@ -1,5 +1,4 @@
 #include "os.h"
-#include "wasm3/source/m3_env.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -52,34 +51,6 @@ static int load(Binary* binary)
     return 1;
 }
 
-static m3ApiRawFunction(queue_create_import)
-{
-    m3ApiReturnType(uint32_t);
-    m3ApiGetArg(uint32_t, item_size);
-    m3ApiGetArg(uint32_t, item_count);
-    OsQueueHandle queue = NULL;
-    (void)runtime;
-    (void)_ctx;
-    (void)_mem;
-    if (os_queue_create(&queue, item_size, item_count) != OS_STATUS_OK)
-        m3ApiReturn(0U);
-    m3ApiReturn(os_queue_get_id(queue));
-}
-
-static m3ApiRawFunction(queue_delete_import)
-{
-    m3ApiReturnType(uint32_t);
-    m3ApiGetArg(uint32_t, queue_id);
-    OsQueueHandle queue = os_queue_find_by_id(queue_id);
-    (void)runtime;
-    (void)_ctx;
-    (void)_mem;
-    if (queue == NULL)
-        m3ApiReturn((uint32_t)OS_STATUS_QUEUE_NOT_FOUND);
-    os_queue_delete(queue);
-    m3ApiReturn((uint32_t)OS_STATUS_OK);
-}
-
 int main(void)
 {
     Binary binary = {0};
@@ -88,10 +59,6 @@ int main(void)
 
     log_file = fopen("queue_api.log", "w");
     expect(os_init() == OS_STATUS_OK, "initialize OS");
-    expect(os_host_import_register("env", "os_queue_create", "i(ii)", queue_create_import) == OS_STATUS_OK,
-           "register queue create import");
-    expect(os_host_import_register("env", "os_queue_delete", "i(i)", queue_delete_import) == OS_STATUS_OK,
-           "register queue delete import");
     expect(load(&binary), "load queue_api.wasm");
 
     if (binary.data != NULL)
@@ -107,6 +74,8 @@ int main(void)
             expect(os_task_get_state(task) == OS_TASK_DEAD, "queue API task reaches DEAD");
             expect(os_task_get_exit_reason(task) == OS_TASK_EXIT_RETURNED, "queue API task returned normally");
             expect(os_task_get_exit_code(task) == 0U, "queue API task returned zero");
+            if (os_task_get_exit_code(task) != 0U)
+                printf("     failed check %u\n", (unsigned)os_task_get_exit_code(task));
             expect(os_task_delete(task) == OS_STATUS_OK, "delete queue API task");
         }
         free(binary.data);

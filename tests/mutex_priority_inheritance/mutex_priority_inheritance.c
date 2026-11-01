@@ -1,26 +1,15 @@
-#include <stdint.h>
+#include <wasm-rtos.h>
 
-#define OS_STATUS_OK 0U
-#define OS_WAIT_FOREVER UINT32_MAX
-
-__attribute__((import_module("env"), import_name("os_yield"))) extern void os_yield(void);
-__attribute__((import_module("env"), import_name("os_mutex_lock"))) extern uint32_t
-os_mutex_lock(uint32_t mutex_id, uint32_t timeout_ms);
-__attribute__((import_module("env"), import_name("os_mutex_unlock"))) extern uint32_t
-os_mutex_unlock(uint32_t mutex_id);
-
-uint32_t app_main_low(uint32_t mutex_id)
+/* low and high share the host's mutex "m". */
+uint32_t app_main_low(uint32_t unused)
 {
-    uint32_t status = os_mutex_lock(mutex_id, OS_WAIT_FOREVER);
+    int32_t mutex = wr_mutex_open("m");
+    (void)unused;
 
-    if (status != OS_STATUS_OK)
-    {
+    if (mutex < 0 || wr_mutex_lock(mutex, WR_WAIT_FOREVER) != 0)
         return 1U;
-    }
-
-    os_yield();
-    status = os_mutex_unlock(mutex_id);
-    return status == OS_STATUS_OK ? 0U : 2U;
+    wr_yield();
+    return wr_mutex_unlock(mutex) == 0 ? 0U : 2U;
 }
 
 uint32_t app_main_medium(uint32_t unused)
@@ -36,15 +25,15 @@ uint32_t app_main_medium(uint32_t unused)
     return value == UINT32_MAX ? 1U : 0U;
 }
 
-uint32_t app_main_high(uint32_t mutex_id)
+uint32_t app_main_high(uint32_t unused)
 {
-    uint32_t status = os_mutex_lock(mutex_id, OS_WAIT_FOREVER);
+    int32_t mutex = wr_mutex_open("m");
+    (void)unused;
 
-    if (status != OS_STATUS_OK)
-    {
+    if (mutex < 0 || wr_mutex_lock(mutex, WR_WAIT_FOREVER) != 0)
         return 3U;
-    }
-
-    status = os_mutex_unlock(mutex_id);
-    return status == OS_STATUS_OK ? 0U : 4U;
+    /* Only the owner may unlock. */
+    if (wr_mutex_unlock(mutex) != 0 || wr_mutex_unlock(mutex) != -WR_ENOTOWNER)
+        return 4U;
+    return 0U;
 }

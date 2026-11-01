@@ -1,7 +1,7 @@
-__attribute__((import_module("env"), import_name("os_delay_ms"))) void os_delay_ms(unsigned int delay_ms);
+#include <wasm-rtos.h>
 
 int app_main(void)
 {
-    os_delay_ms(10);
+    wr_sleep_ms(10);
     return 21;
 }

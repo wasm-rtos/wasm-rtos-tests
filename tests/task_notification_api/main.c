@@ -56,6 +56,73 @@ static int load_wasm(WasmBinary* binary)
     return 1;
 }
 
+/*
+ * Task notifications are a host API; these imports hand them to the guest.
+ * Blocking ones bracket the call with os_host_wait_begin/end.
+ */
+static m3ApiRawFunction(notify_wait_import)
+{
+    m3ApiReturnType(uint32_t);
+    m3ApiGetArg(uint32_t, clear_on_entry);
+    m3ApiGetArg(uint32_t, clear_on_exit);
+    m3ApiGetArg(uint32_t, timeout_ms);
+    (void)runtime;
+    (void)_ctx;
+    (void)_mem;
+    if (os_host_wait_begin(raw_return) != OS_STATUS_OK)
+        m3ApiReturn((uint32_t)OS_STATUS_INVALID_ARGUMENT);
+    *raw_return = (uint32_t)os_task_notify_wait(clear_on_entry, clear_on_exit, timeout_ms);
+    return os_host_wait_end();
+}
+
+static m3ApiRawFunction(notify_value_import)
+{
+    m3ApiReturnType(uint32_t);
+    (void)runtime;
+    (void)_ctx;
+    (void)_mem;
+    m3ApiReturn(os_task_get_last_wait_value(os_task_get_current()));
+}
+
+static m3ApiRawFunction(notify_take_import)
+{
+    m3ApiReturnType(uint32_t);
+    m3ApiGetArg(uint32_t, clear_count_on_exit);
+    m3ApiGetArg(uint32_t, timeout_ms);
+    OsStatus status;
+    (void)runtime;
+    (void)_ctx;
+    (void)_mem;
+    if (os_host_wait_begin(raw_return) != OS_STATUS_OK)
+        m3ApiReturn(0U);
+    status = os_task_notify_take(clear_count_on_exit ? 1U : 0U, timeout_ms);
+    *raw_return = status == OS_STATUS_OK ? os_task_get_last_wait_value(os_task_get_current()) : 0U;
+    return os_host_wait_end();
+}
+
+static m3ApiRawFunction(notify_import)
+{
+    m3ApiReturnType(uint32_t);
+    m3ApiGetArg(uint32_t, task_id);
+    m3ApiGetArg(uint32_t, value);
+    m3ApiGetArg(uint32_t, action);
+    OsTaskHandle task = os_task_find_by_id(task_id);
+    (void)runtime;
+    (void)_ctx;
+    (void)_mem;
+    m3ApiReturn((uint32_t)(task != NULL ? os_task_notify(task, value, (OsNotifyAction)action)
+                                        : OS_STATUS_TASK_NOT_FOUND));
+}
+
+static void register_notify_imports(void)
+{
+    expect(os_host_import_register("env", "notify", "i(iii)", notify_import) == OS_STATUS_OK &&
+               os_host_import_register("env", "notify_wait", "i(iii)", notify_wait_import) == OS_STATUS_OK &&
+               os_host_import_register("env", "notify_value", "i()", notify_value_import) == OS_STATUS_OK &&
+               os_host_import_register("env", "notify_take", "i(ii)", notify_take_import) == OS_STATUS_OK,
+           "register notification imports");
+}
+
 static OsStatus create_task(
     OsTaskHandle* out_task,
     WasmBinary* wasm,
@@ -98,6 +165,7 @@ int main(void)
     }
 
     expect(os_init() == OS_STATUS_OK, "initialize OS");
+    register_notify_imports();
     expect(load_wasm(&wasm), "load notification test module");
 
     if (wasm.bytes != NULL)

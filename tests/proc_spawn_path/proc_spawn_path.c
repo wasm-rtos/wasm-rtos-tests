@@ -1,14 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define PROC_IMPORT(name) __attribute__((import_module("wasm-rtos:proc"), import_name(name)))
-PROC_IMPORT("spawn_path") int proc_spawn_path(const char* path, const char* const* argv, unsigned argc, unsigned priority);
-PROC_IMPORT("wait") unsigned proc_wait(int pid, unsigned* exit_code, unsigned timeout_ms);
-
-#define OS_STATUS_OK 0
-#define OS_STATUS_FILE_NOT_FOUND 25
-#define OS_STATUS_IS_A_DIRECTORY 27
-#define OS_WAIT_FOREVER 0xFFFFFFFFU
+#include <wasm-rtos.h>
 
 /* The same program is the parent and the child; argv selects the role. */
 int main(int argc, char** argv)
@@ -23,20 +16,27 @@ int main(int argc, char** argv)
     if (argc == 2 && strcmp(argv[1], "parent") == 0)
     {
         /* Returns a bit mask of failed checks; 0 means every check passed. */
-        static const char* const child_argv[] = { "child", "child", "5" };
+        wr_str child_args[3];
         int failures = 0;
-        unsigned code = 0U;
-        int pid = proc_spawn_path("/bin/proc_spawn_path", child_argv, 3U, 0U);
+        int32_t child;
 
-        if (pid <= 0)
+        child_args[0] = wr_cstr("child");
+        child_args[1] = wr_cstr("child");
+        child_args[2] = wr_cstr("5");
+        child = wr_spawn_path_cstr("/bin/proc_spawn_path", child_args, 3U, 0U, 0U);
+        if (child <= 0)
             failures |= 1;
-        else if (proc_wait(pid, &code, OS_WAIT_FOREVER) != OS_STATUS_OK || code != 5U)
+        else if (wr_wait(child, WR_WAIT_FOREVER) != 5 || wr_close(child) != 0)
             failures |= 2;
 
-        if (proc_spawn_path("/bin/missing", 0, 0U, 0U) != -OS_STATUS_FILE_NOT_FOUND)
+        if (wr_spawn_path_cstr("/bin/missing", 0, 0U, 0U, 0U) != -WR_ENOTFOUND)
             failures |= 4;
-        if (proc_spawn_path("/bin", 0, 0U, 0U) != -OS_STATUS_IS_A_DIRECTORY)
+        if (wr_spawn_path_cstr("/bin", 0, 0U, 0U, 0U) != -WR_EISDIR)
             failures |= 8;
+        /* Paths and arguments are (pointer, length): no NUL needed. */
+        child = wr_spawn_path("/bin/proc_spawn_pathXYZ", 20U, child_args, 3U, 0U, 0U);
+        if (child <= 0 || wr_wait(child, WR_WAIT_FOREVER) != 5 || wr_close(child) != 0)
+            failures |= 16;
         return failures;
     }
 
