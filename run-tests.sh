@@ -158,6 +158,10 @@ for dir in tests/*; do
         native_flags+=(-DOS_TASK_SLICE_FUEL=1ULL)
     elif [ "$name" = "task_memory_usage" ]; then
         native_flags+=(-Dd_m3HasHeapAccounting=1)
+    elif [ "$name" = "snapshot_portable" ]; then
+        # Short slices stop the program in many places; small code pages make
+        # functions span pages.
+        native_flags+=(-DOS_TASK_SLICE_FUEL=997ULL -Dd_m3CodePageAlignSize=1024)
     elif [ "$name" = "native_stack_budget" ]; then
         native_flags+=(-DOS_NATIVE_STACK_BUDGET=8192U -DOS_TASK_SLICE_FUEL=100000000ULL)
     fi
