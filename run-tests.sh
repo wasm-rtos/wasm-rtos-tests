@@ -69,6 +69,12 @@ for dir in tests/*; do
         continue
     fi
 
+    # Link options a test needs for its own guest module.
+    guest_flags=()
+    if [ "$name" = "custom_page_size" ]; then
+        guest_flags=(-Wl,--page-size=1 -Wl,-z,stack-size=4096)
+    fi
+
     if [ "$name" = "dylink0" ]; then
         library_source="$dir/library.c"
         app_object="$dir/dylink0.o"
@@ -108,7 +114,7 @@ for dir in tests/*; do
         fi
         rm -f "$app_object" "$library_object"
     elif grep -Eq '#include <(stdio|stdlib|wasi)|__wasi_|proc_exit|fd_write' "$source" || [[ "$name" == wasi_* ]]; then
-        if ! "$WASM_CC" "${wasi_flags[@]}" -O0 -o "$wasm" "$source" >"$build_log" 2>&1; then
+        if ! "$WASM_CC" "${wasi_flags[@]}" -O0 ${guest_flags[@]+"${guest_flags[@]}"} -o "$wasm" "$source" >"$build_log" 2>&1; then
             { echo "FAIL building $wasm"; cat "$build_log"; } | tee "$log"
             failed=1
             continue
@@ -124,7 +130,7 @@ for dir in tests/*; do
             export_flags+=("-Wl,--export=$export_name")
         done
 
-        if ! "$WASM_CC" --target=wasm32 -nostdlib -Wl,--no-entry -O0 "${export_flags[@]}" -o "$wasm" "$source" >"$build_log" 2>&1; then
+        if ! "$WASM_CC" --target=wasm32 -nostdlib -Wl,--no-entry -O0 "${export_flags[@]}" ${guest_flags[@]+"${guest_flags[@]}"} -o "$wasm" "$source" >"$build_log" 2>&1; then
             { echo "FAIL building $wasm"; cat "$build_log"; } | tee "$log"
             failed=1
             continue
