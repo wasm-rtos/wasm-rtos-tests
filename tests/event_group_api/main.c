@@ -4,6 +4,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+/* ABI errors, from include/wasm-rtos.h. */
+#define WR_ETIMEOUT 7
+
 typedef struct WasmBinary
 {
     uint8_t* bytes;
@@ -60,21 +63,15 @@ static OsStatus create_task(
     OsTaskHandle* out_task,
     WasmBinary* wasm,
     const char* entry,
-    const char* name,
-    uint32_t event_group_id
-)
+    const char* name)
 {
-    OsValue arg;
-
-    arg.type = OS_VALUE_TYPE_I32;
-    arg.value.i32 = event_group_id;
     return os_task_create_with_args(
         out_task,
         wasm->bytes,
         wasm->size,
         entry,
-        &arg,
-        1U,
+        NULL,
+        0U,
         name,
         64U * 1024U,
         OS_TASK_PRIORITY_NORMAL
@@ -103,11 +100,11 @@ int main(void)
     event_group_id = os_event_group_get_id(event_group);
     expect(os_event_group_find_by_id(event_group_id) == event_group && os_event_group_find_by_id(0U) == NULL,
            "find event group by id");
+    expect(os_event_group_set_name(event_group, "e") == OS_STATUS_OK, "name the event group");
 
     if (wasm.bytes != NULL && event_group != NULL)
     {
-        expect(create_task(&waiter, &wasm, "app_main_wait_all", "wait_all",
-                           event_group_id) == OS_STATUS_OK,
+        expect(create_task(&waiter, &wasm, "app_main_wait_all", "wait_all") == OS_STATUS_OK,
                "create wait-all task");
         expect(os_schedule() == OS_STATUS_OK, "event waiter blocks");
         expect(os_task_get_state(waiter) == OS_TASK_WAITING,
@@ -131,8 +128,7 @@ int main(void)
                    os_task_get_exit_code(waiter) == 0x3U,
                "WASM wait returns matched event bits");
 
-        expect(create_task(&timeout, &wasm, "app_main_timeout", "event_timeout",
-                           event_group_id) == OS_STATUS_OK,
+        expect(create_task(&timeout, &wasm, "app_main_timeout", "event_timeout") == OS_STATUS_OK,
                "create event timeout task");
         expect(os_schedule() == OS_STATUS_OK, "event timeout task blocks");
         os_tick(4U);
@@ -144,8 +140,8 @@ int main(void)
         expect(os_task_get_last_wait_status(timeout) == OS_STATUS_TIMEOUT,
                "event timeout status is recorded");
         expect(os_schedule() == OS_STATUS_OK, "event timeout task resumes");
-        expect(os_task_get_exit_code(timeout) == 0U,
-               "timed-out wait returns current event bits");
+        expect(os_task_get_exit_code(timeout) == (uint32_t)-WR_ETIMEOUT,
+               "timed-out wait returns -WR_ETIMEOUT");
 
         expect(os_event_group_set_bits(event_group, 0x8U) == 0x8U,
                "set unrelated bit");
@@ -153,6 +149,17 @@ int main(void)
                "clear returns previous event bits");
         expect(os_event_group_get_bits(event_group) == 0U,
                "event bit is cleared");
+
+        {
+            OsTaskHandle bits = NULL;
+            expect(create_task(&bits, &wasm, "app_main_bits", "event_bits") == OS_STATUS_OK,
+                   "create a task that sets and clears bits");
+            expect(os_schedule() == OS_STATUS_OK && os_task_get_state(bits) == OS_TASK_DEAD &&
+                       os_task_get_exit_code(bits) == 0U,
+                   "guest set, get, try-wait and clear behave");
+            expect(os_event_group_get_bits(event_group) == 0U, "guest left no bits set");
+            expect(os_task_delete(bits) == OS_STATUS_OK, "delete bits task");
+        }
 
         expect(os_task_delete(waiter) == OS_STATUS_OK, "delete event waiter");
         expect(os_task_delete(timeout) == OS_STATUS_OK,

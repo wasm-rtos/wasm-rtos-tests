@@ -1,38 +1,35 @@
-#include <stdint.h>
+#include <wasm-rtos.h>
 
-#define OS_STATUS_OK 0U
-#define OS_WAIT_FOREVER UINT32_MAX
-
-__attribute__((import_module("env"), import_name("os_queue_send_wait"))) extern uint32_t
-os_queue_send_wait(uint32_t queue_id, const uint32_t* item, uint32_t timeout_ms);
-
-__attribute__((import_module("env"), import_name("os_queue_receive_wait"))) extern uint32_t
-os_queue_receive_wait(uint32_t queue_id, uint32_t* item, uint32_t timeout_ms);
-
-uint32_t app_main_send(uint32_t queue_id, uint32_t value)
+/* Every entry opens the host's queue named "q" and returns the ABI result. */
+static int32_t open_queue(void)
 {
-    return os_queue_send_wait(queue_id, &value, OS_WAIT_FOREVER);
+    return wr_queue_open("q", sizeof(uint32_t), 1U);
 }
 
-uint32_t app_main_receive(uint32_t queue_id)
+int32_t app_main_send(uint32_t value)
+{
+    int32_t queue = open_queue();
+    return queue < 0 ? queue : wr_queue_send(queue, &value, WR_WAIT_FOREVER);
+}
+
+/* The received value, or a negative error. */
+int32_t app_main_receive(void)
 {
     uint32_t value = 0U;
-    uint32_t status = os_queue_receive_wait(
-        queue_id,
-        &value,
-        OS_WAIT_FOREVER
-    );
-
-    return status == OS_STATUS_OK ? value : 0x80000000U | status;
+    int32_t queue = open_queue();
+    int32_t status = queue < 0 ? queue : wr_queue_receive(queue, &value, WR_WAIT_FOREVER);
+    return status == 0 ? (int32_t)value : status;
 }
 
-uint32_t app_main_send_timeout(uint32_t queue_id, uint32_t value)
+int32_t app_main_send_timeout(uint32_t value)
 {
-    return os_queue_send_wait(queue_id, &value, 5U);
+    int32_t queue = open_queue();
+    return queue < 0 ? queue : wr_queue_send(queue, &value, 5U);
 }
 
-uint32_t app_main_receive_timeout(uint32_t queue_id)
+int32_t app_main_receive_timeout(void)
 {
     uint32_t value = 0xfeedbeefU;
-    return os_queue_receive_wait(queue_id, &value, 5U);
+    int32_t queue = open_queue();
+    return queue < 0 ? queue : wr_queue_receive(queue, &value, 5U);
 }

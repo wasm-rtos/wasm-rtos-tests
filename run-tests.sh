@@ -24,7 +24,7 @@ if [ -z "${WASI_TARGET:-}" ]; then
     fi
     rm -rf "$probe_dir"
 fi
-wasi_flags=(--target="$WASI_TARGET" ${wasi_sysroot_flags[@]+"${wasi_sysroot_flags[@]}"})
+wasi_flags=(--target="$WASI_TARGET" ${wasi_sysroot_flags[@]+"${wasi_sysroot_flags[@]}"} -Iwasm-rtos/include)
 echo "WASI target: $WASI_TARGET"
 failed=0
 found=0
@@ -43,9 +43,13 @@ fi
 
 for dir in tests/*; do
     [ -d "$dir" ] || continue
-    found=1
 
     name="$(basename "$dir")"
+    # TESTS="a b" runs only the named tests.
+    if [ -n "${TESTS:-}" ] && [[ " $TESTS " != *" $name "* ]]; then
+        continue
+    fi
+    found=1
     source="$dir/$name.c"
     main="$dir/main.c"
     wasm="$dir/$name.wasm"
@@ -130,7 +134,7 @@ for dir in tests/*; do
             export_flags+=("-Wl,--export=$export_name")
         done
 
-        if ! "$WASM_CC" --target=wasm32 -nostdlib -Wl,--no-entry -O0 "${export_flags[@]}" ${guest_flags[@]+"${guest_flags[@]}"} -o "$wasm" "$source" >"$build_log" 2>&1; then
+        if ! "$WASM_CC" --target=wasm32 -nostdlib -Iwasm-rtos/include -Wl,--no-entry -O0 "${export_flags[@]}" ${guest_flags[@]+"${guest_flags[@]}"} -o "$wasm" "$source" >"$build_log" 2>&1; then
             { echo "FAIL building $wasm"; cat "$build_log"; } | tee "$log"
             failed=1
             continue

@@ -4,6 +4,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+/* ABI errors, from include/wasm-rtos.h. */
+#define WR_ETIMEOUT 7
+#define WR_EMISMATCH 19
+
 typedef struct WasmBinary
 {
     uint8_t* bytes;
@@ -60,21 +64,15 @@ static OsStatus create_task(
     OsTaskHandle* out_task,
     WasmBinary* wasm,
     const char* entry,
-    const char* name,
-    uint32_t semaphore_id
-)
+    const char* name)
 {
-    OsValue arg;
-
-    arg.type = OS_VALUE_TYPE_I32;
-    arg.value.i32 = semaphore_id;
     return os_task_create_with_args(
         out_task,
         wasm->bytes,
         wasm->size,
         entry,
-        &arg,
-        1U,
+        NULL,
+        0U,
         name,
         64U * 1024U,
         OS_TASK_PRIORITY_NORMAL
@@ -105,11 +103,11 @@ int main(void)
     expect(os_semaphore_get_max_count(semaphore) == 1U, "binary semaphore has max count 1");
     expect(os_semaphore_find_by_id(semaphore_id) == semaphore && os_semaphore_find_by_id(0U) == NULL,
            "find semaphore by id");
+    expect(os_semaphore_set_name(semaphore, "s") == OS_STATUS_OK, "name the semaphore");
 
     if (wasm.bytes != NULL && semaphore != NULL)
     {
-        expect(create_task(&waiter, &wasm, "app_main_wait", "waiter",
-                           semaphore_id) == OS_STATUS_OK,
+        expect(create_task(&waiter, &wasm, "app_main_wait", "waiter") == OS_STATUS_OK,
                "create semaphore waiter");
         expect(os_schedule() == OS_STATUS_OK, "waiter attempts take");
         expect(os_task_get_state(waiter) == OS_TASK_WAITING,
@@ -128,8 +126,7 @@ int main(void)
                    os_task_get_exit_code(waiter) == OS_STATUS_OK,
                "blocked take returns success after resume");
 
-        expect(create_task(&timeout, &wasm, "app_main_timeout", "timeout",
-                           semaphore_id) == OS_STATUS_OK,
+        expect(create_task(&timeout, &wasm, "app_main_timeout", "timeout") == OS_STATUS_OK,
                "create timeout waiter");
         expect(os_schedule() == OS_STATUS_OK, "timeout waiter blocks");
         os_tick(4U);
@@ -141,7 +138,7 @@ int main(void)
         expect(os_task_get_last_wait_status(timeout) == OS_STATUS_TIMEOUT,
                "kernel records timeout status");
         expect(os_schedule() == OS_STATUS_OK, "timeout waiter resumes");
-        expect(os_task_get_exit_code(timeout) == OS_STATUS_TIMEOUT,
+        expect(os_task_get_exit_code(timeout) == (uint32_t)-WR_ETIMEOUT,
                "blocked take returns timeout to WASM");
 
         expect(os_semaphore_give(semaphore) == OS_STATUS_OK,
@@ -151,8 +148,7 @@ int main(void)
         expect(os_semaphore_give(semaphore) == OS_STATUS_SEMAPHORE_FULL,
                "give detects full semaphore");
 
-        expect(create_task(&immediate, &wasm, "app_main_immediate", "immediate",
-                           semaphore_id) == OS_STATUS_OK,
+        expect(create_task(&immediate, &wasm, "app_main_immediate", "immediate") == OS_STATUS_OK,
                "create immediate taker");
         expect(os_schedule() == OS_STATUS_OK, "immediate taker runs");
         expect(os_task_get_state(immediate) == OS_TASK_DEAD &&
@@ -160,6 +156,16 @@ int main(void)
                "available token is taken without blocking");
         expect(os_semaphore_get_count(semaphore) == 0U,
                "take consumes stored token");
+
+        {
+            OsTaskHandle mismatch = NULL;
+            expect(create_task(&mismatch, &wasm, "app_main_mismatch", "mismatch") == OS_STATUS_OK,
+                   "create a task opening the name with another limit");
+            expect(os_schedule() == OS_STATUS_OK &&
+                       os_task_get_exit_code(mismatch) == (uint32_t)-WR_EMISMATCH,
+                   "opening with other parameters gives -WR_EMISMATCH");
+            expect(os_task_delete(mismatch) == OS_STATUS_OK, "delete mismatch task");
+        }
 
         expect(os_task_delete(waiter) == OS_STATUS_OK, "delete waiter");
         expect(os_task_delete(timeout) == OS_STATUS_OK, "delete timeout task");

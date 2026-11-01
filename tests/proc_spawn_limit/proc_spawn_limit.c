@@ -1,7 +1,4 @@
-#define PROC_IMPORT(name) __attribute__((import_module("wasm-rtos:proc"), import_name(name)))
-PROC_IMPORT("spawn") int proc_spawn(const void* bytes, unsigned length, const char* const* argv, unsigned argc, unsigned priority);
-
-#define OS_STATUS_LIMIT_REACHED 24
+#include <wasm-rtos.h>
 
 /* (module (func (export "app_main") (loop br 0))) */
 static const unsigned char endless_child[] = {
@@ -13,19 +10,19 @@ static const unsigned char endless_child[] = {
 };
 
 /* Spawns until the kernel refuses; returns how many spawns succeeded, or
- * -1 if the refusal was not OS_STATUS_LIMIT_REACHED. */
+ * -1 if the refusal was not -WR_ELIMIT. */
 int app_main(void)
 {
     int started = 0;
 
     for (;;)
     {
-        int pid = proc_spawn(endless_child, sizeof(endless_child), 0, 0U, 0U);
-        if (pid > 0)
+        int32_t child = wr_spawn(endless_child, sizeof(endless_child), 0, 0U, 0U, 0U);
+        if (child > 0)
         {
             ++started;
             continue;
         }
-        return pid == -OS_STATUS_LIMIT_REACHED ? started : -1;
+        return child == -WR_ELIMIT ? started : -1;
     }
 }

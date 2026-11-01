@@ -79,6 +79,16 @@ static const uint8_t malformed_module[] = {
     0x00, 0x11, 0x0d, 'w', 'a', 's', 'm', '-', 'r', 't', 'o', 's', '.', 'a', 'p', 'p', 0x01, 0x00, 0x10
 };
 
+/* The same module written for ABI 2.0, which this kernel does not know. */
+static const uint8_t future_module[] = {
+    0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00,
+    0x01, 0x05, 0x01, 0x60, 0x00, 0x01, 0x7f,
+    0x03, 0x02, 0x01, 0x00,
+    0x07, 0x0c, 0x01, 0x08, 'a', 'p', 'p', '_', 'm', 'a', 'i', 'n', 0x00, 0x00,
+    0x0a, 0x06, 0x01, 0x04, 0x00, 0x41, 0x2a, 0x0b,
+    0x00, 0x14, 0x0d, 'w', 'a', 's', 'm', '-', 'r', 't', 'o', 's', '.', 'a', 'p', 'p', 0x01, 0x04, 0x00, 0x00, 0x02, 0x00
+};
+
 static OsTaskMemoryUsage usage_of(OsTaskHandle t)
 {
     OsTaskMemoryUsage u = {0};
@@ -123,6 +133,8 @@ int main(void)
     ok(os_task_create(&t, b.d, b.n, "app_main", "own", 0U, OS_TASK_PRIORITY_NORMAL) == OS_STATUS_OK && t,
        "create without a size");
     ok(stack_of(t) == 4096U, "the program's own 4 KiB request applies (an unknown key is skipped)");
+    ok(t && os_task_get_app_name(t) && strcmp(os_task_get_app_name(t), "Stack test") == 0,
+       "the program's name is read from its metadata");
     os_task_delete(t);
     ok(os_task_create(&t, b.d, b.n, "app_main", "explicit", 16384U, OS_TASK_PRIORITY_NORMAL) == OS_STATUS_OK && t,
        "create with 16 KiB");
@@ -147,6 +159,14 @@ int main(void)
            OS_STATUS_WASM_ERROR && !t,
        "a malformed wasm-rtos.app section is rejected");
     ok(strcmp(os_get_last_error_phase(), "app_metadata") == 0, "the error names the metadata");
+    ok(os_task_create(&t, (uint8_t*)future_module, sizeof(future_module), NULL, "future", 0U, OS_TASK_PRIORITY_NORMAL) ==
+           OS_STATUS_UNSUPPORTED && !t,
+       "a program for another ABI major version is refused");
+    ok(os_task_create(&t, (uint8_t*)plain_module, sizeof(plain_module), NULL, "plain", 0U, OS_TASK_PRIORITY_NORMAL) == OS_STATUS_OK &&
+           t && os_task_get_app_name(t) == NULL,
+       "a program without a name has none");
+    os_task_delete(t);
+    t = NULL;
 
     /* The high-water mark grows with use and outlives the task. */
     ok(os_task_create(&t, b.d, b.n, "app_main", "tiny", 0U, OS_TASK_PRIORITY_NORMAL) == OS_STATUS_OK && t, "create a trivial task");

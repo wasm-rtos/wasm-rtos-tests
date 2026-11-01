@@ -1,13 +1,15 @@
-#include <stdint.h>
+#include <wasm-rtos.h>
 
 /*
- * The program's own settings: an unknown key 9 (ignored) and key 1, a
- * 4 KiB interpreter stack.
+ * The program's own settings: an unknown key 9 (skipped), a 4 KiB
+ * interpreter stack, its ABI version and its name.
  */
 __asm__(".section \".custom_section.wasm-rtos.app\",\"\",@\n"
-        ".int8 9\n.int32 123\n"
-        ".int8 1\n.int32 4096\n"
+        ".int8 9\n.uleb128 4\n.int32 123\n"
         ".text\n");
+WR_APP_STACK_SIZE(4096);
+WR_APP_ABI_VERSION();
+WR_APP_NAME("Stack test");
 
 uint32_t app_main(void)
 {

@@ -65,6 +65,58 @@ static int load_wasm(WasmBinary* binary)
     return 1;
 }
 
+/*
+ * Task notifications are a host API; these imports hand them to the guest.
+ * Blocking ones bracket the call with os_host_wait_begin/end.
+ */
+static m3ApiRawFunction(notify_wait_import)
+{
+    m3ApiReturnType(uint32_t);
+    m3ApiGetArg(uint32_t, clear_on_entry);
+    m3ApiGetArg(uint32_t, clear_on_exit);
+    m3ApiGetArg(uint32_t, timeout_ms);
+    (void)runtime;
+    (void)_ctx;
+    (void)_mem;
+    if (os_host_wait_begin(raw_return) != OS_STATUS_OK)
+        m3ApiReturn((uint32_t)OS_STATUS_INVALID_ARGUMENT);
+    *raw_return = (uint32_t)os_task_notify_wait(clear_on_entry, clear_on_exit, timeout_ms);
+    return os_host_wait_end();
+}
+
+static m3ApiRawFunction(notify_value_import)
+{
+    m3ApiReturnType(uint32_t);
+    (void)runtime;
+    (void)_ctx;
+    (void)_mem;
+    m3ApiReturn(os_task_get_last_wait_value(os_task_get_current()));
+}
+
+static m3ApiRawFunction(notify_take_import)
+{
+    m3ApiReturnType(uint32_t);
+    m3ApiGetArg(uint32_t, clear_count_on_exit);
+    m3ApiGetArg(uint32_t, timeout_ms);
+    OsStatus status;
+    (void)runtime;
+    (void)_ctx;
+    (void)_mem;
+    if (os_host_wait_begin(raw_return) != OS_STATUS_OK)
+        m3ApiReturn(0U);
+    status = os_task_notify_take(clear_count_on_exit ? 1U : 0U, timeout_ms);
+    *raw_return = status == OS_STATUS_OK ? os_task_get_last_wait_value(os_task_get_current()) : 0U;
+    return os_host_wait_end();
+}
+
+static void register_notify_imports(void)
+{
+    expect(os_host_import_register("env", "notify_wait", "i(iii)", notify_wait_import) == OS_STATUS_OK &&
+               os_host_import_register("env", "notify_value", "i()", notify_value_import) == OS_STATUS_OK &&
+               os_host_import_register("env", "notify_take", "i(ii)", notify_take_import) == OS_STATUS_OK,
+           "register notification imports");
+}
+
 static OsStatus create_task(
     OsTaskHandle* out_task,
     WasmBinary* wasm,
@@ -104,6 +156,7 @@ static void reset_os(void)
 {
     os_shutdown();
     expect(os_init() == OS_STATUS_OK, "reset OS for timer scenario");
+    register_notify_imports();
 }
 
 static uint32_t fake_now_ms(void* context)
@@ -144,9 +197,9 @@ static void test_wasm_timer_imports(WasmBinary* wasm)
     expect(os_schedule() == OS_STATUS_OK,
            "WASM creates and starts one-shot timer");
     expect(os_task_get_state(task) == OS_TASK_WAITING,
-           "WASM timer task waits for notification");
+           "WASM timer task waits for its timer");
     expect(os_get_timer_count() == 1U && os_get_next_wakeup_ms() == 3U,
-           "WASM change-period import sets nearest deadline");
+           "WASM set-period sets nearest deadline");
 
     os_tick(2U);
     expect(os_task_get_state(task) == OS_TASK_WAITING,
@@ -157,9 +210,9 @@ static void test_wasm_timer_imports(WasmBinary* wasm)
     expect(os_schedule() == OS_STATUS_OK &&
                os_task_get_state(task) == OS_TASK_DEAD &&
                os_task_get_exit_code(task) == 0x5aU,
-           "WASM timer imports return notification value");
+           "WASM timer counts one expiration");
     expect(os_get_timer_count() == 0U,
-           "WASM deletes completed timer");
+           "closing the handle deletes the timer");
     delete_task(&task);
 }
 
@@ -677,6 +730,7 @@ int main(void)
     }
 
     expect(os_init() == OS_STATUS_OK, "initialize OS");
+    register_notify_imports();
     expect(load_wasm(&wasm), "load software timer test module");
 
     if (wasm.bytes != NULL)

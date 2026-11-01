@@ -2,7 +2,6 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 typedef struct
 {
@@ -53,21 +52,21 @@ int main(void)
 {
     Bin b = {0};
     OsTaskHandle t = NULL;
-    const char* result;
     l = fopen("proc_disabled.log", "a");
     ok(os_init() == OS_STATUS_OK, "initialize OS");
     ok(OS_HAS_PROCESSES == 0, "kernel is built without processes");
     ok(load(&b), "load proc_disabled.wasm");
     if (b.d)
     {
-        ok(os_task_create(&t, b.d, b.n, NULL, "proc_disabled", 65536U, OS_TASK_PRIORITY_NORMAL) == OS_STATUS_WASM_ERROR,
-           "program that imports spawn is rejected at load");
-        ok(t == NULL, "failed creation returns null task");
-        ok(strcmp(os_get_last_error_phase(), "check_imports") == 0, "diagnostic phase is check_imports");
-        result = os_get_last_error_result();
-        printf("result: %s\n", result ? result : "(null)");
-        ok(result != NULL && strcmp(result, "missing import wasm-rtos:proc.spawn") == 0,
-           "diagnostic names the unavailable process import");
+        uint32_t i;
+        ok(os_task_create(&t, b.d, b.n, NULL, "proc_disabled", 65536U, OS_TASK_PRIORITY_NORMAL) == OS_STATUS_OK && t,
+           "program that imports spawn still loads");
+        for (i = 0U; t && i < 50U && os_task_get_state(t) != OS_TASK_DEAD; ++i)
+            os_schedule();
+        ok(t && os_task_get_state(t) == OS_TASK_DEAD, "program finishes");
+        ok(t && os_task_get_exit_code(t) == (uint32_t)-13, "spawn returns -WR_EUNSUPPORTED");
+        if (t)
+            os_task_delete(t);
         free(b.d);
     }
     ok(os_get_task_count() == 0U, "clean OS state");

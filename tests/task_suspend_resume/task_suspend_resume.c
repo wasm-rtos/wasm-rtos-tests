@@ -1,9 +1,4 @@
-#include <stdint.h>
-
-#define ENV_IMPORT(name) __attribute__((import_module("env"), import_name(name)))
-ENV_IMPORT("os_delay_ms") void os_delay_ms(uint32_t delay_ms);
-ENV_IMPORT("os_get_time_ms") uint32_t os_get_time_ms(void);
-ENV_IMPORT("os_queue_receive_wait") uint32_t os_queue_receive_wait(uint32_t queue_id, uint32_t* item, uint32_t timeout_ms);
+#include <wasm-rtos.h>
 
 /* Never returns; the host counts its scheduler slices. */
 void app_main_spin(void)
@@ -16,14 +11,17 @@ void app_main_spin(void)
 /* Sleeps 1000 ms and returns how long the sleep really took. */
 uint32_t app_main_sleep(void)
 {
-    uint32_t start = os_get_time_ms();
-    os_delay_ms(1000U);
-    return os_get_time_ms() - start;
+    uint32_t start = (uint32_t)wr_time_ms();
+    wr_sleep_ms(1000U);
+    return (uint32_t)wr_time_ms() - start;
 }
 
-/* Waits forever for a queue item and returns the wait status. */
-uint32_t app_main_receive(uint32_t queue_id)
+/* Waits forever for an item of the host's "inbox" queue and returns the result. */
+int32_t app_main_receive(void)
 {
     uint32_t item = 0U;
-    return os_queue_receive_wait(queue_id, &item, 0xFFFFFFFFU);
+    int32_t queue = wr_queue_open("inbox", sizeof(item), 1U);
+    if (queue < 0)
+        return queue;
+    return wr_queue_receive(queue, &item, WR_WAIT_FOREVER);
 }

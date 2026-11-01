@@ -103,10 +103,11 @@ int main(void)
            "create mutex");
     mutex_id = os_mutex_get_id(mutex);
     expect(os_mutex_find_by_id(mutex_id) == mutex && os_mutex_find_by_id(0U) == NULL, "find mutex by id");
+    expect(os_mutex_set_name(mutex, "m") == OS_STATUS_OK, "name the mutex");
 
     if (wasm.bytes != NULL && mutex != NULL)
     {
-        expect(create_task(&low, &wasm, "app_main_low", "low", mutex_id,
+        expect(create_task(&low, &wasm, "app_main_low", "low", 0U,
                            OS_TASK_PRIORITY_LOW) == OS_STATUS_OK,
                "create low-priority owner");
         expect(os_schedule() == OS_STATUS_OK, "low task locks and yields");
@@ -117,7 +118,7 @@ int main(void)
         expect(create_task(&medium, &wasm, "app_main_medium", "medium", 0U,
                            OS_TASK_PRIORITY_NORMAL) == OS_STATUS_OK,
                "create medium-priority task");
-        expect(create_task(&high, &wasm, "app_main_high", "high", mutex_id,
+        expect(create_task(&high, &wasm, "app_main_high", "high", 0U,
                            OS_TASK_PRIORITY_HIGH) == OS_STATUS_OK,
                "create high-priority waiter");
 

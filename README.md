@@ -49,7 +49,8 @@ bash ./run-tests.sh
 For every directory under `tests/`, the script:
 
 1. verifies that `main.c` and `<test_name>.c` exist;
-2. compiles `<test_name>.c` into `<test_name>.wasm`;
+2. compiles `<test_name>.c` into `<test_name>.wasm`, with the kernel's guest
+   header `wasm-rtos/include/wasm-rtos.h` on the include path;
 3. compiles the directory's standalone `main.c` into a temporary native runner;
 4. executes the runner from inside the test directory;
 5. leaves `<test_name>.log` in that directory;
@@ -67,6 +68,7 @@ The script runs under Bash 3.2 or newer, so it also works with the default shell
 | `WASI_TARGET` | auto | target triple for WASI guests; `wasm32-wasip1` when it links, otherwise the legacy `wasm32-wasi` |
 | `WASI_SYSROOT` | unset | WASI sysroot, when clang does not find one by default |
 | `SANITIZE` | `0` | `1` builds the native runners with AddressSanitizer and UndefinedBehaviorSanitizer |
+| `TESTS` | unset | space-separated test names to run instead of all of them |
 
 On macOS with Homebrew (`brew install llvm lld wasi-libc wasi-runtimes`), Apple clang has no WebAssembly backend, so point the script at the Homebrew toolchain:
 

@@ -4,6 +4,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+/* ABI errors, from include/wasm-rtos.h. */
+#define WR_EBADH 3
+#define WR_ETIMEOUT 7
+
 typedef struct WasmBinary
 {
     uint8_t* bytes;
@@ -61,24 +65,21 @@ static OsStatus create_task(
     WasmBinary* wasm,
     const char* entry,
     const char* name,
-    uint32_t queue_id,
     uint32_t value,
     uint32_t arg_count,
     uint32_t priority
 )
 {
-    OsValue args[2];
+    OsValue arg;
 
-    args[0].type = OS_VALUE_TYPE_I32;
-    args[0].value.i32 = queue_id;
-    args[1].type = OS_VALUE_TYPE_I32;
-    args[1].value.i32 = value;
+    arg.type = OS_VALUE_TYPE_I32;
+    arg.value.i32 = value;
     return os_task_create_with_args(
         out_task,
         wasm->bytes,
         wasm->size,
         entry,
-        args,
+        &arg,
         arg_count,
         name,
         64U * 1024U,
@@ -104,7 +105,6 @@ int main(void)
     uint32_t first = 0U;
     uint32_t second = 0U;
     uint32_t received = 0U;
-    uint32_t queue_id = 0U;
 
     g_log = fopen("queue_blocking.log", "w");
     if (g_log == NULL)
@@ -117,15 +117,15 @@ int main(void)
 
     expect(os_queue_create(&queue, sizeof(uint32_t), 1U) == OS_STATUS_OK,
            "create direct-handoff queue");
-    queue_id = os_queue_get_id(queue);
+    os_queue_set_name(queue, "q");
     expect(create_task(&first_task, &wasm, "app_main_receive", "high_receiver",
-                       queue_id, 0U, 1U, OS_TASK_PRIORITY_HIGH) == OS_STATUS_OK,
+                       0U, 0U, OS_TASK_PRIORITY_HIGH) == OS_STATUS_OK,
            "create high-priority receiver");
     expect(os_schedule() == OS_STATUS_OK, "empty queue blocks receiver");
     expect(os_task_get_state(first_task) == OS_TASK_WAITING,
            "receiver enters WAITING");
     expect(create_task(&second_task, &wasm, "app_main_send", "low_sender",
-                       queue_id, 42U, 2U, OS_TASK_PRIORITY_LOW) == OS_STATUS_OK,
+                       42U, 1U, OS_TASK_PRIORITY_LOW) == OS_STATUS_OK,
            "create low-priority sender");
     expect(os_schedule() == OS_STATUS_OK, "sender directly hands off item");
     expect(os_task_get_state(first_task) == OS_TASK_READY,
@@ -151,17 +151,17 @@ int main(void)
     second = 20U;
     expect(os_queue_create(&queue, sizeof(uint32_t), 1U) == OS_STATUS_OK,
            "create full-queue scenario");
-    queue_id = os_queue_get_id(queue);
+    os_queue_set_name(queue, "q");
     expect(os_queue_send(queue, &first) == OS_STATUS_OK,
            "fill queue before blocking sender");
     expect(create_task(&first_task, &wasm, "app_main_send", "high_sender",
-                       queue_id, second, 2U, OS_TASK_PRIORITY_HIGH) == OS_STATUS_OK,
+                       second, 1U, OS_TASK_PRIORITY_HIGH) == OS_STATUS_OK,
            "create high-priority blocked sender");
     expect(os_schedule() == OS_STATUS_OK, "full queue blocks sender");
     expect(os_task_get_state(first_task) == OS_TASK_WAITING,
            "sender enters WAITING");
     expect(create_task(&second_task, &wasm, "app_main_receive", "low_receiver",
-                       queue_id, 0U, 1U, OS_TASK_PRIORITY_LOW) == OS_STATUS_OK,
+                       0U, 0U, OS_TASK_PRIORITY_LOW) == OS_STATUS_OK,
            "create low-priority receiver");
     expect(os_schedule() == OS_STATUS_OK, "receiver frees queue slot");
     expect(os_task_get_state(first_task) == OS_TASK_READY,
@@ -185,13 +185,13 @@ int main(void)
 
     expect(os_queue_create(&queue, sizeof(uint32_t), 1U) == OS_STATUS_OK,
            "create priority-order queue");
-    queue_id = os_queue_get_id(queue);
+    os_queue_set_name(queue, "q");
     expect(create_task(&first_task, &wasm, "app_main_receive", "low_waiter",
-                       queue_id, 0U, 1U, OS_TASK_PRIORITY_LOW) == OS_STATUS_OK,
+                       0U, 0U, OS_TASK_PRIORITY_LOW) == OS_STATUS_OK,
            "create low-priority waiter");
     expect(os_schedule() == OS_STATUS_OK, "low-priority waiter blocks");
     expect(create_task(&second_task, &wasm, "app_main_receive", "high_waiter",
-                       queue_id, 0U, 1U, OS_TASK_PRIORITY_HIGH) == OS_STATUS_OK,
+                       0U, 0U, OS_TASK_PRIORITY_HIGH) == OS_STATUS_OK,
            "create high-priority waiter");
     expect(os_schedule() == OS_STATUS_OK, "high-priority waiter blocks");
     first = 101U;
@@ -216,13 +216,13 @@ int main(void)
 
     expect(os_queue_create(&queue, sizeof(uint32_t), 1U) == OS_STATUS_OK,
            "create equal-priority FIFO queue");
-    queue_id = os_queue_get_id(queue);
+    os_queue_set_name(queue, "q");
     expect(create_task(&first_task, &wasm, "app_main_receive", "first_waiter",
-                       queue_id, 0U, 1U, OS_TASK_PRIORITY_NORMAL) == OS_STATUS_OK,
+                       0U, 0U, OS_TASK_PRIORITY_NORMAL) == OS_STATUS_OK,
            "create first equal-priority waiter");
     expect(os_schedule() == OS_STATUS_OK, "first equal-priority waiter blocks");
     expect(create_task(&second_task, &wasm, "app_main_receive", "second_waiter",
-                       queue_id, 0U, 1U, OS_TASK_PRIORITY_NORMAL) == OS_STATUS_OK,
+                       0U, 0U, OS_TASK_PRIORITY_NORMAL) == OS_STATUS_OK,
            "create second equal-priority waiter");
     expect(os_schedule() == OS_STATUS_OK, "second equal-priority waiter blocks");
     first = 501U;
@@ -242,9 +242,9 @@ int main(void)
 
     expect(os_queue_create(&queue, sizeof(uint32_t), 1U) == OS_STATUS_OK,
            "create timeout queue");
-    queue_id = os_queue_get_id(queue);
+    os_queue_set_name(queue, "q");
     expect(create_task(&first_task, &wasm, "app_main_receive_timeout",
-                       "receive_timeout", queue_id, 0U, 1U,
+                       "receive_timeout", 0U, 0U,
                        OS_TASK_PRIORITY_NORMAL) == OS_STATUS_OK,
            "create receive-timeout task");
     expect(os_schedule() == OS_STATUS_OK, "receive-timeout task blocks");
@@ -255,14 +255,14 @@ int main(void)
     expect(os_task_get_state(first_task) == OS_TASK_READY,
            "receiver wakes exactly at deadline");
     expect(os_schedule() == OS_STATUS_OK &&
-               os_task_get_exit_code(first_task) == OS_STATUS_TIMEOUT,
+               os_task_get_exit_code(first_task) == (uint32_t)-WR_ETIMEOUT,
            "receive wait returns timeout");
     delete_task(&first_task);
     first = 303U;
     expect(os_queue_send(queue, &first) == OS_STATUS_OK,
            "fill timeout queue");
     expect(create_task(&first_task, &wasm, "app_main_send_timeout",
-                       "send_timeout", queue_id, 404U, 2U,
+                       "send_timeout", 404U, 1U,
                        OS_TASK_PRIORITY_NORMAL) == OS_STATUS_OK,
            "create send-timeout task");
     expect(os_schedule() == OS_STATUS_OK, "send-timeout task blocks");
@@ -273,7 +273,7 @@ int main(void)
     expect(os_task_get_state(first_task) == OS_TASK_READY,
            "sender wakes exactly at deadline");
     expect(os_schedule() == OS_STATUS_OK &&
-               os_task_get_exit_code(first_task) == OS_STATUS_TIMEOUT,
+               os_task_get_exit_code(first_task) == (uint32_t)-WR_ETIMEOUT,
            "send wait returns timeout");
     expect(os_queue_receive(queue, &received) == OS_STATUS_OK && received == first,
            "timed-out sender does not modify queue");
@@ -283,9 +283,9 @@ int main(void)
 
     expect(os_queue_create(&queue, sizeof(uint32_t), 1U) == OS_STATUS_OK,
            "create deletion queue");
-    queue_id = os_queue_get_id(queue);
+    os_queue_set_name(queue, "q");
     expect(create_task(&first_task, &wasm, "app_main_receive", "deleted_waiter",
-                       queue_id, 0U, 1U, OS_TASK_PRIORITY_NORMAL) == OS_STATUS_OK,
+                       0U, 0U, OS_TASK_PRIORITY_NORMAL) == OS_STATUS_OK,
            "create waiter for deleted queue");
     expect(os_schedule() == OS_STATUS_OK, "deleted-queue waiter blocks");
     os_queue_delete(queue);
@@ -294,18 +294,18 @@ int main(void)
            "queue deletion wakes receiver");
     expect(os_schedule() == OS_STATUS_OK &&
                os_task_get_exit_code(first_task) ==
-                   (0x80000000U | (uint32_t)OS_STATUS_QUEUE_NOT_FOUND),
-           "deleted queue returns not-found status");
+                   (uint32_t)-WR_EBADH,
+           "deleted queue gives the receiver -WR_EBADH");
     delete_task(&first_task);
 
     expect(os_queue_create(&queue, sizeof(uint32_t), 1U) == OS_STATUS_OK,
            "create sender-deletion queue");
-    queue_id = os_queue_get_id(queue);
+    os_queue_set_name(queue, "q");
     first = 601U;
     expect(os_queue_send(queue, &first) == OS_STATUS_OK,
            "fill sender-deletion queue");
     expect(create_task(&first_task, &wasm, "app_main_send", "deleted_sender",
-                       queue_id, 602U, 2U, OS_TASK_PRIORITY_NORMAL) == OS_STATUS_OK,
+                       602U, 1U, OS_TASK_PRIORITY_NORMAL) == OS_STATUS_OK,
            "create sender for deleted queue");
     expect(os_schedule() == OS_STATUS_OK &&
                os_task_get_state(first_task) == OS_TASK_WAITING,
@@ -315,8 +315,8 @@ int main(void)
     expect(os_task_get_state(first_task) == OS_TASK_READY,
            "queue deletion wakes sender");
     expect(os_schedule() == OS_STATUS_OK &&
-               os_task_get_exit_code(first_task) == OS_STATUS_QUEUE_NOT_FOUND,
-           "deleted queue returns not-found to sender");
+               os_task_get_exit_code(first_task) == (uint32_t)-WR_EBADH,
+           "deleted queue gives the sender -WR_EBADH");
     delete_task(&first_task);
 
     free(wasm.bytes);
