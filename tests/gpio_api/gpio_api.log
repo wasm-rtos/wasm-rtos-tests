@@ -1,0 +1,25 @@
+PASS initialize OS
+PASS load gpio_api.wasm
+PASS without a port gpio-open returns -WR_EUNSUPPORTED
+PASS install the GPIO port
+PASS register the active-low LED under two names
+PASS register a button that reports edges
+PASS register an open-drain sensor pin
+PASS a name is registered once
+PASS another name for a pin must describe it the same way
+PASS names longer than 32 bytes are refused
+PASS "on" drives the active-low LED low from the start
+PASS writing 0 drives it high
+PASS levels, aliases and bad levels behave
+PASS the kernel released the pin as an input without pulls
+PASS unknown names, bad and unsupported modes, bad handles; a 1.0 import still links
+PASS a closed pin is released too
+PASS the program waits for the button or its timer
+PASS a logical press of an active-low button asks the port for falling edges
+PASS edges wait for the scheduler
+PASS two presses counted, releases ignored, the button reads pressed
+PASS a second program gets -WR_EINUSE
+PASS deleting the owner releases the pin
+PASS then another program can open it
+PASS a program that traps leaves its pins safe
+PASS OS is clean
