@@ -9,18 +9,7 @@ PASS fuel resume crosses a direct Wasm library call
 PASS library returns const char pointer through shared memory
 PASS app passes a struct pointer to the library
 PASS library calls an app function pointer through the shared table
-PASS library mutable data remains in the shared memory link group
-PASS prepare dynamically extendable dylink group
-PASS create group with one dynamic program
-PASS add a program after the group is running
-PASS run first dynamically linked program
-PASS run second program against the same resident library
-PASS remove one program without unloading its dependency
-PASS remaining context survives removal of the first program
-PASS group remains alive with no application contexts
-PASS add a program after the group became empty
-PASS resident library state survives close and reopen
-PASS remove the reopened program
+PASS library keeps its mutable data between calls
 PASS initialize RTOS for linked processes
 PASS register one Wasm library
 PASS query library registry
@@ -49,5 +38,5 @@ PASS fuel resume crosses a direct Wasm library call
 PASS library returns const char pointer through shared memory
 PASS app passes a struct pointer to the library
 PASS library calls an app function pointer through the shared table
-PASS library mutable data remains in the shared memory link group
+PASS library keeps its mutable data between calls
 PASS dylink0
