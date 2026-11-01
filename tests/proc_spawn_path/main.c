@@ -117,7 +117,7 @@ int main(void)
     ok(os_fs_mount("/ram", &copy_driver, &copy_tar) == OS_STATUS_OK, "mount copying driver at /ram");
 
     /* Mapped: runs from the image and keeps the mount busy until destroyed. */
-    ok(os_task_spawn_path(&t, "/bin/proc_spawn_path", child_argv, 3U, 0U) == OS_STATUS_OK && t,
+    ok(os_task_spawn_path(&t, "/bin/proc_spawn_path", child_argv, 3U, 0U, 0U) == OS_STATUS_OK && t,
        "spawn mapped program by path with argv");
     ok(os_fs_unmount("/") == OS_STATUS_BUSY, "mount of a running mapped program is busy");
     ok(run_until_dead(t) == 7U, "mapped program got argv and exited with 7");
@@ -128,14 +128,14 @@ int main(void)
 
     /* Without argv the program sees its path as argv[0]. */
     t = NULL;
-    ok(os_task_spawn_path(&t, "/bin/proc_spawn_path", NULL, 0U, 0U) == OS_STATUS_OK && t,
+    ok(os_task_spawn_path(&t, "/bin/proc_spawn_path", NULL, 0U, 0U, 0U) == OS_STATUS_OK && t,
        "spawn by path without argv");
     ok(run_until_dead(t) == 42U, "argv[0] is the program path");
     os_task_delete(t);
 
     /* Copied: the program no longer needs its file system. */
     t = NULL;
-    ok(os_task_spawn_path(&t, "/ram/bin/proc_spawn_path", copy_argv, 3U, 0U) == OS_STATUS_OK && t,
+    ok(os_task_spawn_path(&t, "/ram/bin/proc_spawn_path", copy_argv, 3U, 0U, 0U) == OS_STATUS_OK && t,
        "spawn program from a driver without map");
     ok(os_fs_unmount("/ram") == OS_STATUS_OK, "copied program does not hold its mount");
     ok(run_until_dead(t) == 9U, "copied program runs after its mount is gone");
@@ -143,18 +143,18 @@ int main(void)
 
     /* Errors leave no process behind. */
     t = NULL;
-    ok(os_task_spawn_path(&t, "/bin/missing", NULL, 0U, 0U) == OS_STATUS_FILE_NOT_FOUND && !t,
+    ok(os_task_spawn_path(&t, "/bin/missing", NULL, 0U, 0U, 0U) == OS_STATUS_FILE_NOT_FOUND && !t,
        "missing file is FILE_NOT_FOUND");
-    ok(os_task_spawn_path(&t, "/bin", NULL, 0U, 0U) == OS_STATUS_IS_A_DIRECTORY && !t,
+    ok(os_task_spawn_path(&t, "/bin", NULL, 0U, 0U, 0U) == OS_STATUS_IS_A_DIRECTORY && !t,
        "directory is IS_A_DIRECTORY");
-    ok(os_task_spawn_path(&t, "/ram/bin/proc_spawn_path", NULL, 0U, 0U) == OS_STATUS_FILE_NOT_FOUND,
+    ok(os_task_spawn_path(&t, "/ram/bin/proc_spawn_path", NULL, 0U, 0U, 0U) == OS_STATUS_FILE_NOT_FOUND,
        "unmounted path is FILE_NOT_FOUND");
-    ok(os_task_spawn_path(&t, NULL, NULL, 0U, 0U) == OS_STATUS_INVALID_ARGUMENT, "NULL path is rejected");
-    ok(os_task_spawn_path(&t, "", NULL, 0U, 0U) == OS_STATUS_INVALID_ARGUMENT, "empty path is rejected");
+    ok(os_task_spawn_path(&t, NULL, NULL, 0U, 0U, 0U) == OS_STATUS_INVALID_ARGUMENT, "NULL path is rejected");
+    ok(os_task_spawn_path(&t, "", NULL, 0U, 0U, 0U) == OS_STATUS_INVALID_ARGUMENT, "empty path is rejected");
 
     /* A guest spawns by path, waits for the child and checks guest errors. */
     t = NULL;
-    ok(os_task_spawn_path(&t, "/bin/proc_spawn_path", parent_argv, 2U, 0U) == OS_STATUS_OK && t,
+    ok(os_task_spawn_path(&t, "/bin/proc_spawn_path", parent_argv, 2U, 0U, 0U) == OS_STATUS_OK && t,
        "spawn guest parent");
     ok(run_until_dead(t) == 0U, "guest spawn_path, wait and error codes work");
     os_task_delete(t);

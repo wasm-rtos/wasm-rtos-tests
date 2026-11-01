@@ -148,7 +148,7 @@ int main(void)
 
 #if OS_HAS_PROCESSES
     /* A spawned process owns a copy of its module. */
-    ok(os_task_spawn(&t, b.d, b.n, NULL, 0U, 0U) == OS_STATUS_OK && t, "spawn the module as a process");
+    ok(os_task_spawn(&t, b.d, b.n, NULL, 0U, 0U, 0U) == OS_STATUS_OK && t, "spawn the module as a process");
     other = usage_of(t, "spawned, created");
     ok(other.image_bytes == b.n, "the kernel's copy of the module is counted");
     ok(other.total_bytes - other.image_bytes - other.kernel_bytes ==
