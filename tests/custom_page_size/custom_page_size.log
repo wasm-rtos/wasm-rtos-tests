@@ -1,0 +1,8 @@
+PASS initialize OS
+PASS load custom_page_size.wasm (1-byte pages, 4 KiB C stack)
+PASS a module with 1-byte pages loads
+PASS its linear memory is a few KiB, not 64 KiB pages
+MEASURED linear memory at start: 5152 bytes
+PASS it runs to the end
+PASS memory.size and memory.grow count bytes, grown memory is zeroed, memory passes 64 KiB
+PASS OS is clean
