@@ -228,8 +228,11 @@ static void run_cached_module(IM3Environment environment,
         expect(result == m3Err_none, "save cached function snapshot");
         if (!result)
         {
+            /* Loading finds safe points by compiling again, which needs the
+             * Wasm source this module released; the runtime is left as it was. */
             result = m3_LoadRuntimeSnapshot(runtime, snapshot, snapshotSize);
-            expect(result == m3Err_none, "restore cached function snapshot");
+            expect(result == m3Err_none || result == m3Err_snapshotUnsupported,
+                   "restore cached function snapshot, or refuse without the source");
         }
     }
 
