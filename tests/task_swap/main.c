@@ -223,6 +223,15 @@ int main(void)
         os_queue_delete(queue);
     }
 
+    /* Paused, swapped out, resumed: the program carries on from where it was. */
+    t = create(&b, "app_main_sleeper");
+    run_until_waiting(t);
+    ok(os_task_suspend(t) == OS_STATUS_OK && os_task_swap_out(t) == OS_STATUS_OK,
+       "pause a sleeping task and swap it out");
+    ok(os_task_get_state(t) == OS_TASK_SUSPENDED && os_task_is_swapped(t), "it stays paused, out of RAM");
+    ok(os_task_resume(t) == OS_STATUS_OK && run_to_result(t) == 1, "resumed, it comes back and finishes");
+    os_task_delete(t);
+
     /* A long computation swapped out between every slice. */
     t = create(&b, "app_main_worker");
     expected = (uint32_t)run_to_result(t);
