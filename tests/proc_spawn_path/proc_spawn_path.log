@@ -1,0 +1,27 @@
+PASS initialize OS
+PASS load proc_spawn_path.wasm
+PASS program image is valid
+PASS second view of the image is valid
+PASS mount mapping driver at /
+PASS mount copying driver at /ram
+PASS spawn mapped program by path with argv
+PASS mount of a running mapped program is busy
+PASS mapped program got argv and exited with 7
+PASS dead but undeleted program still holds its mount
+PASS delete mapped program
+PASS mount is free after the program is destroyed
+PASS mount mapping driver again
+PASS spawn by path without argv
+PASS argv[0] is the program path
+PASS spawn program from a driver without map
+PASS copied program does not hold its mount
+PASS copied program runs after its mount is gone
+PASS missing file is FILE_NOT_FOUND
+PASS directory is IS_A_DIRECTORY
+PASS unmounted path is FILE_NOT_FOUND
+PASS NULL path is rejected
+PASS empty path is rejected
+PASS spawn guest parent
+PASS guest spawn_path, wait and error codes work
+PASS no process left behind
+PASS every image was released
