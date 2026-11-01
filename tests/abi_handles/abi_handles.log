@@ -1,0 +1,14 @@
+PASS initialize OS
+PASS load abi_handles.wasm
+PASS 32 handles fit, the 33rd is refused, a closed slot is reused
+PASS every object the program left open was deleted when it ended
+PASS another program's handle numbers mean nothing
+PASS consumer opens "pipe" and waits
+PASS producer opens the same queue and sends; other limits are a mismatch
+PASS consumer received what the producer sent
+PASS the queue went away with its last holder
+PASS bad names, pointers, handles and counts give their errors
+PASS wait.any blocks on a queue and a stopped timer
+PASS wait.any reports the timer, the queue and the child, and consumes nothing
+PASS the program's timer is gone
+PASS OS is clean

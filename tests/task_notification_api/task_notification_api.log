@@ -1,4 +1,5 @@
 PASS initialize OS
+PASS register notification imports
 PASS load notification test module
 PASS create notification waiter
 PASS notification waiter blocks

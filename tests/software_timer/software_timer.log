@@ -1,16 +1,19 @@
 PASS initialize OS
+PASS register notification imports
 PASS load software timer test module
 PASS reset OS for timer scenario
+PASS register notification imports
 PASS create WASM timer API task
 PASS WASM creates and starts one-shot timer
-PASS WASM timer task waits for notification
-PASS WASM change-period import sets nearest deadline
+PASS WASM timer task waits for its timer
+PASS WASM set-period sets nearest deadline
 PASS WASM timer does not fire early
 PASS WASM timer fires at exact deadline
-PASS WASM timer imports return notification value
-PASS WASM deletes completed timer
+PASS WASM timer counts one expiration
+PASS closing the handle deletes the timer
 PASS delete timer task
 PASS reset OS for timer scenario
+PASS register notification imports
 PASS create timer timeout-tie task
 PASS notification task waits with timeout
 PASS task timeout contributes nearest wakeup
@@ -25,6 +28,7 @@ PASS one-shot notification reaches WASM task
 PASS dead notification target releases its timers
 PASS delete timer task
 PASS reset OS for timer scenario
+PASS register notification imports
 PASS create timer-control waiter
 PASS timer-control waiter blocks
 PASS create controllable timer
@@ -39,6 +43,7 @@ PASS restarted timer uses changed period
 PASS restarted timer delivers notification
 PASS delete timer task
 PASS reset OS for timer scenario
+PASS register notification imports
 PASS create auto-reload notification task
 PASS auto-reload task waits for first period
 PASS start auto-reload increment timer
@@ -51,12 +56,14 @@ PASS auto-reload delivers one notification per update
 PASS task exit removes its auto-reload timer
 PASS delete timer task
 PASS reset OS for timer scenario
+PASS register notification imports
 PASS create deletable timer target
 PASS deletable timer target blocks
 PASS create timer owned by deletable target
 PASS delete timer task
 PASS task deletion removes timers and wakeups
 PASS reset OS for timer scenario
+PASS register notification imports
 PASS advance logical time near uint32 wraparound
 PASS create wraparound timer target
 PASS wraparound timer target blocks
@@ -66,6 +73,7 @@ PASS wrapped timer fires at modular deadline
 PASS wrapped timer delivers notification
 PASS delete timer task
 PASS reset OS for timer scenario
+PASS register notification imports
 PASS create large-delta timer target
 PASS large-delta timer target blocks
 PASS start timer before large tick delta
@@ -74,12 +82,14 @@ PASS large tick delta expires one-shot timer
 PASS large-delta timer notification reaches task
 PASS delete timer task
 PASS reset OS for timer scenario
+PASS register notification imports
 PASS create READY task for timer snapshot guard
 PASS attach inactive timer to READY task
 PASS reject snapshot size while timer is attached
 PASS reject snapshot save while timer is attached
 PASS delete timer task
 PASS reset OS for timer scenario
+PASS register notification imports
 PASS register clock for stale-deadline regression
 PASS create clock-sync timer target
 PASS clock-sync timer target blocks
@@ -92,6 +102,7 @@ PASS synchronized timer expires at new deadline
 PASS synchronized timer notification reaches task
 PASS delete timer task
 PASS reset OS for timer scenario
+PASS register notification imports
 PASS reject incomplete tickless clock port
 PASS register tickless clock and establish baseline
 PASS create tickless timer target
@@ -108,6 +119,7 @@ PASS tickless port has no stale alarm after completion
 PASS delete timer task
 PASS clear tickless clock port
 PASS reset OS for timer scenario
+PASS register notification imports
 PASS register clock-only polling fallback
 PASS create polled-clock timer target
 PASS polled-clock target blocks

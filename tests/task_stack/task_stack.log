@@ -2,6 +2,7 @@ PASS initialize OS
 PASS load task_stack.wasm
 PASS create without a size
 PASS the program's own 4 KiB request applies (an unknown key is skipped)
+PASS the program's name is read from its metadata
 PASS create with 16 KiB
 PASS the creator's size wins over the program's
 PASS create a module without settings
@@ -10,6 +11,8 @@ PASS spawn with a 12 KiB stack
 PASS spawn without a size uses the program's request
 PASS a malformed wasm-rtos.app section is rejected
 PASS the error names the metadata
+PASS a program for another ABI major version is refused
+PASS a program without a name has none
 PASS create a trivial task
 PASS recurse 10 deep
 PASS recurse 40 deep

@@ -1,6 +1,4 @@
 PASS initialize OS
-PASS register queue create import
-PASS register queue delete import
 PASS load queue_api.wasm
 PASS create queue API task
 PASS schedule queue API task

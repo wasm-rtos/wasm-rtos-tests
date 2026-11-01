@@ -73,13 +73,13 @@ PASS create deletion queue
 PASS create waiter for deleted queue
 PASS deleted-queue waiter blocks
 PASS queue deletion wakes receiver
-PASS deleted queue returns not-found status
+PASS deleted queue gives the receiver -WR_EBADH
 PASS delete queue task
 PASS create sender-deletion queue
 PASS fill sender-deletion queue
 PASS create sender for deleted queue
 PASS deleted-queue sender blocks
 PASS queue deletion wakes sender
-PASS deleted queue returns not-found to sender
+PASS deleted queue gives the sender -WR_EBADH
 PASS delete queue task
 PASS OS is clean

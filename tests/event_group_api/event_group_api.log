@@ -2,6 +2,7 @@ PASS initialize OS
 PASS load event group test module
 PASS create event group
 PASS find event group by id
+PASS name the event group
 PASS create wait-all task
 PASS event waiter blocks
 PASS wait-all task enters WAITING
@@ -19,10 +20,14 @@ PASS event task remains blocked before deadline
 PASS event task wakes at deadline
 PASS event timeout status is recorded
 PASS event timeout task resumes
-PASS timed-out wait returns current event bits
+PASS timed-out wait returns -WR_ETIMEOUT
 PASS set unrelated bit
 PASS clear returns previous event bits
 PASS event bit is cleared
+PASS create a task that sets and clears bits
+PASS guest set, get, try-wait and clear behave
+PASS guest left no bits set
+PASS delete bits task
 PASS delete event waiter
 PASS delete event timeout task
 PASS OS is clean

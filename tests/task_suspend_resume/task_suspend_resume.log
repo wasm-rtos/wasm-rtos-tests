@@ -18,12 +18,13 @@ PASS the old deadline does not wake a suspended task
 PASS resume the task
 PASS delay ended at resume, after 2100 ms
 PASS create queue
+PASS name the queue
 PASS receiver blocks on the empty queue
 PASS suspend the blocked receiver
 PASS send while the receiver is suspended
 PASS the suspended receiver does not take the item
 PASS resume the receiver
-PASS its receive returns BUSY
+PASS its receive returns -WR_EBUSY
 PASS the item is still queued
 PASS dead task reports TASK_DEAD
 PASS OS is clean
