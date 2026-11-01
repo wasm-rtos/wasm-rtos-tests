@@ -112,6 +112,18 @@ int main(void)
         free(binary.data);
     }
 
+    {
+        OsQueueHandle queue = NULL;
+        uint32_t item = 1U;
+
+        expect(os_queue_create(&queue, sizeof(uint32_t), 3U) == OS_STATUS_OK, "create host queue with 3 slots");
+        expect(os_queue_get_space(queue) == 3U && os_queue_get_count(queue) == 0U, "empty queue has 3 free slots");
+        expect(os_queue_send(queue, &item) == OS_STATUS_OK && os_queue_get_space(queue) == 2U, "a sent item takes a slot");
+        expect(os_queue_receive(queue, &item) == OS_STATUS_OK && os_queue_get_space(queue) == 3U, "a received item frees it");
+        expect(os_queue_get_space(NULL) == 0U, "NULL queue has no space");
+        os_queue_delete(queue);
+    }
+
     expect(os_get_task_count() == 0U, "OS is clean");
     os_shutdown();
     if (log_file != NULL)

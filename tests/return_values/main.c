@@ -99,6 +99,17 @@ int main(void)
                 expect(value.value.f32 == 12.5f, "f32 value");
             if (i == 3U)
                 expect(value.value.f64 == 123.25, "f64 value");
+            expect(os_task_get_return_value_count(task) == 1U, "one return value");
+            {
+                OsValue values[2];
+                uint32_t count = 0U;
+
+                expect(os_task_get_return_values(task, NULL, 0U, &count) == OS_STATUS_BUFFER_TOO_SMALL && count == 1U,
+                       "an empty buffer is too small and reports the count");
+                expect(os_task_get_return_values(task, values, 2U, &count) == OS_STATUS_OK && count == 1U &&
+                           values[0].type == types[i],
+                       "read every return value");
+            }
             expect(os_task_delete(task) == OS_STATUS_OK, "delete task");
         }
         free(wasm.bytes);

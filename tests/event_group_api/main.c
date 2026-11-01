@@ -101,6 +101,8 @@ int main(void)
                event_group != NULL,
            "create event group");
     event_group_id = os_event_group_get_id(event_group);
+    expect(os_event_group_find_by_id(event_group_id) == event_group && os_event_group_find_by_id(0U) == NULL,
+           "find event group by id");
 
     if (wasm.bytes != NULL && event_group != NULL)
     {

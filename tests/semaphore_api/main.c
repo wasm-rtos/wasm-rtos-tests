@@ -102,6 +102,9 @@ int main(void)
                semaphore != NULL,
            "create binary semaphore");
     semaphore_id = os_semaphore_get_id(semaphore);
+    expect(os_semaphore_get_max_count(semaphore) == 1U, "binary semaphore has max count 1");
+    expect(os_semaphore_find_by_id(semaphore_id) == semaphore && os_semaphore_find_by_id(0U) == NULL,
+           "find semaphore by id");
 
     if (wasm.bytes != NULL && semaphore != NULL)
     {

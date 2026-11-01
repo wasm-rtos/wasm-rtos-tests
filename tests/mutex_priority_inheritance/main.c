@@ -102,6 +102,7 @@ int main(void)
     expect(os_mutex_create(&mutex) == OS_STATUS_OK && mutex != NULL,
            "create mutex");
     mutex_id = os_mutex_get_id(mutex);
+    expect(os_mutex_find_by_id(mutex_id) == mutex && os_mutex_find_by_id(0U) == NULL, "find mutex by id");
 
     if (wasm.bytes != NULL && mutex != NULL)
     {
