@@ -1,0 +1,9 @@
+PASS initialize OS
+PASS load task_error.wasm
+PASS a task that returns has no error
+PASS the task traps
+PASS its error names the trap
+PASS and the functions it was in, innermost first
+PASS each task keeps its own error
+PASS a deleted task has none
+PASS OS is clean

@@ -17,6 +17,9 @@ PASS swap out a task waiting for the queue
 PASS an item sent meanwhile ends its wait
 PASS bring it back explicitly
 PASS the item reached its memory and the receive returned 0
+PASS pause a sleeping task and swap it out
+PASS it stays paused, out of RAM
+PASS resumed, it comes back and finishes
 PASS a task that has not started leaves without an image
 PASS the result is the same as without swapping
 PASS a failed write leaves the task in RAM and no image behind

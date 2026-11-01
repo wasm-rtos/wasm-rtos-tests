@@ -18,6 +18,7 @@ PASS the program waits for the button or its timer
 PASS a logical press of an active-low button asks the port for falling edges
 PASS edges wait for the scheduler
 PASS two presses counted, releases ignored, the button reads pressed
+PASS the host sees who owns a pin
 PASS a second program gets -WR_EINUSE
 PASS deleting the owner releases the pin
 PASS then another program can open it
