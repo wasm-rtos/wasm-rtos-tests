@@ -165,7 +165,9 @@ int main(void)
     printf("counts per slice: full=%u preempted=%u next=%u\n", full_slice, preempted_slice, next_slice);
     ok(full_slice > 0U, "a full slice makes progress");
     ok(preempted_slice < full_slice / 2U, "a pending preemption cuts the next slice short");
-    ok(next_slice == full_slice, "the request is used up: the following slice is full again");
+    /* Fuel is charged per operation, so a slice may end mid-iteration: allow one. */
+    ok(next_slice + 1U >= full_slice && next_slice <= full_slice + 1U,
+       "the request is used up: the following slice is full again");
     os_task_delete(t);
 
     ok(os_get_task_count() == 0U, "OS is clean");
