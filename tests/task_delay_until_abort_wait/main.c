@@ -74,14 +74,14 @@ static m3ApiRawFunction(delay_until_import)
     (void)runtime;
     (void)_ctx;
     (void)_mem;
-    status = os_task_read_memory(task, phase_address, &phase_ms, sizeof(phase_ms));
+    status = os_task_read_memory(task, phase_address, (uint8_t*)&phase_ms, sizeof(phase_ms));
     if (status != OS_STATUS_OK)
         m3ApiReturn((uint32_t)status);
     if (os_host_wait_begin(raw_return) != OS_STATUS_OK)
         m3ApiReturn((uint32_t)OS_STATUS_INVALID_ARGUMENT);
     *raw_return = (uint32_t)os_task_delay_until(&phase_ms, period_ms);
     /* The next phase is known now, even when the task blocks. */
-    os_task_write_memory(task, phase_address, &phase_ms, sizeof(phase_ms));
+    os_task_write_memory(task, phase_address, (const uint8_t*)&phase_ms, sizeof(phase_ms));
     return os_host_wait_end();
 }
 
