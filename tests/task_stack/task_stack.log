@@ -1,0 +1,24 @@
+PASS initialize OS
+PASS load task_stack.wasm
+PASS create without a size
+PASS the program's own 4 KiB request applies (an unknown key is skipped)
+PASS create with 16 KiB
+PASS the creator's size wins over the program's
+PASS create a module without settings
+PASS it gets the 8 KiB default
+PASS spawn with a 12 KiB stack
+PASS spawn without a size uses the program's request
+PASS a malformed wasm-rtos.app section is rejected
+PASS the error names the metadata
+PASS create a trivial task
+PASS recurse 10 deep
+PASS recurse 40 deep
+PASS a finished task still reports its peak
+MEASURED stack peak trivial=12 depth10=648 depth40=2328
+PASS deeper calls use more stack
+PASS use grows with depth
+PASS create a task that recurses far beyond its 4 KiB
+PASS it traps
+PASS the trap is a stack overflow
+PASS it never wrote past its stack
+PASS OS is clean

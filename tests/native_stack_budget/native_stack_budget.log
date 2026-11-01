@@ -1,0 +1,9 @@
+PASS initialize OS
+PASS register env.host_probe
+PASS load native_stack_budget.wasm
+PASS create a 2000-deep recursion with a 1 MiB interpreter stack
+MEASURED deepest native stack 8848 bytes over 51 slices
+PASS the recursion completes with the right result
+PASS native stack stays near the 8 KiB budget
+PASS the budget ended slices early so the native stack could unwind
+PASS OS is clean
