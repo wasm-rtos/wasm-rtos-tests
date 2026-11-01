@@ -87,7 +87,7 @@ int main(void)
         argv_storage[0] = first;
         argv_storage[1] = second;
         argv_storage[2] = third;
-        ok(os_task_spawn(&t, b.d, b.n, argv_storage, 3U, 0U) == OS_STATUS_OK && t, "host spawns a WASI program with argv");
+        ok(os_task_spawn(&t, b.d, b.n, argv_storage, 3U, 0U, 0U) == OS_STATUS_OK && t, "host spawns a WASI program with argv");
         /* The kernel must have copied the module and the arguments. */
         memset(b.d, 0, b.n);
         memset(first, 'x', 31);
@@ -117,8 +117,8 @@ int main(void)
         {
             OsTaskHandle bad = NULL;
             const char* argv_with_null[2] = { "a", NULL };
-            ok(os_task_spawn(&bad, NULL, 4U, NULL, 0U, 0U) == OS_STATUS_INVALID_ARGUMENT, "spawn rejects missing bytes");
-            ok(os_task_spawn(&bad, (const uint8_t*)"x", 1U, argv_with_null, 2U, 0U) == OS_STATUS_INVALID_ARGUMENT,
+            ok(os_task_spawn(&bad, NULL, 4U, NULL, 0U, 0U, 0U) == OS_STATUS_INVALID_ARGUMENT, "spawn rejects missing bytes");
+            ok(os_task_spawn(&bad, (const uint8_t*)"x", 1U, argv_with_null, 2U, 0U, 0U) == OS_STATUS_INVALID_ARGUMENT,
                "spawn rejects a NULL argument");
         }
         free(b.d);
