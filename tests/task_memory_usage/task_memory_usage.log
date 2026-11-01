@@ -1,0 +1,31 @@
+PASS initialize OS
+PASS load task_memory_usage.wasm
+PASS create a small task with an 8 KiB stack
+MEASURED small, created stack=8208 linear=131096 code=32768 interpreter=184016 image=0 kernel=384 total=184400
+PASS stack is the requested size plus guard slots
+PASS linear memory is whole 64 KiB pages plus a header
+PASS interpreter total includes stack, memory and code
+PASS host-owned module bytes are not counted
+PASS task control block is counted
+PASS total adds the parts
+PASS the entry function is compiled at load
+PASS create the same task again
+MEASURED twin, created stack=8208 linear=131096 code=32768 interpreter=184016 image=0 kernel=384 total=184400
+PASS identical tasks use identical memory
+PASS small task runs
+MEASURED small, finished stack=0 linear=0 code=0 interpreter=0 image=0 kernel=384 total=384
+PASS a dead task holds no interpreter memory
+PASS its peak is still reported
+PASS only the control block remains until delete
+PASS create a task that grows its memory
+MEASURED grow, created stack=8208 linear=131096 code=32768 interpreter=184024 image=0 kernel=384 total=184408
+PASS it grew and now sleeps
+MEASURED grow, after memory.grow stack=8208 linear=196632 code=32768 interpreter=249944 image=0 kernel=384 total=250328
+PASS linear memory grew by one page
+PASS the interpreter total grew with it
+PASS spawn the module as a process
+MEASURED spawned, created stack=65552 linear=131096 code=32768 interpreter=241360 image=473 kernel=384 total=242217
+PASS the kernel's copy of the module is counted
+PASS total includes the copy
+PASS NULL task is rejected
+PASS OS is clean
