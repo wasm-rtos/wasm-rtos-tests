@@ -1,5 +1,4 @@
 #include "os.h"
-#include "hal.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -58,7 +57,6 @@ int main(void)
     uint8_t* snapshot = NULL;
     uint32_t size = 0, written = 0, i;
     log_file = fopen("snapshot_yield.log", "a");
-    hal_init();
     expect(os_init() == OS_STATUS_OK, "initialize OS");
     expect(load(&b), "load snapshot_yield.wasm");
     if (b.data)

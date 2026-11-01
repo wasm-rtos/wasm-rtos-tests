@@ -1,5 +1,4 @@
 #include "os.h"
-#include "hal.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -57,7 +56,6 @@ int main(void)
     OsTaskHandle a = NULL, b = NULL;
     uint32_t a_id = 0, b_id = 0;
     log_file = fopen("task_id_api.log", "a");
-    hal_init();
     expect(os_init() == OS_STATUS_OK, "initialize OS");
     expect(load(&binary), "load task_id_api.wasm");
     expect(os_task_get_id(NULL) == 0U, "NULL task id is zero");

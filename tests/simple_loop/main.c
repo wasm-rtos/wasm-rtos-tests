@@ -1,5 +1,4 @@
 #include "os.h"
-#include "hal.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -52,7 +51,6 @@ int main(void)
     OsTaskHandle task = NULL;
     uint32_t i;
     log_file = fopen("simple_loop.log", "w");
-    hal_init();
     expect(os_init() == OS_STATUS_OK, "initialize OS");
     expect(load(&binary), "load simple_loop.wasm");
     if (binary.data)

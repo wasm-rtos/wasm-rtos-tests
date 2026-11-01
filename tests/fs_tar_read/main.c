@@ -1,6 +1,5 @@
 #include "os.h"
 #include "fs.h"
-#include "hal.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -126,7 +125,6 @@ int main(void)
     OsFsTar main_tar;
     OsFsTar extra_tar;
     l = fopen("fs_tar_read.log", "a");
-    hal_init();
     ok(os_init() == OS_STATUS_OK, "initialize OS");
     ok(os_fs_tar_init(&main_tar, main_image, build_main_image(main_image)) == OS_STATUS_OK, "main image is valid");
     ok(os_fs_tar_init(&extra_tar, extra_image, build_extra_image(extra_image)) == OS_STATUS_OK, "extra image is valid");
@@ -139,7 +137,6 @@ int main(void)
         free(b.d);
     }
     os_shutdown();
-    hal_shutdown();
     if (l)
         fclose(l);
     return f ? 1 : 0;

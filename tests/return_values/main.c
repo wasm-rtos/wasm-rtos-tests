@@ -1,5 +1,4 @@
 #include "os.h"
-#include "hal.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -75,7 +74,6 @@ int main(void)
     g_log = fopen("return_values.log", "w");
     if (!g_log)
         return 1;
-    hal_init();
     expect(os_init() == OS_STATUS_OK, "initialize OS");
     expect(load_wasm(&wasm), "load return_values.wasm");
     if (wasm.bytes)
@@ -107,7 +105,6 @@ int main(void)
     }
     expect(os_get_task_count() == 0U, "OS is clean");
     os_shutdown();
-    hal_shutdown();
     fclose(g_log);
     return g_failures == 0 ? 0 : 1;
 }

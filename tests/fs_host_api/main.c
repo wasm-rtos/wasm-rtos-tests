@@ -1,6 +1,5 @@
 #include "os.h"
 #include "fs.h"
-#include "hal.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -114,7 +113,6 @@ int main(void)
     uint32_t i;
     char names[128] = "";
     l = fopen("fs_host_api.log", "a");
-    hal_init();
     ok(os_init() == OS_STATUS_OK, "initialize OS");
     ok(load(&b), "load fs_host_api.wasm");
     free(b.d);
@@ -172,7 +170,6 @@ int main(void)
     }
     ok(os_fs_mount("/m7", &os_fs_tar_driver, &extra_tar) == OS_STATUS_LIMIT_REACHED, "ninth mount is refused");
     os_shutdown();
-    hal_shutdown();
     if (l)
         fclose(l);
     return f ? 1 : 0;

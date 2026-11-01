@@ -1,5 +1,4 @@
 #include "os.h"
-#include "hal.h"
 
 #include <stdint.h>
 #include <stdio.h>
@@ -98,7 +97,6 @@ int main(void)
         return 1;
     }
 
-    hal_init();
     expect(os_init() == OS_STATUS_OK, "initialize OS");
     expect(load_wasm(&wasm), "load mutex test module");
     expect(os_mutex_create(&mutex) == OS_STATUS_OK && mutex != NULL,
@@ -168,7 +166,6 @@ int main(void)
     free(wasm.bytes);
     expect(os_get_task_count() == 0U, "OS is clean");
     os_shutdown();
-    hal_shutdown();
     fclose(g_log);
     return g_failures == 0 ? 0 : 1;
 }

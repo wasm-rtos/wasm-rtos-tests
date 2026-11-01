@@ -1,5 +1,4 @@
 #include "os.h"
-#include "hal.h"
 
 #include <stdint.h>
 #include <stdio.h>
@@ -96,7 +95,6 @@ int main(void)
         return 1;
     }
 
-    hal_init();
     expect(os_init() == OS_STATUS_OK, "initialize OS");
     expect(load_wasm(&wasm), "load event group test module");
     expect(os_event_group_create(&event_group) == OS_STATUS_OK &&
@@ -163,7 +161,6 @@ int main(void)
     free(wasm.bytes);
     expect(os_get_task_count() == 0U, "OS is clean");
     os_shutdown();
-    hal_shutdown();
     fclose(g_log);
     return g_failures == 0 ? 0 : 1;
 }

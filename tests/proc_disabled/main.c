@@ -1,5 +1,4 @@
 #include "os.h"
-#include "hal.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -56,7 +55,6 @@ int main(void)
     OsTaskHandle t = NULL;
     const char* result;
     l = fopen("proc_disabled.log", "a");
-    hal_init();
     ok(os_init() == OS_STATUS_OK, "initialize OS");
     ok(OS_HAS_PROCESSES == 0, "kernel is built without processes");
     ok(load(&b), "load proc_disabled.wasm");
@@ -74,7 +72,6 @@ int main(void)
     }
     ok(os_get_task_count() == 0U, "clean OS state");
     os_shutdown();
-    hal_shutdown();
     if (l)
         fclose(l);
     return f ? 1 : 0;
