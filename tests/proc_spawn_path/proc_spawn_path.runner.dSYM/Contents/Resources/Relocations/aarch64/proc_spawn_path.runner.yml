@@ -1,5 +1,0 @@
----
-triple:          'arm64-apple-darwin'
-binary-path:     'tests/proc_spawn_path/proc_spawn_path.runner'
-relocations:     []
-...

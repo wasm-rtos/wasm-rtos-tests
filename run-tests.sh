@@ -167,6 +167,8 @@ for dir in tests/*; do
     fi
 
     rm -f "$runner" "$build_log"
+    # clang on macOS leaves debug info next to sanitizer builds.
+    rm -rf "$runner.dSYM"
     if [ "$name" = "dylink0" ]; then
         rm -f "$dir/libdylink0.so"
     fi
