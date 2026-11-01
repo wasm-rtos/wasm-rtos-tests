@@ -208,6 +208,8 @@ int main(void)
     /* One owner at a time; a stopped or crashed owner gives the pin back. */
     holder = create(&b, "app_main_hold");
     run_until_waiting(holder);
+    ok(os_gpio_get_owner(2U) == os_task_get_id(holder) && os_gpio_get_owner(4U) == 0U,
+       "the host sees who owns a pin");
     t = create(&b, "app_main_try");
     ok(run_to_result(t) == -22, "a second program gets -WR_EINUSE");
     os_task_delete(t);
