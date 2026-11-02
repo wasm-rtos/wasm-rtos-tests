@@ -1,0 +1,21 @@
+PASS initialize OS
+PASS load pulse_api.wasm
+PASS pins: an LED strip, an infrared receiver and LED with pulse hardware, a plain LED
+PASS without a port pulse-open returns -WR_EUNSUPPORTED
+PASS a port needs configure, send, finish and release
+PASS the LED bytes go to the hardware in the background, 3 per LED
+PASS with the addressable LED bit timings
+PASS the strip pin is configured as an output, idle low
+PASS then the latch: a short train done at once
+PASS the latch is 80 us low
+PASS the channel is released when the program ends
+PASS a NEC frame: 67 items on a 38 kHz carrier
+PASS sent
+PASS the receiver captures into the program's buffer, up to 10 ms of silence
+PASS the receiver pin is configured to capture
+PASS a remote's frame is captured and decoded: address 4, command 8
+PASS no remote pressed: -WR_ETIMEOUT
+PASS a port reporting more items than the buffer holds is cut to the buffer
+PASS deleting a program that captures makes the port stop before its memory goes
+PASS pins without pulse hardware, unknown names, bad flags, ownership, direction, alignment, bad pointers, bad timing
+PASS clean OS state
