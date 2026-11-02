@@ -1,0 +1,15 @@
+PASS initialize OS
+PASS load task_output.wasm
+PASS a port without write is rejected
+PASS install output port
+PASS create first task
+PASS create second task
+PASS both programs return zero
+PASS output carries the writer's task id and fd, in order
+PASS delete tasks
+PASS remove output port
+PASS create task without a port
+PASS default output bypasses the removed port
+PASS reinitialize with a port set
+PASS os_init clears the output port
+PASS clean OS state

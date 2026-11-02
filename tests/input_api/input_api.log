@@ -1,0 +1,18 @@
+PASS initialize OS
+PASS load input_api.wasm
+PASS without devices input-open returns -WR_EUNSUPPORTED
+PASS register buttons, a keyboard, a bezel and a touch screen
+PASS names and numbers are registered once
+PASS repeat needs an interval
+PASS reports that do not fit the device are refused
+PASS an unowned device takes reports
+PASS the program owns the buttons and waits for them
+PASS a held button asks to wake the kernel at its long-press time
+PASS press, long press once at 600 ms, release; nothing from before open
+PASS the device is free again when the program ends
+PASS press, text, repeats after 300 ms every 100 ms, release
+PASS unread turns add up into one event
+PASS down, the last move, up
+PASS a full queue drops the oldest events and says how many
+PASS busy, unknown, flags, bad pointers and handles, nothing queued
+PASS clean OS state

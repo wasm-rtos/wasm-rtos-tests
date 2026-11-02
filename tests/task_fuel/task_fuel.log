@@ -1,0 +1,13 @@
+PASS initialize OS
+PASS load task_fuel.wasm
+PASS no task, no fuel
+PASS create first task
+PASS create second task
+PASS a task that has not run used no fuel
+PASS a slice that runs out spends all of its fuel
+PASS both tasks finish
+PASS the loop's work is counted
+PASS the same program spends the same fuel
+PASS fuel left at a yield is not counted
+PASS delete tasks
+PASS clean OS state

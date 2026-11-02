@@ -1,0 +1,23 @@
+PASS initialize OS
+PASS load display_api.wasm
+PASS without a port display-open returns -WR_EUNSUPPORTED
+PASS a port needs write
+PASS install the display port
+PASS register the round LCD
+PASS register the monochrome OLED
+PASS names and numbers are registered once
+PASS OS_DISPLAY_MAX displays
+PASS the native format must be accepted
+PASS size, shape, formats, dpi, brightness; one owner; not waitable
+PASS the display is free again when the program ends
+PASS writes are checked, fill, flush and brightness work
+PASS the RGB565 block lands where it was written
+PASS an XRGB8888 pixel reaches the port in its own format
+PASS the port's own fill cleared the screen
+PASS flush and brightness reach the port
+PASS monochrome writes and fills; no brightness control
+PASS the kernel's fill by rows and the 1-bit block are exact
+PASS 1-bit rows start on a byte, leftmost pixel in the top bit
+PASS without a port fill the kernel writes one run per row
+PASS a display left open is given back
+PASS clean OS state
