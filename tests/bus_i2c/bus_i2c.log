@@ -1,0 +1,20 @@
+PASS initialize OS
+PASS load bus_i2c.wasm
+PASS without a port i2c-open returns -WR_EUNSUPPORTED
+PASS a port needs transaction
+PASS install the I2C port
+PASS without buses i2c-open returns -WR_EUNSUPPORTED
+PASS register bus i2c0 at 400 kHz
+PASS names and numbers are registered once; a bus has a speed
+PASS the sensor's program owns address 0x48
+PASS a register read is a write and a read in one transaction, at the bus speed
+PASS the display's program shares the bus, but not the address
+PASS the display got its command and its data
+PASS the sensor read 25.5 C
+PASS addresses are free when programs end
+PASS the trace hook saw every transaction
+PASS a scan finds the four devices that answer
+PASS a probe sends only the address
+PASS unknown bus, bad address and flags, NACK, bus error, timeout, bad pointer, too many ops, not waitable
+PASS failed transactions are traced too
+PASS clean OS state

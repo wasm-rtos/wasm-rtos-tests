@@ -1,0 +1,17 @@
+PASS initialize OS
+PASS load bus_spi.wasm
+PASS without a port spi-open returns -WR_EUNSUPPORTED
+PASS register the chip select pins
+PASS install the SPI port and bus spi0, 20 MHz at most
+PASS mode 3 at the 1 MHz the program asked for
+PASS chip select is an output that idles high
+PASS the program owns its chip select
+PASS a second device shares the bus; its chip select goes low although the board inverts it; in-place transfer and a delay
+PASS the delay reached the port; one chip select at a time
+PASS the flash answered its JEDEC id
+PASS chip select is given back when the program ends
+PASS the trace names the chip select pin
+PASS a program can take the whole bus and drive chip select itself
+PASS a faster request gets the bus maximum
+PASS unknown bus and pin, bad mode, a pin in use, op counts and kinds, long delay, bad pointer, not waitable
+PASS clean OS state
