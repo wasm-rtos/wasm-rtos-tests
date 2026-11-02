@@ -1,0 +1,12 @@
+PASS initialize OS
+PASS load arduino_core.wasm
+PASS a board with a button, an LED, i2c0 and spi0
+PASS start the sketch
+PASS setup runs once, loop twice, and the sketch exits with 0
+PASS Serial printed text, numbers, Strings and printf as Arduino does
+PASS digitalWrite drove LED_BUILTIN, the profile's "led"
+PASS INPUT_PULLUP and a FALLING interrupt on pin 0
+PASS endTransmission(false) and requestFrom made one write-read transaction each round
+PASS SPISettings reached the bus: mode 0 at 8 MHz
+PASS the bus and pins are free after exit
+PASS clean OS state
