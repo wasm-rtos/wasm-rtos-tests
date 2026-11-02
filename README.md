@@ -18,7 +18,9 @@ tests/
 Each test directory contains:
 
 - `main.c` — the complete native test runner for one specific OS feature;
-- `<test_name>.c` — the guest C program compiled to WebAssembly;
+- `<test_name>.c` — the guest C program compiled to WebAssembly, or
+  `<test_name>.ino` — an Arduino sketch, built with the kernel's Arduino core
+  (`wasm-rtos/arduino/build.sh`);
 - `<test_name>.wasm` — the generated WebAssembly module;
 - `<test_name>.log` — the log generated when the local `main.c` runs the module.
 
@@ -48,7 +50,7 @@ bash ./run-tests.sh
 
 For every directory under `tests/`, the script:
 
-1. verifies that `main.c` and `<test_name>.c` exist;
+1. verifies that `main.c` and `<test_name>.c` (or `.ino`) exist;
 2. compiles `<test_name>.c` into `<test_name>.wasm`, with the kernel's guest
    header `wasm-rtos/include/wasm-rtos.h` on the include path;
 3. compiles the directory's standalone `main.c` into a temporary native runner;

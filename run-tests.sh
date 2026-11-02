@@ -51,6 +51,10 @@ for dir in tests/*; do
     fi
     found=1
     source="$dir/$name.c"
+    # An Arduino sketch instead of C: built with the kernel's Arduino core.
+    if [ -f "$dir/$name.ino" ]; then
+        source="$dir/$name.ino"
+    fi
     main="$dir/main.c"
     wasm="$dir/$name.wasm"
     runner="$dir/$name.runner"
@@ -117,6 +121,13 @@ for dir in tests/*; do
             continue
         fi
         rm -f "$app_object" "$library_object"
+    elif [[ "$source" == *.ino ]]; then
+        if ! CXX="${WASM_CXX:-${WASM_CC}++}" WASI_TARGET="$WASI_TARGET" \
+                bash wasm-rtos/arduino/build.sh "$source" -o "$wasm" >"$build_log" 2>&1; then
+            { echo "FAIL building Arduino sketch $source"; cat "$build_log"; } | tee "$log"
+            failed=1
+            continue
+        fi
     elif grep -Eq '#include <(stdio|stdlib|wasi)|__wasi_|proc_exit|fd_write' "$source" || [[ "$name" == wasi_* ]]; then
         if ! "$WASM_CC" "${wasi_flags[@]}" -O0 ${guest_flags[@]+"${guest_flags[@]}"} -o "$wasm" "$source" >"$build_log" 2>&1; then
             { echo "FAIL building $wasm"; cat "$build_log"; } | tee "$log"
