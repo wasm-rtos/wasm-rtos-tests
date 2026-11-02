@@ -1,0 +1,24 @@
+PASS initialize OS
+PASS load bus_async.wasm
+PASS a board whose SPI and I2C ports use DMA
+PASS the program waits while the port works
+PASS chip select stays low during the transfer
+PASS other programs run meanwhile
+PASS a program whose memory the port uses is not swapped out
+PASS nothing is traced before the transfer ends
+PASS the end is only recorded, as in an interrupt handler
+PASS the next schedule delivers it: chip select up
+PASS the trace comes at the end, with the program and the result
+PASS the bytes the port wrote into the program's memory arrive
+PASS a failed transfer gives -WR_EBUS
+PASS suspend makes the port finish first
+PASS after that it can be swapped out
+PASS on resume the program has its bytes
+PASS abort-wait finishes the transfer
+PASS delete makes the port finish before the memory is freed
+PASS the second program got the bus too
+PASS after the port finished the first transfer
+PASS both programs have their bytes
+PASS an I2C transfer in the background
+PASS its read arrives
+PASS clean OS state
