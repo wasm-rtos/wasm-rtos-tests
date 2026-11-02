@@ -54,7 +54,7 @@ jobs:
       - name: Install toolchain
         run: |
           sudo apt-get update
-          sudo apt-get install -y clang lld wasi-libc libclang-rt-dev-wasm32 libc++-dev-wasm32 libc++abi-dev-wasm32
+          sudo apt-get install -y clang lld wasi-libc libclang-rt-dev-wasm32 libc++-dev-wasm32
 
       - name: Build and run every isolated test
         id: run_tests
