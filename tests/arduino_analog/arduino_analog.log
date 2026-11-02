@@ -1,0 +1,11 @@
+PASS initialize OS
+PASS load arduino_analog.wasm
+PASS a board with a potentiometer, PWM pins and a serial port
+PASS start the sketch
+PASS the sketch got its reply and exited with 0
+PASS analogRead: 3071 of 4095 is 767 of 1023, then 3071 at 12 bits; pin 0 is A0
+PASS analogWrite: 64 of 255 then 4095 of 4095 at 1 kHz; digitalWrite stops the PWM
+PASS and drives the pin low
+PASS tone: 440 Hz at half duty, off after its duration
+PASS Serial1: SERIAL_8E1, the line sent
+PASS clean OS state

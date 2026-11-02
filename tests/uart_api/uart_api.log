@@ -1,0 +1,13 @@
+PASS initialize OS
+PASS load uart_api.wasm
+PASS without a port uart-open returns -WR_EUNSUPPORTED
+PASS a port needs configure and write
+PASS register two serial ports, the second up to 921600 baud
+PASS the port runs at 115200 with even parity
+PASS the whole command went out, 8 bytes at a time, the program waiting for room
+PASS the program owns uart1
+PASS the program woke for the reply, read it whole and saw one error
+PASS the port is closed and free when the program ends
+PASS busy, unknown, bad speed and format, bad pointers, full, timeout
+PASS 256 bytes kept, 44 dropped and counted
+PASS clean OS state

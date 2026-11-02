@@ -1,0 +1,14 @@
+PASS initialize OS
+PASS load pwm_api.wasm
+PASS pins: an active-low LED and a motor driver that can do PWM, a button that cannot
+PASS without a port pwm-open returns -WR_EUNSUPPORTED
+PASS a port needs start, set_duty and stop
+PASS the LED runs at 1 kHz
+PASS a quarter on, on an active-low pin, is three quarters high on the pin
+PASS the pin is owned as an output
+PASS duty, frequency rounding, ownership
+PASS the output stops and the pin is an input again when the program ends
+PASS fully on with the program's active-low flag is low on the pin
+PASS pins without PWM, unknown names, bad frequency and flags, no free channel, not waitable
+PASS every output stopped
+PASS clean OS state

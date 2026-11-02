@@ -1,0 +1,12 @@
+PASS initialize OS
+PASS load adc_api.wasm
+PASS without a port adc-open returns -WR_EUNSUPPORTED
+PASS a port needs read
+PASS without channels too
+PASS register a potentiometer and a battery divider
+PASS names and numbers once; a channel has a resolution
+PASS properties, shared reads, millivolts by scale, clamping, errors
+PASS without read_mv the battery is scaled: 1023 of 1023 is 6600 mV
+PASS a port's calibration wins
+PASS channels the port does not calibrate are still scaled by the kernel
+PASS clean OS state
