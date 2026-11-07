@@ -1,0 +1,20 @@
+PASS initialize OS
+PASS load counter_api.wasm
+PASS without a port counter-open returns -WR_EUNSUPPORTED
+PASS a port needs start, read, write and stop
+PASS install a counter port with watch points
+PASS without counters counter-open returns -WR_EUNSUPPORTED
+PASS register an encoder and two pulse counters
+PASS names and units are registered once, with a known kind
+PASS kind, speed, filter cut to what the hardware has, signed counts, homing, ownership, modes of the other kind, bad pointers and windows, a count already outside
+PASS the encoder ran in x4 and stopped when the program ended
+PASS a program waits for the knob to move, the hardware watches around 0
+PASS no movement, no wakeup
+PASS the interrupt woke it: the knob turned back 3 steps
+PASS nothing moves: -WR_ETIMEOUT
+PASS a counter port without watch points
+PASS a flow meter program sleeps until 100 pulses
+PASS 60 pulses: still asleep
+PASS 150 pulses: the kernel's next read woke it within the poll interval
+PASS and it read the count
+PASS clean OS state

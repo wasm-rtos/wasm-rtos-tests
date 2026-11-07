@@ -1,0 +1,8 @@
+PASS initialize OS
+PASS load arduino_encoder.wasm
+PASS a board with a quadrature encoder on pins 18 and 19
+PASS start the sketch
+PASS the sketch ran and exited with 0
+PASS Encoder read the turns, write moved the position, readAndReset lost no step
+PASS Encoder(18, 19) counted every edge (x4) of counter "gpio18", stopped at exit
+PASS clean OS state
