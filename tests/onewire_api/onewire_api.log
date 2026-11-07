@@ -1,0 +1,36 @@
+PASS initialize OS
+PASS load onewire_api.wasm
+PASS the 1-Wire CRC-8 matches the datasheet's example code
+PASS without a port onewire-open returns -WR_EUNSUPPORTED
+PASS a port needs transaction
+PASS install the 1-Wire port
+PASS without buses onewire-open returns -WR_EUNSUPPORTED
+PASS register bus ow0
+PASS names and numbers are registered once
+PASS a search finds all four codes, in ROM order: the DS18S20 first, serial 3 last
+PASS with one port triplet per bit of every code
+PASS a search started at family 0x28 skips the DS18S20
+PASS an alarm search finds only sensor 2
+PASS three sensors convert and read: 21.5, -10.125 (parasite, through the pull-up) and 30.062 C
+PASS each conversion held the line high for 750 ms
+PASS traced transactions start with the kernel's reset and match ROM with the code
+PASS a scratchpad read is reset, match ROM, command, 9 bytes in one transaction
+PASS without a strong pull-up the parasite sensor keeps its power-on 85 C, the others convert
+PASS install a port without triplet
+PASS the search finds the same four codes
+PASS through two read slots and a write slot per bit
+PASS and the alarm search the same sensor
+PASS back to the port with triplet
+PASS a program holds the whole bus, its pull-up left on while it sleeps
+PASS meanwhile other programs can neither search the bus nor open a device on it
+PASS the program read sensor 1 through single time slots
+PASS the pull-up it left on ended when it closed the bus
+PASS a conversion with the pull-up runs in the background, the program waits
+PASS another program runs meanwhile
+PASS (it found the device's bus in use for the whole bus)
+PASS the end delivered, the program reads the temperature
+PASS deleting a program in a background conversion makes the port finish first
+PASS unknown bus, bad flags and CRC, kernel's reset, misplaced pull-ups, bad kinds, too many ops, bad pointers, bad search state, absent device
+PASS a code that arrives broken fails the search with -WR_EBUS
+PASS an empty bus: the search finds nothing, a device gets -WR_ENACK
+PASS clean OS state

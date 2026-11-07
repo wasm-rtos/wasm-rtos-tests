@@ -1,0 +1,8 @@
+PASS initialize OS
+PASS load arduino_onewire.wasm
+PASS a board with a 1-Wire bus on pin 4: three DS18B20 (one parasite-powered, one in alarm) and a DS18S20
+PASS start the sketch
+PASS setup and one loop run, and the sketch exits with 0
+PASS OneWire(4) searched the bus, by family and for alarms, converted on parasite power and read every sensor
+PASS depower() ended the pull-up, and the bus is free after exit
+PASS clean OS state
