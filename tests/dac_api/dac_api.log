@@ -1,0 +1,15 @@
+PASS initialize OS
+PASS load dac_api.wasm
+PASS GPIO pins 25 and 26
+PASS without a port dac-open returns -WR_EUNSUPPORTED
+PASS a port needs write and stop
+PASS install the DAC port
+PASS without outputs dac-open returns -WR_EUNSUPPORTED
+PASS register GPIO 25's converter and an external chip
+PASS names and channels are registered once, with a resolution
+PASS properties, raw values, rounded voltages, limits, ownership of the output and its pin, bad flags and handles
+PASS both outputs were switched on and off again
+PASS a program holds the output at 200, and with it GPIO 25
+PASS when it ends the output is off and the pin back to a plain input
+PASS a pin opened as GPIO keeps its converter from others: -WR_EINUSE
+PASS clean OS state

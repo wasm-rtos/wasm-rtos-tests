@@ -1,0 +1,7 @@
+PASS initialize OS
+PASS load arduino_dac.wasm
+PASS a board with an 8-bit converter on GPIO 25
+PASS start the sketch
+PASS the sketch ran and exited with 0
+PASS analogWrite drove the converter (8 bits, then 12 scaled to 8), digitalWrite took the pin back, dacWrite reopened it
+PASS clean OS state
