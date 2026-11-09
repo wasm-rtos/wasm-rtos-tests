@@ -63,37 +63,37 @@ static int load_wasm(WasmBinary* binary)
  * Periodic delays and aborting another task's wait are host APIs; these
  * imports hand them to the guest.
  */
-static m3ApiRawFunction(delay_until_import)
+static OS_HOST_FUNCTION(delay_until_import)
 {
-    m3ApiReturnType(uint32_t);
-    m3ApiGetArg(uint32_t, phase_address);
-    m3ApiGetArg(uint32_t, period_ms);
+    OS_HOST_RETURNS(uint32_t);
+    OS_HOST_ARG(uint32_t, phase_address);
+    OS_HOST_ARG(uint32_t, period_ms);
     OsTaskHandle task = os_task_get_current();
     uint32_t phase_ms = 0U;
     OsStatus status;
     (void)runtime;
-    (void)_ctx;
-    (void)_mem;
+    (void)os_host_user;
+    (void)os_host_memory;
     status = os_task_read_memory(task, phase_address, (uint8_t*)&phase_ms, sizeof(phase_ms));
     if (status != OS_STATUS_OK)
-        m3ApiReturn((uint32_t)status);
+        OS_HOST_RETURN((uint32_t)status);
     if (os_host_wait_begin(raw_return) != OS_STATUS_OK)
-        m3ApiReturn((uint32_t)OS_STATUS_INVALID_ARGUMENT);
+        OS_HOST_RETURN((uint32_t)OS_STATUS_INVALID_ARGUMENT);
     *raw_return = (uint32_t)os_task_delay_until(&phase_ms, period_ms);
     /* The next phase is known now, even when the task blocks. */
     os_task_write_memory(task, phase_address, (const uint8_t*)&phase_ms, sizeof(phase_ms));
     return os_host_wait_end();
 }
 
-static m3ApiRawFunction(abort_wait_import)
+static OS_HOST_FUNCTION(abort_wait_import)
 {
-    m3ApiReturnType(uint32_t);
-    m3ApiGetArg(uint32_t, task_id);
+    OS_HOST_RETURNS(uint32_t);
+    OS_HOST_ARG(uint32_t, task_id);
     OsTaskHandle task = os_task_find_by_id(task_id);
     (void)runtime;
-    (void)_ctx;
-    (void)_mem;
-    m3ApiReturn((uint32_t)(task != NULL ? os_task_abort_wait(task) : OS_STATUS_TASK_NOT_FOUND));
+    (void)os_host_user;
+    (void)os_host_memory;
+    OS_HOST_RETURN((uint32_t)(task != NULL ? os_task_abort_wait(task) : OS_STATUS_TASK_NOT_FOUND));
 }
 
 static void register_imports(void)
