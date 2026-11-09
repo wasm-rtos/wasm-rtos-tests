@@ -32,7 +32,7 @@ jobs:
           fetch-depth: 0
           submodules: false
 
-      - name: Update wasm-rtos and nested vm submodules
+      - name: Update wasm-rtos, its vm, and libraries submodules
         run: |
           git submodule sync --recursive
           if [ "${{ github.event_name }}" = "push" ] &&
@@ -43,10 +43,12 @@ jobs:
           fi
           git -C wasm-rtos submodule sync --recursive
           git -C wasm-rtos submodule update --init --recursive
+          git submodule update --init libraries
           git submodule status --recursive
 
           test -f wasm-rtos/os.c
           test -f wasm-rtos/vm/source/wm.h
+          test -f libraries/arduino/build.sh
 
           echo "wasm-rtos commit: $(git -C wasm-rtos rev-parse HEAD)"
           echo "vm commit: $(git -C wasm-rtos/vm rev-parse HEAD)"

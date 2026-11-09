@@ -1,3 +1,6 @@
 [submodule "wasm-rtos"]
 	path = wasm-rtos
 	url = https://github.com/wasm-rtos/wasm-rtos.git
+[submodule "libraries"]
+	path = libraries
+	url = https://github.com/wasm-rtos/wasm-rtos-libraries
