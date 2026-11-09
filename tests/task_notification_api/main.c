@@ -60,57 +60,57 @@ static int load_wasm(WasmBinary* binary)
  * Task notifications are a host API; these imports hand them to the guest.
  * Blocking ones bracket the call with os_host_wait_begin/end.
  */
-static m3ApiRawFunction(notify_wait_import)
+static OS_HOST_FUNCTION(notify_wait_import)
 {
-    m3ApiReturnType(uint32_t);
-    m3ApiGetArg(uint32_t, clear_on_entry);
-    m3ApiGetArg(uint32_t, clear_on_exit);
-    m3ApiGetArg(uint32_t, timeout_ms);
+    OS_HOST_RETURNS(uint32_t);
+    OS_HOST_ARG(uint32_t, clear_on_entry);
+    OS_HOST_ARG(uint32_t, clear_on_exit);
+    OS_HOST_ARG(uint32_t, timeout_ms);
     (void)runtime;
-    (void)_ctx;
-    (void)_mem;
+    (void)os_host_user;
+    (void)os_host_memory;
     if (os_host_wait_begin(raw_return) != OS_STATUS_OK)
-        m3ApiReturn((uint32_t)OS_STATUS_INVALID_ARGUMENT);
+        OS_HOST_RETURN((uint32_t)OS_STATUS_INVALID_ARGUMENT);
     *raw_return = (uint32_t)os_task_notify_wait(clear_on_entry, clear_on_exit, timeout_ms);
     return os_host_wait_end();
 }
 
-static m3ApiRawFunction(notify_value_import)
+static OS_HOST_FUNCTION(notify_value_import)
 {
-    m3ApiReturnType(uint32_t);
+    OS_HOST_RETURNS(uint32_t);
     (void)runtime;
-    (void)_ctx;
-    (void)_mem;
-    m3ApiReturn(os_task_get_last_wait_value(os_task_get_current()));
+    (void)os_host_user;
+    (void)os_host_memory;
+    OS_HOST_RETURN(os_task_get_last_wait_value(os_task_get_current()));
 }
 
-static m3ApiRawFunction(notify_take_import)
+static OS_HOST_FUNCTION(notify_take_import)
 {
-    m3ApiReturnType(uint32_t);
-    m3ApiGetArg(uint32_t, clear_count_on_exit);
-    m3ApiGetArg(uint32_t, timeout_ms);
+    OS_HOST_RETURNS(uint32_t);
+    OS_HOST_ARG(uint32_t, clear_count_on_exit);
+    OS_HOST_ARG(uint32_t, timeout_ms);
     OsStatus status;
     (void)runtime;
-    (void)_ctx;
-    (void)_mem;
+    (void)os_host_user;
+    (void)os_host_memory;
     if (os_host_wait_begin(raw_return) != OS_STATUS_OK)
-        m3ApiReturn(0U);
+        OS_HOST_RETURN(0U);
     status = os_task_notify_take(clear_count_on_exit ? 1U : 0U, timeout_ms);
     *raw_return = status == OS_STATUS_OK ? os_task_get_last_wait_value(os_task_get_current()) : 0U;
     return os_host_wait_end();
 }
 
-static m3ApiRawFunction(notify_import)
+static OS_HOST_FUNCTION(notify_import)
 {
-    m3ApiReturnType(uint32_t);
-    m3ApiGetArg(uint32_t, task_id);
-    m3ApiGetArg(uint32_t, value);
-    m3ApiGetArg(uint32_t, action);
+    OS_HOST_RETURNS(uint32_t);
+    OS_HOST_ARG(uint32_t, task_id);
+    OS_HOST_ARG(uint32_t, value);
+    OS_HOST_ARG(uint32_t, action);
     OsTaskHandle task = os_task_find_by_id(task_id);
     (void)runtime;
-    (void)_ctx;
-    (void)_mem;
-    m3ApiReturn((uint32_t)(task != NULL ? os_task_notify(task, value, (OsNotifyAction)action)
+    (void)os_host_user;
+    (void)os_host_memory;
+    OS_HOST_RETURN((uint32_t)(task != NULL ? os_task_notify(task, value, (OsNotifyAction)action)
                                         : OS_STATUS_TASK_NOT_FOUND));
 }
 
