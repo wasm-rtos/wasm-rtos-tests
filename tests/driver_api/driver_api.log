@@ -1,0 +1,8 @@
+PASS initialize OS
+PASS load driver_api.wasm
+PASS a program that imports interfaces no driver offers loads; their calls are unsupported
+PASS add the host's own driver
+PASS adding it again does nothing
+PASS a program calls the driver and uses its handle
+PASS closing the handle reached the driver
+PASS clean OS state

@@ -1,7 +1,5 @@
 #include "os.h"
-#include "wasm3/source/m3_dylink.h"
-#include "wasm3/source/m3_env.h"
-#include "wasm3/source/m3_m3c.h"
+#include "vm/source/wm_dylink.h"
 
 #include <stdarg.h>
 #include <stdint.h>
@@ -16,20 +14,9 @@ typedef struct WasmBinary
 }
 WasmBinary;
 
-typedef struct MemoryStorage
-{
-    uint8_t * bytes;
-    size_t size;
-    size_t capacity;
-}
-MemoryStorage;
-
 typedef struct ResolverContext
 {
-    IM3Environment environment;
     WasmBinary library;
-    MemoryStorage * libraryM3C;
-    int useM3C;
 }
 ResolverContext;
 
@@ -86,164 +73,101 @@ static int load_binary(const char * path, WasmBinary * binary)
     return 1;
 }
 
-static M3Result storage_read(void * context, uint64_t offset,
-                             void * data, uint32_t size)
-{
-    MemoryStorage * storage = (MemoryStorage *) context;
-    if (offset > storage->size || size > storage->size - (size_t) offset)
-        return "dylink test storage read overflow";
-    memcpy(data, storage->bytes + (size_t) offset, size);
-    return m3Err_none;
-}
-
-static M3Result storage_write(void * context, uint64_t offset,
-                              const void * data, uint32_t size)
-{
-    MemoryStorage * storage = (MemoryStorage *) context;
-    size_t end;
-    if (offset > SIZE_MAX || size > SIZE_MAX - (size_t) offset)
-        return "dylink test storage write overflow";
-    end = (size_t) offset + size;
-    if (end > storage->capacity)
-    {
-        size_t capacity = storage->capacity ? storage->capacity : 512;
-        uint8_t * bytes;
-        while (capacity < end)
-            capacity *= 2;
-        bytes = (uint8_t *) realloc(storage->bytes, capacity);
-        if (!bytes)
-            return m3Err_mallocFailed;
-        storage->bytes = bytes;
-        storage->capacity = capacity;
-    }
-    memcpy(storage->bytes + (size_t) offset, data, size);
-    if (end > storage->size)
-        storage->size = end;
-    return m3Err_none;
-}
-
-static M3CStorage make_storage(MemoryStorage * memory)
-{
-    M3CStorage storage = {memory, storage_read, storage_write, NULL};
-    return storage;
-}
-
-static M3Result resolve_library(void * context, const char * name,
-                                IM3Module * outModule)
+static WmResult resolve_library(void * context, const char * name,
+                                WmModule ** outModule)
 {
     ResolverContext * resolver = (ResolverContext *) context;
-    if (!name || !strstr(name, "libdylink0.so"))
-        return "unexpected dylink dependency";
-    if (resolver->useM3C)
-    {
-        M3CStorage storage = make_storage(resolver->libraryM3C);
-        return m3_ParseM3C(resolver->environment, outModule, &storage, 0);
-    }
-    return m3_ParseModule(resolver->environment, outModule,
-                          resolver->library.bytes, resolver->library.size);
+    (void) name;
+    return wm_module_load(outModule, resolver->library.bytes,
+                          resolver->library.size);
 }
 
-static int call_no_args(IM3Runtime runtime, const char * name,
-                        uint32_t expected)
+static WmFunc * find_function(WmInstance * instance, const char * name)
 {
-    IM3Function function = NULL;
-    uint32_t value = UINT32_MAX;
-    M3Result result = m3_FindFunction(&function, runtime, name);
-    if (!result)
-        result = m3_CallV(function);
-    if (!result)
-        result = m3_GetResultsV(function, &value);
-    return result == m3Err_none && value == expected;
+    WmExtern found;
+    if (wm_instance_export(instance, name, (uint32_t) strlen(name), &found) ||
+        found.kind != WM_EXTERN_FUNC)
+        return NULL;
+    return found.as.func;
 }
 
-static int run_program(IM3Environment environment, WasmBinary * app,
-                     MemoryStorage * appM3C, ResolverContext * resolver)
+static int call_no_args(WmRuntime * runtime, WmInstance * instance,
+                        const char * name, uint32_t expected)
 {
-    IM3Runtime runtime = m3_NewRuntime(environment, 64U * 1024U, NULL);
-    IM3Module module = NULL;
-    IM3Function function = NULL;
-    M3Result result;
+    WmFunc * function = find_function(instance, name);
     uint32_t value = UINT32_MAX;
+    return function && wm_call(runtime, function, NULL, &value) == NULL &&
+           value == expected;
+}
+
+static int run_program(WasmBinary * app, ResolverContext * resolver)
+{
+    WmRuntime * runtime = wm_runtime_new(64U * 1024U, 1024U);
+    WmModule * module = NULL;
+    WmDylink * process = NULL;
+    WmInstance * instance = NULL;
+    WmFunc * function = NULL;
+    WmResult result;
+    WmDylinkOptions options = {resolver, resolve_library, NULL, 16U * 1024U};
+    uint32_t value = UINT32_MAX;
+    uint32_t argument;
     uint32_t attempts;
 
     expect(runtime != NULL, "create dylink runtime");
     if (!runtime)
         return 0;
-    if (resolver->useM3C)
-    {
-        M3CStorage storage = make_storage(appM3C);
-        result = m3_ParseM3C(environment, &module, &storage, 0);
-    }
-    else result = m3_ParseModule(environment, &module, app->bytes, app->size);
-    expect(result == m3Err_none && module != NULL,
-           resolver->useM3C ? "parse app from .m3c" : "parse app Wasm");
+    result = wm_module_load(&module, app->bytes, app->size);
+    expect(result == NULL && module != NULL && wm_module_is_dylink(module),
+           "parse app Wasm");
     if (result || !module)
     {
-        m3_FreeRuntime(runtime);
+        wm_runtime_free(runtime);
         return 0;
     }
 
-    M3DylinkOptions options = {resolver, resolve_library, NULL, 16U * 1024U};
-    result = m3_DylinkLoad(runtime, module, "dylink0-app", &options);
-    expect(result == m3Err_none,
-           resolver->useM3C ? "link .m3c app and library" : "link Wasm app and library");
+    result = wm_dylink_load(&process, module, "dylink0-app", runtime, &options);
+    expect(result == NULL, "link Wasm app and library");
     if (result)
-    {
-        m3_FreeRuntime(runtime);
-        return 0;
-    }
+        goto done;
+    instance = wm_dylink_instance(process);
 
-    result = m3_FindFunction(&function, runtime, "app_main");
-    expect(result == m3Err_none && function != NULL,
-           "find app function that imports library code");
-    if (!result && function)
+    function = find_function(instance, "app_main");
+    expect(function != NULL, "find app function that imports library code");
+    result = "no app_main";
+    if (function)
     {
-        m3_SetFuel(runtime, 1);
-        result = m3_CallV(function, (uint32_t) 5);
-        for (attempts = 0; attempts < 2000 && result == m3Err_fuelExhausted;
+        argument = 5;
+        wm_set_fuel(runtime, 1);
+        result = wm_call(runtime, function, &argument, &value);
+        for (attempts = 0; attempts < 2000 && result == wm_fuel_exhausted;
              ++attempts)
         {
-            m3_AddFuel(runtime, 1);
-            result = m3_Resume(runtime);
+            wm_set_fuel(runtime, 1);
+            result = wm_resume(runtime, &value);
         }
-        if (!result)
-            result = m3_GetResultsV(function, &value);
     }
-    expect(result == m3Err_none && value == 42,
+    expect(result == NULL && value == 42,
            "fuel resume crosses a direct Wasm library call");
-    m3_DisableFuel(runtime);
+    wm_disable_fuel(runtime);
 
-    result = m3_FindFunction(&function, runtime, "app_name_char");
-    if (!result)
-        result = m3_CallV(function, (uint32_t) 1);
+    function = find_function(instance, "app_name_char");
     value = UINT32_MAX;
-    if (!result)
-        result = m3_GetResultsV(function, &value);
-    expect(result == m3Err_none && value == (uint32_t) 'V',
+    argument = 1;
+    expect(function && wm_call(runtime, function, &argument, &value) == NULL &&
+               value == (uint32_t) 'V',
            "library returns const char pointer through shared memory");
-    expect(call_no_args(runtime, "app_struct", 41),
+    expect(call_no_args(runtime, instance, "app_struct", 41),
            "app passes a struct pointer to the library");
-    expect(call_no_args(runtime, "app_callback", 17),
+    expect(call_no_args(runtime, instance, "app_callback", 17),
            "library calls an app function pointer through the shared table");
-    expect(call_no_args(runtime, "app_counter", 2),
+    expect(call_no_args(runtime, instance, "app_counter", 2),
            "library keeps its mutable data between calls");
 
-    m3_FreeRuntime(runtime);
-    return 1;
-}
-
-static int write_m3c(IM3Environment environment, WasmBinary * binary,
-                     MemoryStorage * output)
-{
-    IM3Module module = NULL;
-    M3CStorage storage = make_storage(output);
-    M3Result result = m3_ParseModule(environment, &module, binary->bytes,
-                                     binary->size);
-    if (!result)
-        result = m3_WriteM3C(module, &storage, 0, NULL);
-    if (module)
-        m3_FreeModule(module);
-    return result == m3Err_none;
+done:
+    wm_dylink_free(process);
+    wm_module_free(module);
+    wm_runtime_free(runtime);
+    return result == NULL;
 }
 
 /* Runs task until it dies and returns its i32 result, or 0 on failure. */
@@ -383,9 +307,6 @@ int main(void)
 {
     WasmBinary app = {0};
     WasmBinary library = {0};
-    MemoryStorage appM3C = {0};
-    MemoryStorage libraryM3C = {0};
-    IM3Environment environment = NULL;
     ResolverContext resolver;
 
     g_log = fopen("dylink0.log", "w");
@@ -393,35 +314,16 @@ int main(void)
         return 1;
     expect(load_binary("dylink0.wasm", &app), "load PIE app artifact");
     expect(load_binary("libdylink0.so", &library), "load shared library artifact");
-    environment = m3_NewEnvironment();
-    expect(environment != NULL, "create dylink environment");
-    if (!app.bytes || !library.bytes || !environment)
+    if (!app.bytes || !library.bytes)
         goto cleanup;
 
-    resolver.environment = environment;
     resolver.library = library;
-    resolver.libraryM3C = &libraryM3C;
-    resolver.useM3C = 0;
-    run_program(environment, &app, &appM3C, &resolver);
+    run_program(&app, &resolver);
     run_os_processes(&app, &library);
 
-    expect(write_m3c(environment, &app, &appM3C),
-           "write app .m3c image with unresolved Wasm imports");
-    expect(write_m3c(environment, &library, &libraryM3C),
-           "write library .m3c image with dylink relocations");
-    if (appM3C.size && libraryM3C.size)
-    {
-        resolver.useM3C = 1;
-        run_program(environment, &app, &appM3C, &resolver);
-    }
-
 cleanup:
-    if (environment)
-        m3_FreeEnvironment(environment);
     free(app.bytes);
     free(library.bytes);
-    free(appM3C.bytes);
-    free(libraryM3C.bytes);
     expect(g_failures == 0, "dylink0");
     fclose(g_log);
     return g_failures ? 1 : 0;

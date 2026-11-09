@@ -193,8 +193,8 @@ int main(void)
     ok(t != NULL, "create a task that recurses far beyond its 4 KiB");
     run_to_result(t);
     ok(os_task_get_exit_reason(t) == OS_TASK_EXIT_WASM_ERROR, "it traps");
-    ok(os_get_last_error_result() != NULL && strstr(os_get_last_error_result(), "stack overflow") != NULL,
-       "the trap is a stack overflow");
+    ok(os_get_last_error_result() != NULL && strstr(os_get_last_error_result(), "stack exhausted") != NULL,
+       "the trap is an exhausted stack");
     ok(usage_of(t).stack_peak_bytes <= 4096U, "it never wrote past its stack");
     os_task_delete(t);
 

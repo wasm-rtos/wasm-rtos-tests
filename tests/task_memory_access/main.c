@@ -61,14 +61,14 @@ static int32_t run_to_result(OsTaskHandle t)
 
 static uint32_t g_buffer_address;
 
-static m3ApiRawFunction(host_publish)
+static OS_HOST_FUNCTION(host_publish)
 {
-    m3ApiGetArg(uint32_t, address);
+    OS_HOST_ARG(uint32_t, address);
     (void)runtime;
-    (void)_ctx;
-    (void)_mem;
+    (void)os_host_user;
+    (void)os_host_memory;
     g_buffer_address = address;
-    m3ApiSuccess();
+    return NULL;
 }
 
 int main(void)

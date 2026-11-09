@@ -98,21 +98,21 @@ int main(void)
     created = usage_of(t, "small, created");
     ok(created.stack_bytes >= stack_size && created.stack_bytes < stack_size + 64U, "stack is the requested size plus guard slots");
     ok(created.linear_memory_bytes >= 65536U && created.linear_memory_bytes % 65536U < 64U, "linear memory is whole 64 KiB pages plus a header");
-#if d_m3HasHeapAccounting
+#if OS_HAS_MEMORY_ACCOUNTING
     ok(created.interpreter_bytes >= created.stack_bytes + created.linear_memory_bytes + created.code_bytes,
        "interpreter total includes stack, memory and code");
 #else
-    ok(created.interpreter_bytes == 0U, "without heap accounting the interpreter total is 0");
+    ok(created.interpreter_bytes == 0U, "without memory accounting the interpreter total is 0");
 #endif
     ok(created.image_bytes == 0U, "host-owned module bytes are not counted");
     ok(created.kernel_bytes > 0U, "task control block is counted");
-#if d_m3HasHeapAccounting
+#if OS_HAS_MEMORY_ACCOUNTING
     ok(created.total_bytes == created.interpreter_bytes + created.kernel_bytes, "total adds the parts");
 #else
     ok(created.total_bytes == created.stack_bytes + created.linear_memory_bytes + created.code_bytes + created.kernel_bytes,
        "total adds the measured parts");
 #endif
-    ok(created.code_bytes > 0U, "the entry function is compiled at load");
+    ok(created.code_bytes > 0U, "the code is decoded at load");
 
     /* The same program costs the same in another task. */
     ok(os_task_create(&twin, b.d, b.n, "app_main", "twin", stack_size, OS_TASK_PRIORITY_NORMAL) == OS_STATUS_OK && twin,
@@ -127,7 +127,7 @@ int main(void)
     finished = usage_of(t, "small, finished");
     ok(finished.interpreter_bytes == 0U && finished.stack_bytes == 0U && finished.linear_memory_bytes == 0U &&
        finished.code_bytes == 0U, "a dead task holds no interpreter memory");
-#if d_m3HasHeapAccounting
+#if OS_HAS_MEMORY_ACCOUNTING
     ok(finished.interpreter_peak_bytes >= created.interpreter_bytes, "its peak is still reported");
 #endif
     ok(finished.total_bytes == finished.kernel_bytes, "only the control block remains until delete");
@@ -144,7 +144,7 @@ int main(void)
     ok(after_grow.linear_memory_bytes >= before_grow.linear_memory_bytes + 65536U &&
            after_grow.linear_memory_bytes <= before_grow.linear_memory_bytes + 2U * 65536U,
        "linear memory grew by one page plus at most the spare room");
-#if d_m3HasHeapAccounting
+#if OS_HAS_MEMORY_ACCOUNTING
     ok(after_grow.interpreter_bytes >= before_grow.interpreter_bytes + 65536U, "the interpreter total grew with it");
 #endif
     os_task_delete(t);

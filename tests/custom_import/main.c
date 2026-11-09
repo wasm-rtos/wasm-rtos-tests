@@ -1,5 +1,4 @@
 #include "os.h"
-#include "wasm3/source/m3_env.h"
 
 #include <stdarg.h>
 #include <stdint.h>
@@ -117,14 +116,14 @@ static uint32_t fake_now_ms(void* context)
     return ((FakeClock*)context)->now_ms;
 }
 
-static m3ApiRawFunction(host_test_value)
+static OS_HOST_FUNCTION(host_test_value)
 {
-    m3ApiReturnType(uint32_t);
-    m3ApiGetArg(uint32_t, input);
+    OS_HOST_RETURNS(uint32_t);
+    OS_HOST_ARG(uint32_t, input);
     uint32_t local_output = 0U;
     (void)runtime;
-    (void)_ctx;
-    (void)_mem;
+    (void)os_host_user;
+    (void)os_host_memory;
 
     if (g_test_mode == HOST_TEST_NATIVE_WAIT)
     {
@@ -134,7 +133,7 @@ static m3ApiRawFunction(host_test_value)
             OS_WAIT_FOREVER
         );
         g_native_wait_task_state = os_task_get_state(os_task_get_current());
-        m3ApiReturn(
+        OS_HOST_RETURN(
             g_native_wait_status == OS_STATUS_UNSUPPORTED &&
             g_native_wait_task_state == OS_TASK_RUNNING
                 ? input + 42U
@@ -146,14 +145,14 @@ static m3ApiRawFunction(host_test_value)
     {
         g_clock.now_ms = 1100U;
         g_delay_status = os_task_delay_ms(5U);
-        m3ApiReturn(
+        OS_HOST_RETURN(
             g_delay_status == OS_STATUS_OK
                 ? input + 42U
                 : 0U
         );
     }
 
-    m3ApiReturn(input + 42U);
+    OS_HOST_RETURN(input + 42U);
 }
 
 int main(void)

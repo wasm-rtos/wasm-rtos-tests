@@ -58,34 +58,34 @@ static OsTaskHandle create(Bin* b, const char* entry, const char* name, OsValue*
 
 static uint32_t g_counter_address;
 
-static m3ApiRawFunction(host_yield)
+static OS_HOST_FUNCTION(host_yield)
 {
     (void)runtime;
-    (void)_ctx;
-    (void)_sp;
-    (void)_mem;
+    (void)os_host_user;
+    (void)os_host_slot;
+    (void)os_host_memory;
     os_task_yield();
-    m3ApiSuccess();
+    return NULL;
 }
 
-static m3ApiRawFunction(host_preempt)
+static OS_HOST_FUNCTION(host_preempt)
 {
     (void)runtime;
-    (void)_ctx;
-    (void)_sp;
-    (void)_mem;
+    (void)os_host_user;
+    (void)os_host_slot;
+    (void)os_host_memory;
     os_request_preempt();
-    m3ApiSuccess();
+    return NULL;
 }
 
-static m3ApiRawFunction(host_publish)
+static OS_HOST_FUNCTION(host_publish)
 {
-    m3ApiGetArg(uint32_t, address);
+    OS_HOST_ARG(uint32_t, address);
     (void)runtime;
-    (void)_ctx;
-    (void)_mem;
+    (void)os_host_user;
+    (void)os_host_memory;
     g_counter_address = address;
-    m3ApiSuccess();
+    return NULL;
 }
 
 /* Returns the number of slices until the task died, or 0 if it never did. */

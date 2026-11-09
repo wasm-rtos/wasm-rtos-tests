@@ -123,7 +123,7 @@ for dir in tests/*; do
         rm -f "$app_object" "$library_object"
     elif [[ "$source" == *.ino ]]; then
         if ! CXX="${WASM_CXX:-${WASM_CC}++}" WASI_TARGET="$WASI_TARGET" \
-                bash wasm-rtos/arduino/build.sh "$source" -o "$wasm" >"$build_log" 2>&1; then
+                WASM_RTOS=wasm-rtos bash libraries/arduino/build.sh "$source" -o "$wasm" >"$build_log" 2>&1; then
             { echo "FAIL building Arduino sketch $source"; cat "$build_log"; } | tee "$log"
             failed=1
             continue
@@ -158,30 +158,23 @@ for dir in tests/*; do
         continue
     fi
 
-    native_flags=(-Dd_m3HasWASI)
-    if [ "$name" = "m3c_roundtrip" ]; then
-        native_flags+=(-Dd_m3HasM3C=1)
-    elif [ "$name" = "dylink0" ]; then
-        native_flags+=(-Dd_m3HasDylink=1 -Dd_m3HasM3C=1)
+    native_flags=()
+    if [ "$name" = "dylink0" ]; then
+        native_flags+=(-DOS_HAS_DYLINK=1)
     elif [ "$name" = "proc_disabled" ]; then
         native_flags+=(-DOS_HAS_PROCESSES=0)
     elif [ "$name" = "preempt_memory_grow" ]; then
         native_flags+=(-DOS_TASK_SLICE_FUEL=1ULL)
     elif [ "$name" = "task_memory_usage" ]; then
-        native_flags+=(-Dd_m3HasHeapAccounting=1)
-    elif [ "$name" = "task_error" ]; then
-        native_flags+=(-Dd_m3RecordBacktraces=1)
+        native_flags+=(-DOS_HAS_MEMORY_ACCOUNTING=1)
     elif [ "$name" = "snapshot_portable" ]; then
-        # Short slices stop the program in many places; small code pages make
-        # functions span pages.
-        native_flags+=(-DOS_TASK_SLICE_FUEL=997ULL -Dd_m3CodePageAlignSize=1024)
-    elif [ "$name" = "native_stack_budget" ]; then
-        native_flags+=(-DOS_NATIVE_STACK_BUDGET=8192U -DOS_TASK_SLICE_FUEL=100000000ULL)
+        # Short slices stop the program in many places.
+        native_flags+=(-DOS_TASK_SLICE_FUEL=997ULL)
     fi
 
-    if ! "$CC_BIN" ${sanitize_flags[@]+"${sanitize_flags[@]}"} -std=c11 -Wall -Wextra -D_GNU_SOURCE -D_POSIX_C_SOURCE=200809L "${native_flags[@]}" \
+    if ! "$CC_BIN" ${sanitize_flags[@]+"${sanitize_flags[@]}"} -std=c11 -Wall -Wextra -D_GNU_SOURCE -D_POSIX_C_SOURCE=200809L ${native_flags[@]+"${native_flags[@]}"} \
         -Iwasm-rtos \
-        "$main" wasm-rtos/*.c wasm-rtos/wasm3/source/*.c \
+        "$main" wasm-rtos/*.c wasm-rtos/vm/source/*.c \
         -lm -o "$runner" >>"$build_log" 2>&1; then
         { echo "FAIL building $runner"; cat "$build_log"; } | tee "$log"
         failed=1
