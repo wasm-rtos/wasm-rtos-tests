@@ -77,6 +77,59 @@ static OsStatus store_write(void* context, uint32_t slot, const void* frame)
     return OS_STATUS_OK;
 }
 
+/*
+ * Reading in the background, as with DMA: read_start notes the read, and it
+ * ends a few scheduler steps later (store_tick), or at once on finish.
+ */
+static struct
+{
+    int on;
+    uint32_t slot;
+    void* frame;
+    uint32_t steps_left;
+} g_read;
+static uint32_t g_background_reads;
+
+static OsStatus store_read_start(void* context, uint32_t slot, void* frame)
+{
+    (void)context;
+    if (g_read.on || slot >= SLOTS)
+        return OS_STATUS_BUSY;
+    g_read.on = 1;
+    g_read.slot = slot;
+    g_read.frame = frame;
+    g_read.steps_left = 3U;
+    g_background_reads++;
+    return OS_STATUS_PENDING;
+}
+
+static void store_end_read(void)
+{
+    memcpy(g_read.frame, g_slots[g_read.slot], 4096U);
+    g_reads++;
+    g_read.on = 0;
+}
+
+static OsStatus store_finish(void* context, uint32_t slot)
+{
+    (void)context;
+    if (!g_read.on || g_read.slot != slot)
+        return OS_STATUS_INVALID_ARGUMENT;
+    store_end_read();
+    return OS_STATUS_OK;
+}
+
+/* One scheduler step of the store's own time: a read in flight may end. */
+static void store_tick(void)
+{
+    if (g_read.on && --g_read.steps_left == 0U)
+    {
+        uint32_t slot = g_read.slot;
+        store_end_read();
+        os_page_read_done(slot, OS_STATUS_OK);
+    }
+}
+
 static OsStatus store_read(void* context, uint32_t slot, void* frame)
 {
     (void)context;
@@ -113,6 +166,7 @@ static void run(OsTaskHandle a, OsTaskHandle b)
     uint32_t i;
     for (i = 0; i < 100000U && (os_task_get_state(a) != OS_TASK_DEAD || (b && os_task_get_state(b) != OS_TASK_DEAD)); i++)
     {
+        store_tick();
         os_schedule();
         os_page_get_stats(&stats);
         if (stats.ram_frames > g_most_in_ram)
@@ -201,6 +255,59 @@ int main(void)
 
     ok(os_get_task_count() == 0U, "OS is clean");
     os_shutdown();
+
+    /* The same store reading in the background: a program waits for its frames, the others run. */
+    {
+        OsPageStore background = {NULL, SLOTS, RAM_FRAMES, store_write, store_read, store_read_start, store_finish};
+        uint32_t spin_runs_while_waiting = 0U;
+        int predecoded = 0;
+        uint32_t i;
+        ok(os_init() == OS_STATUS_OK && os_page_store_set(&background) == OS_STATUS_OK,
+           "install a page store that reads in the background");
+        ok(create(&t, &b, "app_main_big", 4U, 1U) == OS_STATUS_OK && create(&u, &b, "app_main_spin", 20000000U, 1U) == OS_STATUS_OK,
+           "create a program with stored frames and one that only counts");
+        for (i = 0; i < 100000U && (os_task_get_state(t) != OS_TASK_DEAD || os_task_get_state(u) != OS_TASK_DEAD); i++)
+        {
+            uint32_t runs = os_task_get_run_count(u);
+            int waiting = os_task_get_state(t) == OS_TASK_WAITING;
+            store_tick();
+            os_schedule();
+            if (waiting && os_task_get_run_count(u) > runs)
+                spin_runs_while_waiting++;
+        }
+        ok(result_of(t) == expected_sum(4U), "it reads back everything it wrote");
+        ok(result_of(u) == (uint32_t)(20000000ULL * 19999999ULL / 2ULL), "the other program counted right");
+        /* Only predecoded code waits for a frame; code run in place (as in a build with UBSan) reads it at once. */
+        predecoded = g_background_reads > 0U;
+        if (!predecoded)
+        {
+            printf("NOTE the interpreter runs in place here: no background reads to check\n");
+        }
+        else
+        {
+            ok(g_background_reads > 30U, "its frames came back in the background");
+            /* Its stack is paged too, so it waits at times as well; the store reads one frame at a time. */
+            ok(spin_runs_while_waiting > 5U, "the other program ran while it waited for them");
+        }
+        os_task_delete(t);
+        os_task_delete(u);
+
+        /* A program deleted while its frame is being read: the read ends first, nothing is left. */
+        ok(create(&t, &b, "app_main_big", 4U, 1U) == OS_STATUS_OK, "create the program again");
+        for (i = 0; i < 100000U && !g_read.on; i++)
+        {
+            store_tick();
+            os_schedule();
+        }
+        if (predecoded)
+            ok(g_read.on && os_task_get_state(t) == OS_TASK_WAITING, "it waits for a frame being read");
+        os_task_delete(t);
+        os_page_get_stats(&stats);
+        ok(!g_read.on && stats.reserved_frames == 0U && stats.stored_frames == 0U && stats.ram_frames == 0U,
+           "deleting it ends the read and gives everything back");
+        ok(os_get_task_count() == 0U, "OS is clean again");
+        os_shutdown();
+    }
     free(b.d);
     if (l)
         fclose(l);

@@ -57,3 +57,13 @@ uint32_t app_main_grow_all(void)
         ++pages;
     return pages;
 }
+
+/* Counts for a while: a program that never touches stored frames. */
+uint32_t app_main_spin(uint32_t rounds)
+{
+    volatile uint32_t sum = 0U;
+    uint32_t i;
+    for (i = 0U; i < rounds; ++i)
+        sum += i;
+    return sum;
+}

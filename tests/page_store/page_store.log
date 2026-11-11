@@ -22,3 +22,13 @@ PASS memory.grow stops where the promise would break
 PASS everything is given back
 MEASURED store writes=203 in order=203 reads=159 most in RAM=8
 PASS OS is clean
+PASS install a page store that reads in the background
+PASS create a program with stored frames and one that only counts
+PASS it reads back everything it wrote
+PASS the other program counted right
+PASS its frames came back in the background
+PASS the other program ran while it waited for them
+PASS create the program again
+PASS it waits for a frame being read
+PASS deleting it ends the read and gives everything back
+PASS OS is clean again
