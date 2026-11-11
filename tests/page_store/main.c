@@ -22,6 +22,9 @@ static FILE* l;
 static int f;
 static uint8_t g_slots[SLOTS][4096];
 static uint32_t g_writes;
+/* Writes to the slot right after the one written before: the store is written like a log. */
+static uint32_t g_in_order;
+static uint32_t g_last_slot = SLOTS - 1U;
 static uint32_t g_reads;
 static uint32_t g_most_in_ram;
 
@@ -68,6 +71,9 @@ static OsStatus store_write(void* context, uint32_t slot, const void* frame)
         return OS_STATUS_INVALID_ARGUMENT;
     memcpy(g_slots[slot], frame, 4096U);
     g_writes++;
+    if (slot == (g_last_slot + 1U) % SLOTS)
+        g_in_order++;
+    g_last_slot = slot;
     return OS_STATUS_OK;
 }
 
@@ -150,6 +156,7 @@ int main(void)
     /* Written once, then only read: a frame that came back clean leaves again without a write. */
     ok(g_writes <= usage.linear_memory_bytes / 4096U + 4U * 16U, "no frame was written to the store twice");
     ok(g_most_in_ram <= RAM_FRAMES, "RAM never held more than 8 frames");
+    ok(g_in_order * 10U >= g_writes * 9U, "frames are written one slot after another, like a log");
     os_task_delete(t);
     os_page_get_stats(&stats);
     ok(stats.reserved_frames == 0U && stats.stored_frames == 0U && stats.ram_frames == 0U,
@@ -189,7 +196,8 @@ int main(void)
     ok(stats.reserved_frames == 0U && stats.stored_frames == 0U, "everything is given back");
     printf("store: %u frames written, %u read\n", g_writes, g_reads);
     if (l)
-        fprintf(l, "MEASURED store writes=%u reads=%u most in RAM=%u\n", g_writes, g_reads, g_most_in_ram);
+        fprintf(l, "MEASURED store writes=%u in order=%u reads=%u most in RAM=%u\n", g_writes, g_in_order, g_reads,
+                g_most_in_ram);
 
     ok(os_get_task_count() == 0U, "OS is clean");
     os_shutdown();

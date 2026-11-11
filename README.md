@@ -81,11 +81,17 @@ WASI_SYSROOT=/opt/homebrew/share/wasi-sysroot \
 bash ./run-tests.sh
 ```
 
+Any platform can also use a [WASI SDK](https://github.com/WebAssembly/wasi-sdk/releases) release, which brings clang, `wasm-ld`, wasi-libc and libc++ in one archive:
+
+```bash
+WASM_CC=$SDK/bin/clang WASM_LD=$SDK/bin/wasm-ld WASI_SYSROOT=$SDK/share/wasi-sysroot bash ./run-tests.sh
+```
+
 ## GitHub Actions
 
 `.github/workflows/run-tests.yml` runs `run-tests.sh` automatically for pushes, pull requests, and manual workflow dispatches.
 
-The workflow installs the native and WASI toolchains, builds and executes every isolated test, and uploads the complete `tests/` directory as the `isolated-tests` artifact. The artifact contains the generated `.wasm` modules and `.log` files.
+The workflow takes the WebAssembly toolchain from a pinned WASI SDK release on GitHub (checked against its SHA-256 digest; the runner's `cc` builds the native runners), builds and executes every isolated test, and uploads the complete `tests/` directory as the `isolated-tests` artifact. The artifact contains the generated `.wasm` modules and `.log` files.
 
 The committed `.wasm` and `.log` files always come from CI's toolchain: after every push to `main` the workflow regenerates them and commits any change, together with the latest `wasm-rtos` submodule. Pull requests only have to pass the tests; their artifacts may be stale or missing, and CI never commits to their branches.
 
