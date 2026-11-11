@@ -179,8 +179,13 @@ static void store_tick(void)
     }
 }
 
+/* Reads that fail, as from a card that went away. */
+static int g_reads_fail;
+
 static OsStatus store_read(void* context, uint32_t slot, void* frame)
 {
+    if (g_reads_fail)
+        return OS_STATUS_ERROR;
     (void)context;
     if (slot >= SLOTS)
         return OS_STATUS_INVALID_ARGUMENT;
@@ -282,6 +287,18 @@ int main(void)
     run(t, NULL);
     ok(result_of(t) == 0U && os_queue_receive(queue, item) == OS_STATUS_OK && memcmp(item, "from a far frame", 16U) == 0,
        "the item it sent arrives whole");
+    os_task_delete(t);
+
+    /* A store that cannot read: a host call that needs a stored frame ends the program with the reason. */
+    g_reads_fail = 1;
+    ok(create(&t, &b, "app_main_send", 2U, 1U) == OS_STATUS_OK, "create the sending program once more");
+    run(t, NULL);
+    ok(os_task_get_error(t) != NULL && strstr(os_task_get_error(t), "page store") != NULL &&
+           os_queue_receive(queue, item) == OS_STATUS_QUEUE_EMPTY,
+       "when its frame cannot come back, the call traps and sends nothing");
+    if (os_task_get_error(t))
+        printf("error: %s\n", os_task_get_error(t));
+    g_reads_fail = 0;
     os_task_delete(t);
     os_queue_delete(queue);
 
