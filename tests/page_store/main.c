@@ -137,7 +137,7 @@ int main(void)
         return 1;
     ok(os_page_store_set(&store) == OS_STATUS_OK, "install a page store: 8 frames of RAM, 256 slots");
     os_page_get_stats(&stats);
-    ok(stats.limit_frames == SLOTS + RAM_FRAMES && stats.reserved_frames == 0U, "it can promise RAM frames plus slots");
+    ok(stats.limit_frames == SLOTS && stats.reserved_frames == 0U, "it can promise a slot for every frame");
 
     /* One program with 256 KiB more memory than RAM holds. */
     ok(create(&t, &b, "app_main_big", 4U, 1U) == OS_STATUS_OK && t, "create a program that grows by 4 pages");
@@ -147,6 +147,8 @@ int main(void)
     run(t, NULL);
     ok(result_of(t) == expected_sum(4U), "it reads back everything it wrote");
     ok(g_writes > 0U && g_reads > 0U, "frames went to the store and came back");
+    /* Written once, then only read: a frame that came back clean leaves again without a write. */
+    ok(g_writes <= usage.linear_memory_bytes / 4096U + 4U * 16U, "no frame was written to the store twice");
     ok(g_most_in_ram <= RAM_FRAMES, "RAM never held more than 8 frames");
     os_task_delete(t);
     os_page_get_stats(&stats);
@@ -180,7 +182,7 @@ int main(void)
     {
         uint32_t start_frames = usage.linear_memory_bytes / 4096U;
         run(t, NULL);
-        ok(result_of(t) == (SLOTS + RAM_FRAMES - start_frames) / 16U, "memory.grow stops where the promise would break");
+        ok(result_of(t) == (SLOTS - start_frames) / 16U, "memory.grow stops where the promise would break");
     }
     os_task_delete(t);
     os_page_get_stats(&stats);
