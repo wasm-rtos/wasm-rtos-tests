@@ -110,18 +110,67 @@ static void store_end_read(void)
     g_read.on = 0;
 }
 
-static OsStatus store_finish(void* context, uint32_t slot)
+/* Writes in the background: up to 8 at once, each ending a few scheduler steps later. */
+static struct
+{
+    uint32_t slot;
+    const void* frame;
+    uint32_t steps_left;
+} g_pending[8];
+static uint32_t g_pending_count;
+static uint32_t g_background_writes;
+
+static OsStatus store_write_start(void* context, uint32_t slot, const void* frame)
 {
     (void)context;
+    if (g_pending_count == 8U || slot >= SLOTS)
+        return OS_STATUS_BUSY;
+    g_pending[g_pending_count].slot = slot;
+    g_pending[g_pending_count].frame = frame;
+    g_pending[g_pending_count].steps_left = 2U + g_pending_count;
+    g_pending_count++;
+    g_background_writes++;
+    return OS_STATUS_PENDING;
+}
+
+/* Write i reaches its slot. */
+static uint32_t store_end_write(uint32_t i)
+{
+    uint32_t slot = g_pending[i].slot;
+    memcpy(g_slots[slot], g_pending[i].frame, 4096U);
+    g_writes++;
+    for (--g_pending_count; i < g_pending_count; ++i)
+        g_pending[i] = g_pending[i + 1U];
+    return slot;
+}
+
+static OsStatus store_finish(void* context, uint32_t slot)
+{
+    uint32_t i;
+    (void)context;
+    for (i = 0U; i < g_pending_count; ++i)
+        if (g_pending[i].slot == slot)
+        {
+            store_end_write(i);
+            return OS_STATUS_OK;
+        }
     if (!g_read.on || g_read.slot != slot)
         return OS_STATUS_INVALID_ARGUMENT;
     store_end_read();
     return OS_STATUS_OK;
 }
 
-/* One scheduler step of the store's own time: a read in flight may end. */
+/* One scheduler step of the store's own time: a read or writes in flight may end. */
 static void store_tick(void)
 {
+    uint32_t i = 0U;
+    while (i < g_pending_count)
+    {
+        if (--g_pending[i].steps_left == 0U)
+            os_page_write_done(store_end_write(i), OS_STATUS_OK);
+        else
+            i++;
+    }
     if (g_read.on && --g_read.steps_left == 0U)
     {
         uint32_t slot = g_read.slot;
@@ -306,6 +355,47 @@ int main(void)
         ok(!g_read.on && stats.reserved_frames == 0U && stats.stored_frames == 0U && stats.ram_frames == 0U,
            "deleting it ends the read and gives everything back");
         ok(os_get_task_count() == 0U, "OS is clean again");
+        os_shutdown();
+    }
+
+    /* A store that also writes in the background: dirty frames leave RAM when their writes end. */
+    {
+        OsPageStore both = {NULL, SLOTS, RAM_FRAMES, store_write, store_read, store_read_start, store_finish,
+                            store_write_start};
+        uint32_t most = 0U;
+        uint32_t i;
+        g_background_writes = 0U;
+        ok(os_init() == OS_STATUS_OK && os_page_store_set(&both) == OS_STATUS_OK,
+           "install a page store that reads and writes in the background");
+        ok(create(&t, &b, "app_main_big", 4U, 1U) == OS_STATUS_OK && create(&u, &b, "app_main_spin", 20000000U, 1U) == OS_STATUS_OK,
+           "create the two programs again");
+        for (i = 0; i < 100000U && (os_task_get_state(t) != OS_TASK_DEAD || os_task_get_state(u) != OS_TASK_DEAD); i++)
+        {
+            store_tick();
+            os_schedule();
+            os_page_get_stats(&stats);
+            if (stats.ram_frames > most)
+                most = stats.ram_frames;
+        }
+        ok(result_of(t) == expected_sum(4U) && result_of(u) == (uint32_t)(20000000ULL * 19999999ULL / 2ULL),
+           "both get their results");
+        ok(g_background_writes > 30U, "dirty frames were written in the background");
+        ok(most <= RAM_FRAMES + 4U, "RAM held the budget plus at most 4 frames being written");
+        os_task_delete(t);
+        os_task_delete(u);
+
+        /* Deleting a program while its frames are being written: the writes end first, nothing is left. */
+        ok(create(&t, &b, "app_main_big", 4U, 1U) == OS_STATUS_OK, "create the program once more");
+        for (i = 0; i < 100000U && g_pending_count == 0U; i++)
+        {
+            store_tick();
+            os_schedule();
+        }
+        ok(g_pending_count > 0U, "writes of its frames are in flight");
+        os_task_delete(t);
+        os_page_get_stats(&stats);
+        ok(g_pending_count == 0U && stats.reserved_frames == 0U && stats.stored_frames == 0U && stats.ram_frames == 0U,
+           "deleting it ends the writes and gives everything back");
         os_shutdown();
     }
     free(b.d);
