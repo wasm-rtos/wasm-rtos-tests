@@ -1,0 +1,22 @@
+PASS initialize OS
+PASS load page_store.wasm
+PASS install a page store: 8 frames of RAM, 256 slots
+PASS it can promise RAM frames plus slots
+PASS create a program that grows by 4 pages
+PASS the store stays while tasks exist
+PASS its memory comes into RAM only as it is touched
+PASS it reads back everything it wrote
+PASS frames went to the store and came back
+PASS RAM never held more than 8 frames
+PASS a deleted program leaves no frames, slots or promises
+PASS create two programs
+PASS both read back what they wrote
+PASS together they kept to 8 frames of RAM
+PASS create a queue
+PASS create a program that sends from far memory
+PASS the item it sent arrives whole
+PASS create a program that grows until it cannot
+PASS memory.grow stops where the promise would break
+PASS everything is given back
+MEASURED store writes=315 reads=159 most in RAM=8
+PASS OS is clean
