@@ -20,7 +20,7 @@ ok fd_write takes split buffers
 ok fd_write counts the bytes into a split word
 ok clock_time_get writes a split timestamp
 ok the timestamp arrived
-area 8192
+area 73728
 ok an item that arrives later lands across frames
 ok the host wrote across frames
 PASS OS is clean
