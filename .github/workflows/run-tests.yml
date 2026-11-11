@@ -53,10 +53,29 @@ jobs:
           echo "wasm-rtos commit: $(git -C wasm-rtos rev-parse HEAD)"
           echo "vm commit: $(git -C wasm-rtos/vm rev-parse HEAD)"
 
+      # The WebAssembly toolchain (clang, wasm-ld, wasi-libc and libc++) comes
+      # from the WASI SDK release on GitHub, checked against its digest, not
+      # from the distribution's package mirrors: the job needs nothing but
+      # GitHub to be reachable. The runner's own cc builds the native runners.
       - name: Install toolchain
+        env:
+          WASI_SDK_VERSION: "34"
+          WASI_SDK_SHA256: b761e3a0721dbae9c09a0059e5fdb2bf917d1b4a8a7b430fb3b5aafb0984b2c4
         run: |
-          sudo apt-get update
-          sudo apt-get install -y clang lld wasi-libc libclang-rt-dev-wasm32 libc++-dev-wasm32
+          archive="wasi-sdk-${WASI_SDK_VERSION}.0-x86_64-linux.tar.gz"
+          sdk="$RUNNER_TEMP/wasi-sdk"
+          curl -fsSL --retry 5 -o "$RUNNER_TEMP/$archive" \
+            "https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-${WASI_SDK_VERSION}/$archive"
+          echo "$WASI_SDK_SHA256  $RUNNER_TEMP/$archive" | sha256sum -c -
+          mkdir -p "$sdk"
+          tar -xzf "$RUNNER_TEMP/$archive" -C "$sdk" --strip-components=1
+          {
+            echo "WASM_CC=$sdk/bin/clang"
+            echo "WASM_LD=$sdk/bin/wasm-ld"
+            echo "WASI_SYSROOT=$sdk/share/wasi-sysroot"
+          } >> "$GITHUB_ENV"
+          "$sdk/bin/clang" --version
+          cc --version
 
       - name: Build and run every isolated test
         id: run_tests
