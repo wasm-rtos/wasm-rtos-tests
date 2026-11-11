@@ -1,0 +1,26 @@
+PASS initialize OS
+PASS load guest_buffer_frames.wasm
+PASS install output port
+PASS create a queue of 16-byte items
+PASS create the program
+PASS its memory is paged: only touched frames are in RAM
+PASS the program waits for an item
+PASS the program says where its buffers are
+PASS os_task_read_memory reads across frames
+PASS os_task_write_memory writes across frames
+PASS an address past the memory is refused
+PASS send the program an item
+PASS the program's checks all pass
+PASS fd_write delivered the split bytes
+PASS the program reports no failure
+OUTPUT ok open the host's queue
+ok a queue item goes across frames both ways
+written across frames
+ok fd_write takes split buffers
+ok fd_write counts the bytes into a split word
+ok clock_time_get writes a split timestamp
+ok the timestamp arrived
+area 73728
+ok an item that arrives later lands across frames
+ok the host wrote across frames
+PASS OS is clean
