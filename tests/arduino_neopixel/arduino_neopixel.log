@@ -1,0 +1,14 @@
+PASS initialize OS
+PASS load arduino_neopixel.wasm
+PASS a board with LED strips on pins 18 and 19 (pulse hardware) and a plain pin 20
+PASS start the sketch
+PASS the sketch ran and exited with 0
+PASS begin() opened pins 18 and 19 for sending, idle low; pin 20 has no pulse hardware
+PASS four trains, each the bytes then one latch, nothing else
+PASS show() sent red, green, blue in GRB order, 3 bytes per LED at 800 kHz, latched 300 us low
+PASS setBrightness(51) rescaled the stored colors
+PASS fill() from pixel 1 to the end, at that brightness
+PASS the RGBW strip: 4 bytes per LED at 400 kHz
+PASS getPixelColor undid the brightness; Color, ColorHSV, gamma8, gamma32, sine8, str2order
+PASS the pins went back to the kernel at exit
+PASS clean OS state
