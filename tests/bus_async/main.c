@@ -150,23 +150,24 @@ static void trace(void* context, const OsBusTrace* record)
     g_last_trace = *record;
 }
 
-static uint8_t g_swap_store[1 << 20];
+/* A page store in host memory, so programs can be swapped out. */
+static uint8_t g_slots[256][4096];
 
-static OsStatus swap_write(void* context, uint32_t task_id, uint32_t offset, const void* data, uint32_t size)
+static OsStatus store_write(void* context, uint32_t slot, const void* frame)
 {
     (void)context;
-    (void)task_id;
-    if (offset + size > sizeof(g_swap_store))
+    if (slot >= 256U)
         return OS_STATUS_OUT_OF_MEMORY;
-    memcpy(g_swap_store + offset, data, size);
+    memcpy(g_slots[slot], frame, 4096U);
     return OS_STATUS_OK;
 }
 
-static OsStatus swap_read(void* context, uint32_t task_id, uint32_t offset, void* data, uint32_t size)
+static OsStatus store_read(void* context, uint32_t slot, void* frame)
 {
     (void)context;
-    (void)task_id;
-    memcpy(data, g_swap_store + offset, size);
+    if (slot >= 256U)
+        return OS_STATUS_OUT_OF_MEMORY;
+    memcpy(frame, g_slots[slot], 4096U);
     return OS_STATUS_OK;
 }
 
@@ -203,7 +204,7 @@ int main(void)
     OsGpioPort gpio = { NULL, gpio_configure, gpio_write, gpio_read };
     OsSpiPort spi = { NULL, spi_transaction, spi_finish };
     OsI2cPort i2c = { NULL, i2c_transaction, i2c_finish };
-    OsSwapPort swap = { NULL, swap_write, swap_read, NULL };
+    OsPageStore store = { NULL, 256U, 64U, store_write, store_read, NULL, NULL, NULL };
     OsTaskHandle flash = NULL;
     OsTaskHandle spin = NULL;
     OsTaskHandle second = NULL;
@@ -219,7 +220,7 @@ int main(void)
            os_gpio_add_pin("cs-b", 6U, OS_GPIO_CAN_ALL, 0U) == OS_STATUS_OK &&
            os_spi_port_set(&spi) == OS_STATUS_OK && os_spi_add_bus("spi0", 0U, 10000000U) == OS_STATUS_OK &&
            os_i2c_port_set(&i2c) == OS_STATUS_OK && os_i2c_add_bus("i2c0", 0U, 400000U) == OS_STATUS_OK &&
-           os_swap_port_set(&swap) == OS_STATUS_OK,
+           os_page_store_set(&store) == OS_STATUS_OK,
        "a board whose SPI and I2C ports use DMA");
     os_bus_trace_set(trace, NULL);
 

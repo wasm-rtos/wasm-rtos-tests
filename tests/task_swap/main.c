@@ -50,83 +50,35 @@ static int load(Bin* b)
 }
 
 /* Swap storage in RAM, one image per task, with failures on request. */
-typedef struct Image
-{
-    uint32_t id;
-    uint8_t* data;
-    uint32_t size;
-} Image;
-
-static Image g_images[8];
+/* The page store: slots in host memory, standing in for an SD card or external RAM. */
+#define SLOTS 256U
+static uint8_t g_slots[SLOTS][4096];
 static int g_fail_write;
 static int g_fail_read;
-static uint32_t g_discards;
 
-static Image* image_of(uint32_t id, int create)
+static OsStatus store_write(void* context, uint32_t slot, const void* frame)
 {
-    uint32_t i;
-    for (i = 0; i < 8U; ++i)
-        if (g_images[i].data && g_images[i].id == id)
-            return &g_images[i];
-    if (!create)
-        return NULL;
-    for (i = 0; i < 8U; ++i)
-        if (!g_images[i].data)
-        {
-            g_images[i].id = id;
-            g_images[i].size = 0U;
-            g_images[i].data = malloc(1U);
-            return g_images[i].data ? &g_images[i] : NULL;
-        }
-    return NULL;
-}
-
-static OsStatus swap_write(void* context, uint32_t id, uint32_t offset, const void* data, uint32_t size)
-{
-    Image* image = image_of(id, 1);
-    uint8_t* grown;
     (void)context;
-    if (g_fail_write || !image || offset != image->size)
+    if (g_fail_write || slot >= SLOTS)
         return OS_STATUS_ERROR;
-    grown = realloc(image->data, image->size + size + 1U);
-    if (!grown)
-        return OS_STATUS_OUT_OF_MEMORY;
-    image->data = grown;
-    memcpy(image->data + image->size, data, size);
-    image->size += size;
+    memcpy(g_slots[slot], frame, 4096U);
     return OS_STATUS_OK;
 }
 
-static OsStatus swap_read(void* context, uint32_t id, uint32_t offset, void* data, uint32_t size)
+static OsStatus store_read(void* context, uint32_t slot, void* frame)
 {
-    Image* image = image_of(id, 0);
     (void)context;
-    if (g_fail_read || !image || offset > image->size || size > image->size - offset)
+    if (g_fail_read || slot >= SLOTS)
         return OS_STATUS_ERROR;
-    memcpy(data, image->data + offset, size);
+    memcpy(frame, g_slots[slot], 4096U);
     return OS_STATUS_OK;
 }
 
-static void swap_discard(void* context, uint32_t id)
+static OsPageStats page_stats(void)
 {
-    Image* image = image_of(id, 0);
-    (void)context;
-    if (image)
-    {
-        free(image->data);
-        image->data = NULL;
-        image->size = 0U;
-        ++g_discards;
-    }
-}
-
-static uint32_t images_held(void)
-{
-    uint32_t n = 0U;
-    uint32_t i;
-    for (i = 0; i < 8U; ++i)
-        n += g_images[i].data != NULL;
-    return n;
+    OsPageStats stats;
+    os_page_get_stats(&stats);
+    return stats;
 }
 
 static OsTaskHandle create(Bin* b, const char* entry)
@@ -166,7 +118,7 @@ static OsTaskMemoryUsage usage_of(OsTaskHandle t)
 
 int main(void)
 {
-    static const OsSwapPort port = { NULL, swap_write, swap_read, swap_discard };
+    static const OsPageStore store = { NULL, SLOTS, 64U, store_write, store_read, NULL, NULL, NULL };
     Bin b = {0};
     OsTaskHandle t = NULL;
     OsTaskMemoryUsage before;
@@ -183,26 +135,31 @@ int main(void)
 
     t = create(&b, "app_main_sleeper");
     run_until_waiting(t);
-    ok(os_task_swap_out(t) == OS_STATUS_UNSUPPORTED, "without a port nothing is swapped");
-    ok(os_swap_port_set(&port) == OS_STATUS_OK, "install a swap port");
+    ok(os_task_swap_out(t) == OS_STATUS_UNSUPPORTED, "without a page store nothing is swapped");
+    os_task_delete(t);
+    ok(os_page_store_set(&store) == OS_STATUS_OK, "install a page store");
 
     /* A sleeping task leaves RAM and comes back when it wakes. */
+    t = create(&b, "app_main_sleeper");
+    run_until_waiting(t);
     ok(os_task_get_state(t) == OS_TASK_WAITING, "the sleeper filled its memory and sleeps");
     before = usage_of(t);
     ok(os_task_swap_out(t) == OS_STATUS_OK && os_task_is_swapped(t), "swap the sleeping task out");
     after = usage_of(t);
-    printf("     before: %u bytes in RAM; after: %u bytes in RAM, %u in swap\n", before.total_bytes, after.total_bytes,
-           after.swap_bytes);
-    ok(after.linear_memory_bytes == 0U && after.stack_bytes == 0U && after.code_bytes == 0U,
-       "its memory, stack and code are freed");
-    ok(after.swap_bytes > 0U && after.swap_bytes < before.linear_memory_bytes / 2U, "the image holds less than the memory did");
+    printf("     before: %u bytes in RAM; after: %u bytes in RAM, %u of state in the store\n", before.total_bytes,
+           after.total_bytes, after.swap_bytes);
+    ok(after.resident_memory_bytes == 0U && after.stack_bytes == 0U && after.code_bytes == 0U,
+       "its stack and code are freed, and none of its memory stays in RAM");
+    ok(after.stored_memory_bytes > 0U && after.linear_memory_bytes == before.linear_memory_bytes,
+       "its memory is kept, in the page store");
+    ok(after.swap_bytes > 0U && after.swap_bytes < before.linear_memory_bytes / 2U, "its state is small beside the memory");
     ok(os_task_get_state(t) == OS_TASK_WAITING, "it is still waiting");
-    ok(os_task_read_memory(t, 0U, &byte, 1U) == OS_STATUS_BUSY, "its memory cannot be read while swapped out");
-    ok(os_task_get_snapshot_size(t, &expected) == OS_STATUS_BUSY, "nor snapshotted");
+    ok(os_task_read_memory(t, 0U, &byte, 1U) == OS_STATUS_OK, "its memory can be read while swapped out");
+    ok(os_task_get_snapshot_size(t, &expected) == OS_STATUS_BUSY, "but it cannot be snapshotted");
     os_tick(100U);
     ok(os_task_get_state(t) == OS_TASK_READY && os_task_is_swapped(t), "it wakes while swapped out");
     ok(run_to_result(t) == 1, "it comes back by itself and finds its memory intact");
-    ok(!os_task_is_swapped(t) && images_held() == 0U, "the image is discarded once it is back");
+    ok(!os_task_is_swapped(t) && usage_of(t).swap_bytes == 0U, "its state leaves the store once it is back");
     os_task_delete(t);
 
     /* A wait that delivers data while the task is out. */
@@ -216,7 +173,7 @@ int main(void)
         ok(os_task_get_state(t) == OS_TASK_WAITING && os_task_swap_out(t) == OS_STATUS_OK,
            "swap out a task waiting for the queue");
         ok(os_queue_send(queue, &item) == OS_STATUS_OK && os_task_get_state(t) == OS_TASK_READY,
-           "an item sent meanwhile ends its wait");
+           "an item sent meanwhile ends its wait, straight into its memory");
         ok(os_task_swap_in(t) == OS_STATUS_OK && !os_task_is_swapped(t), "bring it back explicitly");
         ok(run_to_result(t) == 4242, "the item reached its memory and the receive returned 0");
         os_task_delete(t);
@@ -238,7 +195,7 @@ int main(void)
     os_task_delete(t);
     t = create(&b, "app_main_worker");
     ok(os_task_swap_out(t) == OS_STATUS_OK && usage_of(t).swap_bytes == 0U,
-       "a task that has not started leaves without an image");
+       "a task that has not started leaves without a state");
     while (os_task_get_state(t) != OS_TASK_DEAD && swaps < 100000U)
     {
         os_schedule();
@@ -253,8 +210,8 @@ int main(void)
     t = create(&b, "app_main_sleeper");
     run_until_waiting(t);
     g_fail_write = 1;
-    ok(os_task_swap_out(t) == OS_STATUS_ERROR && !os_task_is_swapped(t) && images_held() == 0U,
-       "a failed write leaves the task in RAM and no image behind");
+    ok(os_task_swap_out(t) == OS_STATUS_ERROR && !os_task_is_swapped(t) && usage_of(t).swap_bytes == 0U,
+       "a failed write leaves the task in RAM and no state behind");
     g_fail_write = 0;
     os_tick(100U);
     ok(run_to_result(t) == 1, "and it carries on");
@@ -270,15 +227,15 @@ int main(void)
     ok(os_task_get_state(t) == OS_TASK_DEAD && os_task_get_exit_reason(t) == OS_TASK_EXIT_WASM_ERROR,
        "when the scheduler cannot bring it back, the task ends with an error");
     g_fail_read = 0;
-    g_discards = 0U;
     os_task_delete(t);
-    ok(g_discards == 1U && images_held() == 0U, "deleting it discards its image");
+    ok(page_stats().reserved_frames == 0U && page_stats().stored_frames == 0U,
+       "deleting it lets its state and memory go from the store");
 
     t = create(&b, "app_main_sleeper");
     run_until_waiting(t);
-    ok(os_task_swap_out(t) == OS_STATUS_OK && images_held() == 1U, "a swapped task at shutdown");
+    ok(os_task_swap_out(t) == OS_STATUS_OK && page_stats().stored_frames > 0U, "a swapped task at shutdown");
     os_task_delete(t);
-    ok(images_held() == 0U, "is discarded too");
+    ok(page_stats().reserved_frames == 0U && page_stats().stored_frames == 0U, "lets everything go too");
 
     free(b.d);
     ok(os_get_task_count() == 0U, "OS is clean");
