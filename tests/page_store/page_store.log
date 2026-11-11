@@ -32,3 +32,11 @@ PASS create the program again
 PASS it waits for a frame being read
 PASS deleting it ends the read and gives everything back
 PASS OS is clean again
+PASS install a page store that reads and writes in the background
+PASS create the two programs again
+PASS both get their results
+PASS dirty frames were written in the background
+PASS RAM held the budget plus at most 4 frames being written
+PASS create the program once more
+PASS writes of its frames are in flight
+PASS deleting it ends the writes and gives everything back
