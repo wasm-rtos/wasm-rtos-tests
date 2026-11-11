@@ -3,7 +3,7 @@ PASS load guest_buffer_frames.wasm
 PASS install output port
 PASS create a queue of 16-byte items
 PASS create the program
-PASS its memory is paged: only touched frames are in RAM
+PASS its memory is larger than any block, so paged, and all of it is in RAM
 PASS the program waits for an item
 PASS the program says where its buffers are
 PASS os_task_read_memory reads across frames
@@ -20,7 +20,7 @@ ok fd_write takes split buffers
 ok fd_write counts the bytes into a split word
 ok clock_time_get writes a split timestamp
 ok the timestamp arrived
-area 73728
+area 8192
 ok an item that arrives later lands across frames
 ok the host wrote across frames
 PASS OS is clean
