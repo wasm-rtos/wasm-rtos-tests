@@ -1,33 +1,34 @@
 PASS initialize OS
 PASS load task_swap.wasm
-PASS without a port nothing is swapped
-PASS install a swap port
+PASS without a page store nothing is swapped
+PASS install a page store
 PASS the sleeper filled its memory and sleeps
 PASS swap the sleeping task out
-PASS its memory, stack and code are freed
-PASS the image holds less than the memory did
+PASS its stack and code are freed, and none of its memory stays in RAM
+PASS its memory is kept, in the page store
+PASS its state is small beside the memory
 PASS it is still waiting
-PASS its memory cannot be read while swapped out
-PASS nor snapshotted
+PASS its memory can be read while swapped out
+PASS but it cannot be snapshotted
 PASS it wakes while swapped out
 PASS it comes back by itself and finds its memory intact
-PASS the image is discarded once it is back
+PASS its state leaves the store once it is back
 PASS create the host's inbox
 PASS swap out a task waiting for the queue
-PASS an item sent meanwhile ends its wait
+PASS an item sent meanwhile ends its wait, straight into its memory
 PASS bring it back explicitly
 PASS the item reached its memory and the receive returned 0
 PASS pause a sleeping task and swap it out
 PASS it stays paused, out of RAM
 PASS resumed, it comes back and finishes
-PASS a task that has not started leaves without an image
+PASS a task that has not started leaves without a state
 PASS the result is the same as without swapping
-PASS a failed write leaves the task in RAM and no image behind
+PASS a failed write leaves the task in RAM and no state behind
 PASS and it carries on
 PASS swap out once more
 PASS a failed read keeps it swapped out
 PASS when the scheduler cannot bring it back, the task ends with an error
-PASS deleting it discards its image
+PASS deleting it lets its state and memory go from the store
 PASS a swapped task at shutdown
-PASS is discarded too
+PASS lets everything go too
 PASS OS is clean

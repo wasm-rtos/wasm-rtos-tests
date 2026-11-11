@@ -22,7 +22,7 @@ PASS when its frame cannot come back, the call traps and sends nothing
 PASS create a program that grows until it cannot
 PASS memory.grow stops where the promise would break
 PASS everything is given back
-MEASURED store writes=230 in order=230 reads=159 most in RAM=8
+MEASURED store writes=215 in order=215 reads=144 most in RAM=8
 PASS OS is clean
 PASS install a page store that reads in the background
 PASS create a program with stored frames and one that only counts
