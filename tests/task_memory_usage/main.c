@@ -63,13 +63,13 @@ static OsTaskMemoryUsage usage_of(OsTaskHandle t, const char* label)
 {
     OsTaskMemoryUsage u = {0};
     os_task_get_memory_usage(t, &u);
-    printf("%-22s stack=%u linear=%u code=%u interpreter=%u (metadata %d) peak=%u image=%u kernel=%u total=%u\n",
-           label, u.stack_bytes, u.linear_memory_bytes, u.code_bytes, u.interpreter_bytes,
-           (int)u.interpreter_bytes - (int)(u.stack_bytes + u.linear_memory_bytes + u.code_bytes),
+    printf("%-22s stack=%u linear=%u resident=%u code=%u interpreter=%u (metadata %d) peak=%u image=%u kernel=%u total=%u\n",
+           label, u.stack_bytes, u.linear_memory_bytes, u.resident_memory_bytes, u.code_bytes, u.interpreter_bytes,
+           (int)u.interpreter_bytes - (int)(u.stack_bytes + u.resident_memory_bytes + u.code_bytes),
            u.interpreter_peak_bytes, u.image_bytes, u.kernel_bytes, u.total_bytes);
     if (l)
-        fprintf(l, "MEASURED %s stack=%u linear=%u code=%u interpreter=%u image=%u kernel=%u total=%u\n",
-                label, u.stack_bytes, u.linear_memory_bytes, u.code_bytes, u.interpreter_bytes,
+        fprintf(l, "MEASURED %s stack=%u linear=%u resident=%u code=%u interpreter=%u image=%u kernel=%u total=%u\n",
+                label, u.stack_bytes, u.linear_memory_bytes, u.resident_memory_bytes, u.code_bytes, u.interpreter_bytes,
                 u.image_bytes, u.kernel_bytes, u.total_bytes);
     return u;
 }
@@ -98,9 +98,11 @@ int main(void)
     created = usage_of(t, "small, created");
     ok(created.stack_bytes >= stack_size && created.stack_bytes < stack_size + 64U, "stack is the requested size plus guard slots");
     ok(created.linear_memory_bytes >= 65536U && created.linear_memory_bytes % 65536U < 64U, "linear memory is whole 64 KiB pages plus a header");
+    /* A paged memory holds only the pages the program has touched. */
+    ok(created.resident_memory_bytes <= created.linear_memory_bytes, "no more of the memory is in RAM than there is");
 #if OS_HAS_MEMORY_ACCOUNTING
-    ok(created.interpreter_bytes >= created.stack_bytes + created.linear_memory_bytes + created.code_bytes,
-       "interpreter total includes stack, memory and code");
+    ok(created.interpreter_bytes >= created.stack_bytes + created.resident_memory_bytes + created.code_bytes,
+       "interpreter total includes stack, memory in RAM and code");
 #else
     ok(created.interpreter_bytes == 0U, "without memory accounting the interpreter total is 0");
 #endif
@@ -109,7 +111,7 @@ int main(void)
 #if OS_HAS_MEMORY_ACCOUNTING
     ok(created.total_bytes == created.interpreter_bytes + created.kernel_bytes, "total adds the parts");
 #else
-    ok(created.total_bytes == created.stack_bytes + created.linear_memory_bytes + created.code_bytes + created.kernel_bytes,
+    ok(created.total_bytes == created.stack_bytes + created.resident_memory_bytes + created.code_bytes + created.kernel_bytes,
        "total adds the measured parts");
 #endif
     ok(created.code_bytes > 0U, "the code is decoded at load");
@@ -126,14 +128,14 @@ int main(void)
     ok(run_to_result(t) == 1, "small task runs");
     finished = usage_of(t, "small, finished");
     ok(finished.interpreter_bytes == 0U && finished.stack_bytes == 0U && finished.linear_memory_bytes == 0U &&
-       finished.code_bytes == 0U, "a dead task holds no interpreter memory");
+       finished.resident_memory_bytes == 0U && finished.code_bytes == 0U, "a dead task holds no interpreter memory");
 #if OS_HAS_MEMORY_ACCOUNTING
     ok(finished.interpreter_peak_bytes >= created.interpreter_bytes, "its peak is still reported");
 #endif
     ok(finished.total_bytes == finished.kernel_bytes, "only the control block remains until delete");
     os_task_delete(t);
 
-    /* memory.grow shows up in linear memory and in the interpreter total. */
+    /* memory.grow shows up in linear memory, and in RAM and the interpreter total as far as it is used. */
     ok(os_task_create(&t, b.d, b.n, "app_main_grow", "grow", stack_size, OS_TASK_PRIORITY_NORMAL) == OS_STATUS_OK && t,
        "create a task that grows its memory");
     before_grow = usage_of(t, "grow, created");
@@ -145,7 +147,9 @@ int main(void)
            after_grow.linear_memory_bytes <= before_grow.linear_memory_bytes + 2U * 65536U,
        "linear memory grew by one page plus at most the spare room");
 #if OS_HAS_MEMORY_ACCOUNTING
-    ok(after_grow.interpreter_bytes >= before_grow.interpreter_bytes + 65536U, "the interpreter total grew with it");
+    ok(after_grow.interpreter_bytes >= before_grow.interpreter_bytes +
+           (after_grow.resident_memory_bytes - before_grow.resident_memory_bytes),
+       "the interpreter total grew with the memory in RAM");
 #endif
     os_task_delete(t);
 
@@ -155,7 +159,7 @@ int main(void)
     other = usage_of(t, "spawned, created");
     ok(other.image_bytes == b.n, "the kernel's copy of the module is counted");
     ok(other.total_bytes - other.image_bytes - other.kernel_bytes ==
-           (other.interpreter_bytes ? other.interpreter_bytes : other.stack_bytes + other.linear_memory_bytes + other.code_bytes),
+           (other.interpreter_bytes ? other.interpreter_bytes : other.stack_bytes + other.resident_memory_bytes + other.code_bytes),
        "total includes the copy");
     os_task_delete(t);
 #endif
