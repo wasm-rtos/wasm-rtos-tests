@@ -1,0 +1,13 @@
+PASS initialize OS
+PASS load page_block.wasm
+PASS install a page store with 40 frames of RAM
+PASS alone, a program's memory is one block in RAM
+PASS and nothing went to the store
+PASS the sleeper filled its memory, one block, and waits
+PASS the worker's memory is paged: there is no room for a second block
+PASS while it sleeps, the sleeper's memory has left RAM for the worker
+PASS the sleeper's block went to the store
+PASS the worker's result is the same as alone
+PASS the sleeper woke, paged, and found its memory as it left it
+PASS RAM stayed within its budget
+PASS deleted: nothing reserved, nothing in RAM
