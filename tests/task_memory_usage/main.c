@@ -114,7 +114,6 @@ int main(void)
     ok(created.total_bytes == created.stack_bytes + created.resident_memory_bytes + created.code_bytes + created.kernel_bytes,
        "total adds the measured parts");
 #endif
-    ok(created.code_bytes > 0U, "the code is decoded at load");
 
     /* The same program costs the same in another task. */
     ok(os_task_create(&twin, b.d, b.n, "app_main", "twin", stack_size, OS_TASK_PRIORITY_NORMAL) == OS_STATUS_OK && twin,
@@ -146,6 +145,8 @@ int main(void)
     ok(after_grow.linear_memory_bytes >= before_grow.linear_memory_bytes + 65536U &&
            after_grow.linear_memory_bytes <= before_grow.linear_memory_bytes + 2U * 65536U,
        "linear memory grew by one page plus at most the spare room");
+    /* Predecoded code is made at a function's first call, not at load. */
+    ok(after_grow.code_bytes > 0U, "the code that ran is decoded");
 #if OS_HAS_MEMORY_ACCOUNTING
     ok(after_grow.interpreter_bytes >= before_grow.interpreter_bytes +
            (after_grow.resident_memory_bytes - before_grow.resident_memory_bytes),
