@@ -171,11 +171,11 @@ int main(void)
     sleeper = create(&b, "app_main_sleeper");
     run_until_waiting(sleeper);
     u = usage_of(sleeper);
-    ok(os_task_get_state(sleeper) == OS_TASK_WAITING && u.resident_memory_bytes == u.linear_memory_bytes,
+    ok(os_task_get_state(sleeper) == OS_TASK_WAITING && u.block_memory_bytes == u.linear_memory_bytes,
        "the sleeper filled its memory, one block, and waits");
     worker = create(&b, "app_main_worker");
     u = usage_of(worker);
-    ok(worker && u.resident_memory_bytes < u.linear_memory_bytes,
+    ok(worker && u.block_memory_bytes == 0U && u.resident_memory_bytes < u.linear_memory_bytes,
        "the worker's memory is paged: there is no room for a second block");
 
     /* The worker needs frames: the waiting sleeper's block leaves RAM whole, not the worker's own frames. */
@@ -189,8 +189,24 @@ int main(void)
         }
     }
     u = usage_of(sleeper);
-    ok(os_task_get_state(sleeper) == OS_TASK_WAITING && u.resident_memory_bytes < u.linear_memory_bytes / 4U,
+    ok(os_task_get_state(sleeper) == OS_TASK_WAITING && u.block_memory_bytes == 0U &&
+           u.resident_memory_bytes < u.linear_memory_bytes / 4U,
        "while it sleeps, the sleeper's memory has left RAM for the worker");
+    run_until_dead(worker, NULL);
+    {
+        /* With the worker gone the RAM has room again: the sleeper's memory goes back into one block. */
+        uint32_t i;
+        for (i = 0; i < 2000U && os_task_get_state(sleeper) != OS_TASK_DEAD &&
+                    usage_of(sleeper).block_memory_bytes == 0U; i++)
+        {
+            os_tick(1U);
+            os_schedule();
+        }
+        u = usage_of(sleeper);
+        ok(os_task_get_state(sleeper) != OS_TASK_DEAD && u.block_memory_bytes == u.linear_memory_bytes &&
+               u.stored_memory_bytes == 0U,
+           "with the RAM free again, the sleeper's memory is one block again before it ends");
+    }
     run_until_dead(worker, sleeper);
     ok(page_stats().stores > before.stores, "the sleeper's block went to the store");
     ok(result_of(worker) == expected, "the worker's result is the same as alone");
