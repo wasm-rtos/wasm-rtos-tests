@@ -9,7 +9,6 @@ PASS interpreter total includes stack, memory in RAM and code
 PASS host-owned module bytes are not counted
 PASS task control block is counted
 PASS total adds the parts
-PASS the code is decoded at load
 PASS create the same task again
 MEASURED twin, created stack=8200 linear=65536 resident=65536 code=380 interpreter=79911 image=0 kernel=496 total=80407
 PASS identical tasks use identical memory
@@ -23,6 +22,7 @@ MEASURED grow, created stack=8200 linear=65536 resident=65536 code=380 interpret
 PASS it grew and now sleeps
 MEASURED grow, after memory.grow stack=8200 linear=131072 resident=131072 code=380 interpreter=145447 image=0 kernel=496 total=145943
 PASS linear memory grew by one page plus at most the spare room
+PASS the code that ran is decoded
 PASS the interpreter total grew with the memory in RAM
 PASS spawn the module as a process
 MEASURED spawned, created stack=8200 linear=65536 resident=65536 code=380 interpreter=79911 image=721 kernel=496 total=81128
