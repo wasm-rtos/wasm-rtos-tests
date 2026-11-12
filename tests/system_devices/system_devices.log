@@ -1,0 +1,17 @@
+PASS load system_devices.wasm
+PASS uninterrupted: every program ends
+PASS the button the program waits on is the one wake pin, its falling edge
+PASS the LED was opened high and the program has set it low
+PASS save the system while every device is held
+PASS after the sleep the hardware is as at power-on
+PASS restore into a firmware that registers the pins in another order
+PASS every device is set up as it was: pins, levels, PWM, DAC, counter, pulse, serial port, brightness
+PASS the SPI device and its chip select pin are the program's again
+PASS every program ends with the result of the run never stopped
+PASS the serial line carried the same bytes
+PASS restore with a device gone and one broken
+PASS the program whose counter is gone ended: restore: a device it held is gone
+PASS the program whose PWM output cannot start ended: restore: a device it held cannot be set up
+PASS and its pin and analog output are free again
+PASS every other program ends with the result of the run never stopped
+PASS a display that loses its picture blocks saving, and the error says so
