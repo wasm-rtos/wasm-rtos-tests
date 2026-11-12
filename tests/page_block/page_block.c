@@ -24,12 +24,19 @@ static uint32_t check(void)
     return sum;
 }
 
-/* Fills its memory, sleeps while another program needs the RAM, then checks it; 1 when it survived. */
+/*
+ * Fills its memory, sleeps while another program needs the RAM, checks it,
+ * then sleeps twice more while the RAM is free again; 1 when it survived.
+ */
 uint32_t app_main_sleeper(void)
 {
     uint32_t before = fill(3U);
+    uint32_t survived;
     wr_sleep_ms(200U);
-    return check() == before ? 1U : 0U;
+    survived = check() == before ? 1U : 0U;
+    wr_sleep_ms(50U);
+    wr_sleep_ms(50U);
+    return survived && check() == before ? 1U : 0U;
 }
 
 /* Long work over all of its memory. */
