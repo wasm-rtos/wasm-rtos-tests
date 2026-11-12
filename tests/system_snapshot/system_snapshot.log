@@ -1,0 +1,24 @@
+PASS load system_snapshot.wasm
+PASS uninterrupted: every program ends
+PASS at the save the locker sleeps holding the mutex, the contender, the parent and the reader wait
+PASS the consumer is swapped out of RAM
+PASS the system is saved, the kernel shut down, started again and restored
+PASS the host finds its queue by the id it had
+PASS an object made after the restore gets an id of its own
+PASS every program ends with the result of the run never stopped
+PASS the host's timer notified the ticker as often
+PASS saved and restored after every millisecond
+PASS and every program still ends with the same result
+PASS a sleeper saved 30 ms into 100 ms, asleep 50 ms
+PASS it wakes 20 ms after the restore and sees its 100 ms go by
+PASS save mid-way again
+PASS a cut stream restores nothing
+PASS and the kernel starts tasks as if new
+PASS which run to the end
+PASS a stream of another version restores nothing
+PASS restore after the world changed
+PASS the locker, whose module changed, ended: restore: its module changed
+PASS the reader, whose file changed, ended: restore: a file it had open changed
+PASS the contender got the mutex the locker held and ended
+PASS the parent, whose child's program is gone, got its child's end and ended
+PASS every other program ends with the result of the run never stopped
