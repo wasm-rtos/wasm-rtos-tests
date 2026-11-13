@@ -1,0 +1,32 @@
+PASS load page_stores.wasm
+PASS set store A, with 8 frames of RAM
+PASS add store B at priority 5
+PASS an added store cannot bring RAM
+PASS nor be added twice
+PASS frames go to B, the higher priority
+PASS B full: frames spill to A
+PASS A to priority 9 while it runs
+PASS new frames go to A now
+PASS the program ends with its result
+PASS its slots are free again
+PASS A and B, both priority 0, take a frame each in turn
+PASS and the program's memory is whole
+PASS swap one program out
+PASS frames and the swapped state are on B
+PASS removing B with too few slots elsewhere is refused, nothing moved
+PASS add store D
+PASS now B leaves
+PASS its frames went to the other stores
+PASS both programs end with their results: moved frames and state whole
+PASS one program pages to L
+PASS another, started after K came, pages to K
+PASS L is lost
+PASS the program with frames on L ends: page store gone
+PASS the other goes on
+PASS and ends with its result
+PASS no slot is left used
+PASS save, frames on two stores
+PASS restore on fresh stores
+PASS it ends with its result
+PASS a failed read: page store: a frame could not be read, not exhaustion
+PASS clean OS state
