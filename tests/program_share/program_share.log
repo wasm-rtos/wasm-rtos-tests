@@ -1,0 +1,18 @@
+PASS load program_share.wasm
+PASS three processes start
+PASS the same file twice and a copy under another name: one program
+PASS they hold the same program and module
+PASS the later files were only read to compare them: one copy for the three
+PASS a file changed in one byte, the same size, is a new program
+PASS the old processes keep the old bytes
+PASS spawn from equal bytes shares the loaded program, no copy
+PASS swap out every process of the first program
+PASS its module is freed; the other program keeps its own
+PASS every process runs to its end
+PASS each computed its own result, as if alone
+PASS the programs went with their last processes
+PASS save two processes of one program
+PASS restore them
+PASS restored, they share one program
+PASS and run to the same results
+PASS clean OS state
