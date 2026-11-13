@@ -1,0 +1,14 @@
+PASS initialize OS
+PASS load abi_freeze_minimal.wasm
+PASS the gpio driver is there
+PASS program importing every 1.8 call, @1.0.0, @1.9.0 and unanswered WASI calls loads
+PASS program finishes
+PASS a call named @1.0.0 and @1.9.0 is the same call
+PASS a kernel call 1.8 lacks, named @1.9.0, returns -WR_EUNSUPPORTED
+PASS a driver call 1.8 lacks, named @1.9.0, returns -WR_EUNSUPPORTED
+PASS an interface 1.8 lacks returns -WR_EUNSUPPORTED
+PASS a WASI call nothing answers returns ENOSYS
+PASS spawn above the parent's priority succeeds (or is unsupported)
+PASS a WASI file call returns ENOSYS without files
+PASS no child without processes
+PASS clean OS state

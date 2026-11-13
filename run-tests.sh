@@ -163,6 +163,8 @@ for dir in tests/*; do
         native_flags+=(-DOS_HAS_DYLINK=1)
     elif [ "$name" = "proc_disabled" ]; then
         native_flags+=(-DOS_HAS_PROCESSES=0)
+    elif [ "$name" = "abi_freeze_minimal" ]; then
+        native_flags+=(-DOS_HAS_PROCESSES=0 -DOS_HAS_FS=0)
     elif [ "$name" = "preempt_memory_grow" ]; then
         native_flags+=(-DOS_TASK_SLICE_FUEL=1ULL)
     elif [ "$name" = "task_memory_usage" ]; then
