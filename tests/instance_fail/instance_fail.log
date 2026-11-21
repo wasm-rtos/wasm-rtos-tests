@@ -1,0 +1,11 @@
+PASS initialize OS
+PASS a data segment out of bounds fails the task's creation
+PASS no task is left
+PASS it fails while instantiating
+PASS a data segment out of bounds fails the task's creation
+PASS no task is left
+PASS it fails while instantiating
+PASS a data segment out of bounds fails the task's creation
+PASS no task is left
+PASS it fails while instantiating
+ok
