@@ -1,0 +1,15 @@
+PASS load page_compressed.wasm
+PASS make a compressed store
+PASS every frame that fits reads back as it was
+PASS frames that compress fit, random ones are refused
+PASS a slow store with 32 KB of RAM for frames
+PASS the program runs through the slow store alone
+PASS the slow store again
+PASS a compressed store of 256 KB above it, at priority 5
+PASS too small a region is refused
+PASS with it, the program's result is the same
+PASS the slow store writes less than a quarter as often
+PASS frames of random words, which do not compress, still go to the slow store
+PASS when the program ends, its compressed frames are let go
+PASS a second run fits as the first did: nothing of the first is held
+ok
