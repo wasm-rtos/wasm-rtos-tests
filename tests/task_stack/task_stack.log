@@ -17,7 +17,7 @@ PASS create a trivial task
 PASS recurse 10 deep
 PASS recurse 40 deep
 PASS a finished task still reports its peak
-MEASURED stack peak trivial=4 depth10=196 depth40=676
+MEASURED stack peak trivial=4 depth10=192 depth40=672
 PASS deeper calls use more stack
 PASS use grows with depth
 PASS create a task that recurses far beyond its 4 KiB
