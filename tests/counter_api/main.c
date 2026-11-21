@@ -114,7 +114,7 @@ static void move(uint32_t unit, int32_t count, int with_interrupt)
 {
     g_count[unit] = count;
     if (with_interrupt && (count < g_low[unit] || count > g_high[unit]))
-        os_counter_event(unit);
+        hw_counter_event(unit);
 }
 
 static OsTaskHandle start(Bin* b, const char* entry)
@@ -148,13 +148,13 @@ static int32_t finish(OsTaskHandle t, const char* entry)
 
 int main(void)
 {
-    static const OsCounterInfo encoder = { OS_COUNTER_QUADRATURE, 40000000U };
-    static const OsCounterInfo pulses = { OS_COUNTER_PULSE, 1000000U };
-    static const OsCounterInfo bad = { 3U, 0U };
+    static const HwCounterInfo encoder = { HW_COUNTER_QUADRATURE, 40000000U };
+    static const HwCounterInfo pulses = { HW_COUNTER_PULSE, 1000000U };
+    static const HwCounterInfo bad = { 3U, 0U };
     Bin b = {0};
-    OsCounterPort port = { NULL, fake_start, fake_read, fake_write, fake_watch, fake_stop };
-    OsCounterPort polled = { NULL, fake_start, fake_read, fake_write, NULL, fake_stop };
-    OsCounterPort empty = { NULL, fake_start, fake_read, NULL, NULL, fake_stop };
+    HwCounterPort port = { NULL, fake_start, fake_read, fake_write, fake_watch, fake_stop };
+    HwCounterPort polled = { NULL, fake_start, fake_read, fake_write, NULL, fake_stop };
+    HwCounterPort empty = { NULL, fake_start, fake_read, NULL, NULL, fake_stop };
     OsTaskHandle t = NULL;
     uint32_t started;
     uint32_t i;
@@ -166,24 +166,24 @@ int main(void)
         return 1;
 
     ok(finish(start(&b, "app_main_try"), "app_main_try") == -13, "without a port counter-open returns -WR_EUNSUPPORTED");
-    ok(os_counter_port_set(&empty) == OS_STATUS_INVALID_ARGUMENT, "a port needs start, read, write and stop");
-    ok(os_counter_port_set(&port) == OS_STATUS_OK, "install a counter port with watch points");
+    ok(hw_counter_port_set(&empty) == OS_STATUS_INVALID_ARGUMENT, "a port needs start, read, write and stop");
+    ok(hw_counter_port_set(&port) == OS_STATUS_OK, "install a counter port with watch points");
     ok(finish(start(&b, "app_main_try"), "app_main_try") == -13, "without counters counter-open returns -WR_EUNSUPPORTED");
-    ok(os_counter_add("enc0", 0U, &encoder) == OS_STATUS_OK && os_counter_add("flow", 1U, &pulses) == OS_STATUS_OK &&
-           os_counter_add("enc1", 2U, &pulses) == OS_STATUS_OK,
+    ok(hw_counter_add("enc0", 0U, &encoder) == OS_STATUS_OK && hw_counter_add("flow", 1U, &pulses) == OS_STATUS_OK &&
+           hw_counter_add("enc1", 2U, &pulses) == OS_STATUS_OK,
        "register an encoder and two pulse counters");
-    ok(os_counter_add("enc0", 5U, &pulses) == OS_STATUS_BUSY && os_counter_add("other", 1U, &pulses) == OS_STATUS_BUSY &&
-           os_counter_add("odd", 6U, &bad) == OS_STATUS_INVALID_ARGUMENT && os_counter_add("x", 7U, NULL) == OS_STATUS_INVALID_ARGUMENT,
+    ok(hw_counter_add("enc0", 5U, &pulses) == OS_STATUS_BUSY && hw_counter_add("other", 1U, &pulses) == OS_STATUS_BUSY &&
+           hw_counter_add("odd", 6U, &bad) == OS_STATUS_INVALID_ARGUMENT && hw_counter_add("x", 7U, NULL) == OS_STATUS_INVALID_ARGUMENT,
        "names and units are registered once, with a known kind");
 
     ok(finish(start(&b, "app_main_basic"), "app_main_basic") == 0,
        "kind, speed, filter cut to what the hardware has, signed counts, homing, ownership, modes of the other kind, bad pointers and windows, "
        "a count already outside");
-    ok(g_mode[0] == OS_COUNTER_X4 && !g_running[0] && g_stops == 1U, "the encoder ran in x4 and stopped when the program ended");
+    ok(g_mode[0] == HW_COUNTER_X4 && !g_running[0] && g_stops == 1U, "the encoder ran in x4 and stopped when the program ended");
 
     t = start(&b, "app_main_wait");
     run_until_waiting(t);
-    ok(os_task_get_state(t) == OS_TASK_WAITING && os_counter_get_owner(0U) == os_task_get_id(t) && g_low[0] == 0 &&
+    ok(os_task_get_state(t) == OS_TASK_WAITING && hw_counter_get_owner(0U) == os_task_get_id(t) && g_low[0] == 0 &&
            g_high[0] == 0,
        "a program waits for the knob to move, the hardware watches around 0");
     move(0U, 0, 1);
@@ -197,10 +197,10 @@ int main(void)
     ok(finish(start(&b, "app_main_wait_timeout"), "app_main_wait_timeout") == -7, "nothing moves: -WR_ETIMEOUT");
 
     /* Hardware without watch points: the kernel reads the count itself. */
-    ok(os_counter_port_set(&polled) == OS_STATUS_OK, "a counter port without watch points");
+    ok(hw_counter_port_set(&polled) == OS_STATUS_OK, "a counter port without watch points");
     t = start(&b, "app_main_flow");
     run_until_waiting(t);
-    ok(os_task_get_state(t) == OS_TASK_WAITING && g_mode[1] == OS_COUNTER_RISING, "a flow meter program sleeps until 100 pulses");
+    ok(os_task_get_state(t) == OS_TASK_WAITING && g_mode[1] == HW_COUNTER_RISING, "a flow meter program sleeps until 100 pulses");
     move(1U, 60, 0);
     for (i = 0; i < 30U; i++)
         if (os_schedule() == OS_STATUS_NO_READY_TASKS)
@@ -211,7 +211,7 @@ int main(void)
     for (i = 0; i < 100U && os_task_get_state(t) == OS_TASK_WAITING; i++)
         if (os_schedule() == OS_STATUS_NO_READY_TASKS)
             os_tick(1U);
-    ok(os_task_get_state(t) != OS_TASK_WAITING && os_get_tick_ms() - started <= OS_COUNTER_POLL_MS,
+    ok(os_task_get_state(t) != OS_TASK_WAITING && os_get_tick_ms() - started <= HW_COUNTER_POLL_MS,
        "150 pulses: the kernel's next read woke it within the poll interval");
     ok(finish(t, "app_main_flow") == 150, "and it read the count");
 

@@ -87,12 +87,12 @@ static int32_t run(Bin* b, const char* entry)
 int main(void)
 {
     Bin b = {0};
-    OsAdcPort plain = { NULL, adc_read, NULL };
-    OsAdcPort calibrated = { NULL, adc_read, adc_read_mv };
-    OsAdcPort broken = { NULL, NULL, NULL };
-    OsAdcInfo pot = { 12U, 3300U };
-    OsAdcInfo battery = { 10U, 6600U };
-    OsAdcInfo bad = { 0U, 3300U };
+    HwAdcPort plain = { NULL, adc_read, NULL };
+    HwAdcPort calibrated = { NULL, adc_read, adc_read_mv };
+    HwAdcPort broken = { NULL, NULL, NULL };
+    HwAdcInfo pot = { 12U, 3300U };
+    HwAdcInfo battery = { 10U, 6600U };
+    HwAdcInfo bad = { 0U, 3300U };
 
     l = fopen("adc_api.log", "w");
     ok(os_init() == OS_STATUS_OK, "initialize OS");
@@ -101,17 +101,17 @@ int main(void)
         return 1;
 
     ok(run(&b, "app_main_try") == -13, "without a port adc-open returns -WR_EUNSUPPORTED");
-    ok(os_adc_port_set(&broken) == OS_STATUS_INVALID_ARGUMENT && os_adc_port_set(&plain) == OS_STATUS_OK,
+    ok(hw_adc_port_set(&broken) == OS_STATUS_INVALID_ARGUMENT && hw_adc_port_set(&plain) == OS_STATUS_OK,
        "a port needs read");
     ok(run(&b, "app_main_try") == -13, "without channels too");
-    ok(os_adc_add_channel("a0", 6U, &pot) == OS_STATUS_OK && os_adc_add_channel("battery", 9U, &battery) == OS_STATUS_OK,
+    ok(hw_adc_add_channel("a0", 6U, &pot) == OS_STATUS_OK && hw_adc_add_channel("battery", 9U, &battery) == OS_STATUS_OK,
        "register a potentiometer and a battery divider");
-    ok(os_adc_add_channel("a0", 7U, &pot) == OS_STATUS_BUSY && os_adc_add_channel("x", 6U, &pot) == OS_STATUS_BUSY &&
-           os_adc_add_channel("bad", 8U, &bad) == OS_STATUS_INVALID_ARGUMENT,
+    ok(hw_adc_add_channel("a0", 7U, &pot) == OS_STATUS_BUSY && hw_adc_add_channel("x", 6U, &pot) == OS_STATUS_BUSY &&
+           hw_adc_add_channel("bad", 8U, &bad) == OS_STATUS_INVALID_ARGUMENT,
        "names and numbers once; a channel has a resolution");
     ok(run(&b, "app_main_read") == 0, "properties, shared reads, millivolts by scale, clamping, errors");
     ok(run(&b, "app_main_calibrated") == 6600, "without read_mv the battery is scaled: 1023 of 1023 is 6600 mV");
-    ok(os_adc_port_set(&calibrated) == OS_STATUS_OK && run(&b, "app_main_calibrated") == 3987,
+    ok(hw_adc_port_set(&calibrated) == OS_STATUS_OK && run(&b, "app_main_calibrated") == 3987,
        "a port's calibration wins");
     ok(run(&b, "app_main_read") == 0, "channels the port does not calibrate are still scaled by the kernel");
 

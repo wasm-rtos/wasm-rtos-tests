@@ -172,8 +172,8 @@ int main(void)
     static const uint8_t filled[9] = { 0x00, 0x33, 0x00, 0x04, 0x02, 0x06, 0x04, 0x02, 0x06 };
     static const uint8_t rgbw[8] = { 0x01, 0x02, 0x03, 0x04, 0x00, 0x00, 0x00, 0xFF };
     Bin b = {0};
-    OsGpioPort gpio = { NULL, gpio_configure, gpio_write, gpio_read };
-    OsPulsePort rmt = { NULL, rmt_configure, rmt_send, rmt_send_bits, NULL, rmt_finish, rmt_release, 25U };
+    HwGpioPort gpio = { NULL, gpio_configure, gpio_write, gpio_read };
+    HwPulsePort rmt = { NULL, rmt_configure, rmt_send, rmt_send_bits, NULL, rmt_finish, rmt_release, 25U };
     OsOutputPort output = { NULL, capture };
     OsTaskHandle t = NULL;
     uint32_t i;
@@ -183,10 +183,10 @@ int main(void)
     ok(load(&b), "load arduino_neopixel.wasm");
     if (!b.d)
         return 1;
-    ok(os_gpio_port_set(&gpio) == OS_STATUS_OK && os_pulse_port_set(&rmt) == OS_STATUS_OK &&
-           os_gpio_add_pin("gpio18", 18U, OS_GPIO_CAN_OUTPUT | OS_GPIO_CAN_PULSE, 0U) == OS_STATUS_OK &&
-           os_gpio_add_pin("gpio19", 19U, OS_GPIO_CAN_OUTPUT | OS_GPIO_CAN_PULSE, 0U) == OS_STATUS_OK &&
-           os_gpio_add_pin("gpio20", 20U, OS_GPIO_CAN_OUTPUT, 0U) == OS_STATUS_OK &&
+    ok(hw_gpio_port_set(&gpio) == OS_STATUS_OK && hw_pulse_port_set(&rmt) == OS_STATUS_OK &&
+           hw_gpio_add_pin("gpio18", 18U, HW_GPIO_CAN_OUTPUT | HW_GPIO_CAN_PULSE, 0U) == OS_STATUS_OK &&
+           hw_gpio_add_pin("gpio19", 19U, HW_GPIO_CAN_OUTPUT | HW_GPIO_CAN_PULSE, 0U) == OS_STATUS_OK &&
+           hw_gpio_add_pin("gpio20", 20U, HW_GPIO_CAN_OUTPUT, 0U) == OS_STATUS_OK &&
            os_output_port_set(&output) == OS_STATUS_OK,
        "a board with LED strips on pins 18 and 19 (pulse hardware) and a plain pin 20");
     ok(os_task_create(&t, b.d, b.n, "_start", "sketch", 65536U, OS_TASK_PRIORITY_NORMAL) == OS_STATUS_OK && t,

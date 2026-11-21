@@ -97,11 +97,11 @@ int main(void)
 {
     Bin b = {0};
     OsTaskHandle t = NULL;
-    OsInputInfo buttons = { OS_INPUT_BUTTONS, 0U, 0U, 0U, 600U, 0U, 0U };
-    OsInputInfo keyboard = { OS_INPUT_KEYBOARD, 0U, 0U, 0U, 0U, 300U, 100U };
-    OsInputInfo bezel = { OS_INPUT_ROTARY, 0U, 0U, 24U, 0U, 0U, 0U };
-    OsInputInfo touch = { OS_INPUT_TOUCH, 240U, 240U, 0U, 0U, 0U, 0U };
-    OsInputInfo bad = { OS_INPUT_KEYBOARD, 0U, 0U, 0U, 0U, 300U, 0U };
+    HwInputInfo buttons = { HW_INPUT_BUTTONS, 0U, 0U, 0U, 600U, 0U, 0U };
+    HwInputInfo keyboard = { HW_INPUT_KEYBOARD, 0U, 0U, 0U, 0U, 300U, 100U };
+    HwInputInfo bezel = { HW_INPUT_ROTARY, 0U, 0U, 24U, 0U, 0U, 0U };
+    HwInputInfo touch = { HW_INPUT_TOUCH, 240U, 240U, 0U, 0U, 0U, 0U };
+    HwInputInfo bad = { HW_INPUT_KEYBOARD, 0U, 0U, 0U, 0U, 300U, 0U };
     uint32_t i;
 
     l = fopen("input_api.log", "w");
@@ -112,70 +112,70 @@ int main(void)
 
     ok(finish(start(&b, "app_main_try"), "app_main_try") == -13, "without devices input-open returns -WR_EUNSUPPORTED");
 
-    ok(os_input_add("buttons", BUTTONS, &buttons) == OS_STATUS_OK && os_input_add("keyboard", KEYBOARD, &keyboard) == OS_STATUS_OK &&
-           os_input_add("bezel", BEZEL, &bezel) == OS_STATUS_OK && os_input_add("touch", TOUCH, &touch) == OS_STATUS_OK,
+    ok(hw_input_add("buttons", BUTTONS, &buttons) == OS_STATUS_OK && hw_input_add("keyboard", KEYBOARD, &keyboard) == OS_STATUS_OK &&
+           hw_input_add("bezel", BEZEL, &bezel) == OS_STATUS_OK && hw_input_add("touch", TOUCH, &touch) == OS_STATUS_OK,
        "register buttons, a keyboard, a bezel and a touch screen");
-    ok(os_input_add("bezel", 9U, &bezel) == OS_STATUS_BUSY && os_input_add("knob", BEZEL, &bezel) == OS_STATUS_BUSY,
+    ok(hw_input_add("bezel", 9U, &bezel) == OS_STATUS_BUSY && hw_input_add("knob", BEZEL, &bezel) == OS_STATUS_BUSY,
        "names and numbers are registered once");
-    ok(os_input_add("bad", 9U, &bad) == OS_STATUS_INVALID_ARGUMENT, "repeat needs an interval");
-    ok(os_input_rotate(BUTTONS, REL_DIAL, 1) == OS_STATUS_INVALID_ARGUMENT &&
-           os_input_touch(TOUCH, 0U, OS_INPUT_TOUCH_DOWN, 240U, 0U) == OS_STATUS_INVALID_ARGUMENT &&
-           os_input_text(BUTTONS, 'a') == OS_STATUS_INVALID_ARGUMENT && os_input_key(TOUCH, KEY_A, 1U) == OS_STATUS_INVALID_ARGUMENT &&
-           os_input_text(KEYBOARD, 0xD800U) == OS_STATUS_INVALID_ARGUMENT && os_input_key(42U, KEY_A, 1U) == OS_STATUS_INVALID_ARGUMENT,
+    ok(hw_input_add("bad", 9U, &bad) == OS_STATUS_INVALID_ARGUMENT, "repeat needs an interval");
+    ok(hw_input_rotate(BUTTONS, REL_DIAL, 1) == OS_STATUS_INVALID_ARGUMENT &&
+           hw_input_touch(TOUCH, 0U, HW_INPUT_TOUCH_DOWN, 240U, 0U) == OS_STATUS_INVALID_ARGUMENT &&
+           hw_input_text(BUTTONS, 'a') == OS_STATUS_INVALID_ARGUMENT && hw_input_key(TOUCH, KEY_A, 1U) == OS_STATUS_INVALID_ARGUMENT &&
+           hw_input_text(KEYBOARD, 0xD800U) == OS_STATUS_INVALID_ARGUMENT && hw_input_key(42U, KEY_A, 1U) == OS_STATUS_INVALID_ARGUMENT,
        "reports that do not fit the device are refused");
 
     /* Before anyone owns the device, what happens is not kept. */
-    ok(os_input_key(BUTTONS, KEY_SELECT, 1U) == OS_STATUS_OK && os_input_key(BUTTONS, KEY_SELECT, 0U) == OS_STATUS_OK,
+    ok(hw_input_key(BUTTONS, KEY_SELECT, 1U) == OS_STATUS_OK && hw_input_key(BUTTONS, KEY_SELECT, 0U) == OS_STATUS_OK,
        "an unowned device takes reports");
     t = start(&b, "app_main_buttons");
     settle();
-    ok(os_input_get_owner(BUTTONS) == os_task_get_id(t) && os_task_get_state(t) == OS_TASK_WAITING,
+    ok(hw_input_get_owner(BUTTONS) == os_task_get_id(t) && os_task_get_state(t) == OS_TASK_WAITING,
        "the program owns the buttons and waits for them");
-    os_input_key(BUTTONS, KEY_SELECT, 1U);
-    os_input_key(BUTTONS, KEY_SELECT, 1U);
+    hw_input_key(BUTTONS, KEY_SELECT, 1U);
+    hw_input_key(BUTTONS, KEY_SELECT, 1U);
     settle();
     ok(os_get_next_wakeup_ms() == 600U, "a held button asks to wake the kernel at its long-press time");
     os_tick(600U);
     settle();
     os_tick(100U);
-    os_input_key(BUTTONS, KEY_SELECT, 0U);
+    hw_input_key(BUTTONS, KEY_SELECT, 0U);
     ok(finish(t, "app_main_buttons") == 0, "press, long press once at 600 ms, release; nothing from before open");
-    ok(os_input_get_owner(BUTTONS) == 0U, "the device is free again when the program ends");
+    ok(hw_input_get_owner(BUTTONS) == 0U, "the device is free again when the program ends");
 
     t = start(&b, "app_main_keyboard");
     settle();
-    os_input_key(KEYBOARD, KEY_A, 1U);
-    os_input_text(KEYBOARD, 'a');
+    hw_input_key(KEYBOARD, KEY_A, 1U);
+    hw_input_text(KEYBOARD, 'a');
     settle();
     os_tick(300U);
     settle();
     os_tick(100U);
     settle();
-    os_input_key(KEYBOARD, KEY_A, 0U);
+    hw_input_key(KEYBOARD, KEY_A, 0U);
     ok(finish(t, "app_main_keyboard") == 0, "press, text, repeats after 300 ms every 100 ms, release");
 
     t = start(&b, "app_main_bezel");
     settle();
-    os_input_rotate(BEZEL, REL_DIAL, 1);
-    os_input_rotate(BEZEL, REL_DIAL, 1);
-    os_input_rotate(BEZEL, REL_DIAL, 1);
-    os_input_rotate(BEZEL, REL_DIAL, -1);
+    hw_input_rotate(BEZEL, REL_DIAL, 1);
+    hw_input_rotate(BEZEL, REL_DIAL, 1);
+    hw_input_rotate(BEZEL, REL_DIAL, 1);
+    hw_input_rotate(BEZEL, REL_DIAL, -1);
     settle();
-    os_input_rotate(BEZEL, REL_DIAL, -5);
+    hw_input_rotate(BEZEL, REL_DIAL, -5);
     ok(finish(t, "app_main_bezel") == 0, "unread turns add up into one event");
 
     t = start(&b, "app_main_touch");
     settle();
-    os_input_touch(TOUCH, 0U, OS_INPUT_TOUCH_DOWN, 10U, 11U);
-    os_input_touch(TOUCH, 0U, OS_INPUT_TOUCH_MOVE, 20U, 21U);
-    os_input_touch(TOUCH, 0U, OS_INPUT_TOUCH_MOVE, 30U, 31U);
-    os_input_touch(TOUCH, 0U, OS_INPUT_TOUCH_UP, 30U, 31U);
+    hw_input_touch(TOUCH, 0U, HW_INPUT_TOUCH_DOWN, 10U, 11U);
+    hw_input_touch(TOUCH, 0U, HW_INPUT_TOUCH_MOVE, 20U, 21U);
+    hw_input_touch(TOUCH, 0U, HW_INPUT_TOUCH_MOVE, 30U, 31U);
+    hw_input_touch(TOUCH, 0U, HW_INPUT_TOUCH_UP, 30U, 31U);
     ok(finish(t, "app_main_touch") == 0, "down, the last move, up");
 
     t = start(&b, "app_main_overflow");
     settle();
     for (i = 0; i < 40U; i++)
-        os_input_key(BUTTONS, BTN_0 + i / 2U, (uint8_t)(i % 2U == 0U));
+        hw_input_key(BUTTONS, BTN_0 + i / 2U, (uint8_t)(i % 2U == 0U));
     ok(finish(t, "app_main_overflow") == 0, "a full queue drops the oldest events and says how many");
 
     ok(finish(start(&b, "app_main_errors"), "app_main_errors") == 0, "busy, unknown, flags, bad pointers and handles, nothing queued");

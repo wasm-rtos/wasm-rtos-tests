@@ -102,7 +102,7 @@ static void drain(void)
     memcpy(g_sent + g_sent_length, g_fifo, g_fifo_used);
     g_sent_length += g_fifo_used;
     g_fifo_used = 0;
-    os_uart_writable(1U);
+    hw_uart_writable(1U);
 }
 
 static OsTaskHandle start(Bin* b, const char* entry)
@@ -131,8 +131,8 @@ int main(void)
 {
     static const uint8_t reply[] = "$PMTK001,220,3*30\r\n";
     Bin b = {0};
-    OsUartPort port = { NULL, uart_configure, uart_write, uart_close };
-    OsUartPort broken = { NULL, NULL, uart_write, NULL };
+    HwUartPort port = { NULL, uart_configure, uart_write, uart_close };
+    HwUartPort broken = { NULL, NULL, uart_write, NULL };
     OsTaskHandle t = NULL;
     uint32_t i;
     uint8_t noise[300];
@@ -143,14 +143,14 @@ int main(void)
     if (!b.d)
         return 1;
     ok(finish(start(&b, "app_main_try"), "app_main_try") == -13, "without a port uart-open returns -WR_EUNSUPPORTED");
-    ok(os_uart_port_set(&broken) == OS_STATUS_INVALID_ARGUMENT && os_uart_port_set(&port) == OS_STATUS_OK,
+    ok(hw_uart_port_set(&broken) == OS_STATUS_INVALID_ARGUMENT && hw_uart_port_set(&port) == OS_STATUS_OK,
        "a port needs configure and write");
-    ok(os_uart_add("uart1", 1U, 0U) == OS_STATUS_OK && os_uart_add("uart2", 2U, 921600U) == OS_STATUS_OK &&
-           os_uart_add("uart1", 3U, 0U) == OS_STATUS_BUSY,
+    ok(hw_uart_add("uart1", 1U, 0U) == OS_STATUS_OK && hw_uart_add("uart2", 2U, 921600U) == OS_STATUS_OK &&
+           hw_uart_add("uart1", 3U, 0U) == OS_STATUS_BUSY,
        "register two serial ports, the second up to 921600 baud");
 
     /* Bytes before the program opens the port are not kept. */
-    os_uart_receive(1U, reply, 4U);
+    hw_uart_receive(1U, reply, 4U);
     t = start(&b, "app_main_talk");
     for (i = 0; i < 1000U && g_sent_length + g_fifo_used < 18U; i++)
     {
@@ -160,16 +160,16 @@ int main(void)
             os_tick(1U);
     }
     drain();
-    ok(g_baud == 115200U && g_format == OS_UART_PARITY_EVEN, "the port runs at 115200 with even parity");
+    ok(g_baud == 115200U && g_format == HW_UART_PARITY_EVEN, "the port runs at 115200 with even parity");
     ok(g_sent_length == 18U && memcmp(g_sent, "$PMTK220,1000*1F\r\n", 18U) == 0,
        "the whole command went out, 8 bytes at a time, the program waiting for room");
-    ok(os_uart_get_owner(1U) == os_task_get_id(t), "the program owns uart1");
+    ok(hw_uart_get_owner(1U) == os_task_get_id(t), "the program owns uart1");
     /* The reply comes in pieces from the receive interrupt, and a framing error with it. */
-    os_uart_receive(1U, reply, 3U);
-    os_uart_error(1U);
-    os_uart_receive(1U, reply + 3, sizeof(reply) - 4U);
+    hw_uart_receive(1U, reply, 3U);
+    hw_uart_error(1U);
+    hw_uart_receive(1U, reply + 3, sizeof(reply) - 4U);
     ok(finish(t, "app_main_talk") == 1, "the program woke for the reply, read it whole and saw one error");
-    ok(g_closed == 1U && os_uart_get_owner(1U) == 0U, "the port is closed and free when the program ends");
+    ok(g_closed == 1U && hw_uart_get_owner(1U) == 0U, "the port is closed and free when the program ends");
 
     t = start(&b, "app_main_errors");
     ok(finish(t, "app_main_errors") == 0, "busy, unknown, bad speed and format, bad pointers, full, timeout");
@@ -179,7 +179,7 @@ int main(void)
     for (i = 0; i < 1000U && os_task_get_state(t) != OS_TASK_WAITING; i++)
         os_schedule();
     memset(noise, 'n', sizeof(noise));
-    os_uart_receive(1U, noise, sizeof(noise));
+    hw_uart_receive(1U, noise, sizeof(noise));
     ok(finish(t, "app_main_overflow") == 44 * 1000 + 256, "256 bytes kept, 44 dropped and counted");
 
     free(b.d);

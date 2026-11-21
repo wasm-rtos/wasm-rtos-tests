@@ -93,7 +93,7 @@ int main(void)
     printf("build: processes %d, files %d\n", OS_HAS_PROCESSES, OS_HAS_FS);
     ok(load(&b), "load " TEST_NAME ".wasm");
     /* A pin gives programs the gpio driver, so a newer gpio call goes through it. */
-    ok(os_gpio_add_pin("led", 2U, OS_GPIO_CAN_OUTPUT, 0U) == OS_STATUS_OK, "the gpio driver is there");
+    ok(hw_gpio_add_pin("led", 2U, HW_GPIO_CAN_OUTPUT, 0U) == OS_STATUS_OK, "the gpio driver is there");
     if (b.d)
     {
         uint32_t i;

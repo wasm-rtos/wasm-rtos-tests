@@ -143,7 +143,7 @@ static void complete(OsStatus status, uint32_t count)
     uint32_t pin = g_pending_pin;
     g_pending_pin = 0xFFFFFFFFU;
     g_capture = NULL;
-    os_pulse_complete(pin, status, count);
+    hw_pulse_complete(pin, status, count);
 }
 
 /* Ends a capture with nothing captured, as if the kernel cut it short. */
@@ -169,11 +169,11 @@ static uint32_t nec_capture(uint32_t* items, uint8_t address, uint8_t command)
                     ((uint32_t)(uint8_t)~command << 24);
     uint32_t n = 0;
     items[n++] = 9100000U;
-    items[n++] = OS_PULSE_HIGH | 4420000U;
+    items[n++] = HW_PULSE_HIGH | 4420000U;
     for (uint32_t bit = 0; bit < 32U; bit++)
     {
         items[n++] = 600000U;
-        items[n++] = OS_PULSE_HIGH | ((code >> bit) & 1U ? 1650000U : 530000U);
+        items[n++] = HW_PULSE_HIGH | ((code >> bit) & 1U ? 1650000U : 530000U);
     }
     items[n++] = 580000U;
     return n;
@@ -211,9 +211,9 @@ int main(void)
 {
     static const uint8_t grb[9] = { 0x00, 0xFF, 0x00, 0xFF, 0x00, 0x00, 0x00, 0x00, 0xFF };
     Bin b = {0};
-    OsGpioPort gpio = { NULL, gpio_configure, gpio_write, gpio_read };
-    OsPulsePort rmt = { NULL, rmt_configure, rmt_send, rmt_send_bits, rmt_receive, rmt_finish, rmt_release, 25U };
-    OsPulsePort broken = { NULL, rmt_configure, rmt_send, NULL, NULL, NULL, rmt_release, 25U };
+    HwGpioPort gpio = { NULL, gpio_configure, gpio_write, gpio_read };
+    HwPulsePort rmt = { NULL, rmt_configure, rmt_send, rmt_send_bits, rmt_receive, rmt_finish, rmt_release, 25U };
+    HwPulsePort broken = { NULL, rmt_configure, rmt_send, NULL, NULL, NULL, rmt_release, 25U };
     OsTaskHandle t = NULL;
     uint32_t count;
 
@@ -222,14 +222,14 @@ int main(void)
     ok(load(&b), "load pulse_api.wasm");
     if (!b.d)
         return 1;
-    ok(os_gpio_port_set(&gpio) == OS_STATUS_OK &&
-           os_gpio_add_pin("strip", 18U, OS_GPIO_CAN_OUTPUT | OS_GPIO_CAN_PULSE, 0U) == OS_STATUS_OK &&
-           os_gpio_add_pin("ir-in", 19U, OS_GPIO_CAN_INPUT | OS_GPIO_CAN_PULSE, 0U) == OS_STATUS_OK &&
-           os_gpio_add_pin("ir-out", 20U, OS_GPIO_CAN_OUTPUT | OS_GPIO_CAN_PULSE, 0U) == OS_STATUS_OK &&
-           os_gpio_add_pin("led", 2U, OS_GPIO_CAN_OUTPUT, 0U) == OS_STATUS_OK,
+    ok(hw_gpio_port_set(&gpio) == OS_STATUS_OK &&
+           hw_gpio_add_pin("strip", 18U, HW_GPIO_CAN_OUTPUT | HW_GPIO_CAN_PULSE, 0U) == OS_STATUS_OK &&
+           hw_gpio_add_pin("ir-in", 19U, HW_GPIO_CAN_INPUT | HW_GPIO_CAN_PULSE, 0U) == OS_STATUS_OK &&
+           hw_gpio_add_pin("ir-out", 20U, HW_GPIO_CAN_OUTPUT | HW_GPIO_CAN_PULSE, 0U) == OS_STATUS_OK &&
+           hw_gpio_add_pin("led", 2U, HW_GPIO_CAN_OUTPUT, 0U) == OS_STATUS_OK,
        "pins: an LED strip, an infrared receiver and LED with pulse hardware, a plain LED");
     ok(finish(start(&b, "app_main_try"), "app_main_try") == -13, "without a port pulse-open returns -WR_EUNSUPPORTED");
-    ok(os_pulse_port_set(&broken) == OS_STATUS_INVALID_ARGUMENT && os_pulse_port_set(&rmt) == OS_STATUS_OK,
+    ok(hw_pulse_port_set(&broken) == OS_STATUS_INVALID_ARGUMENT && hw_pulse_port_set(&rmt) == OS_STATUS_OK,
        "a port needs configure, send, finish and release");
 
     t = start(&b, "app_main_strip");
@@ -247,8 +247,8 @@ int main(void)
     g_sent_count = 0U;
     t = start(&b, "app_main_ir_send");
     run_until_waiting(t);
-    ok(g_sent_count == 67U && g_carrier == 38000U && g_sent[0] == (OS_PULSE_HIGH | 9000000U) &&
-           g_sent[1] == 4500000U && g_sent[66] == (OS_PULSE_HIGH | 562500U),
+    ok(g_sent_count == 67U && g_carrier == 38000U && g_sent[0] == (HW_PULSE_HIGH | 9000000U) &&
+           g_sent[1] == 4500000U && g_sent[66] == (HW_PULSE_HIGH | 562500U),
        "a NEC frame: 67 items on a 38 kHz carrier");
     complete(OS_STATUS_OK, 0U);
     ok(finish(t, "app_main_ir_send") == 0, "sent");
@@ -257,7 +257,7 @@ int main(void)
     run_until_waiting(t);
     ok(g_capture != NULL && g_capture_max == 80U && g_idle == 10000000U && g_timeout == 1000U,
        "the receiver captures into the program's buffer, up to 10 ms of silence");
-    ok(g_configured[19] == (OS_PULSE_RECEIVE | 0x100U), "the receiver pin is configured to capture");
+    ok(g_configured[19] == (HW_PULSE_RECEIVE | 0x100U), "the receiver pin is configured to capture");
     count = nec_capture(g_capture, 0x04, 0x08);
     complete(OS_STATUS_OK, count);
     ok(finish(t, "app_main_ir_receive") == 0x0408, "a remote's frame is captured and decoded: address 4, command 8");

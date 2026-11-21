@@ -66,8 +66,8 @@ static OsStatus fake_configure(void* context, uint32_t pin, uint32_t flags)
         return OS_STATUS_INVALID_ARGUMENT;
     g_pins[pin].flags = flags;
     g_pins[pin].configures++;
-    if (flags & OS_GPIO_OUTPUT)
-        g_pins[pin].level = (flags & OS_GPIO_INIT_HIGH) ? 1U : 0U;
+    if (flags & HW_GPIO_OUTPUT)
+        g_pins[pin].level = (flags & HW_GPIO_INIT_HIGH) ? 1U : 0U;
     return OS_STATUS_OK;
 }
 
@@ -85,11 +85,11 @@ static OsStatus fake_read(void* context, uint32_t pin, uint8_t* out_level)
     (void)context;
     if (pin >= 8U)
         return OS_STATUS_INVALID_ARGUMENT;
-    *out_level = (g_pins[pin].flags & OS_GPIO_OUTPUT) ? g_pins[pin].level : g_pins[pin].input;
+    *out_level = (g_pins[pin].flags & HW_GPIO_OUTPUT) ? g_pins[pin].level : g_pins[pin].input;
     return OS_STATUS_OK;
 }
 
-static const OsGpioPort g_port = { NULL, fake_configure, fake_write, fake_read };
+static const HwGpioPort g_port = { NULL, fake_configure, fake_write, fake_read };
 
 static OsTaskHandle create(Bin* b, const char* entry)
 {
@@ -128,14 +128,14 @@ static void report(const char* entry, int32_t result)
 
 static void setup_board(void)
 {
-    ok(os_gpio_port_set(&g_port) == OS_STATUS_OK, "install the GPIO port");
-    ok(os_gpio_add_pin("led", 2U, OS_GPIO_CAN_INPUT | OS_GPIO_CAN_OUTPUT, OS_GPIO_ACTIVE_LOW) == OS_STATUS_OK &&
-           os_gpio_add_pin("gpio2", 2U, OS_GPIO_CAN_INPUT | OS_GPIO_CAN_OUTPUT, OS_GPIO_ACTIVE_LOW) == OS_STATUS_OK,
+    ok(hw_gpio_port_set(&g_port) == OS_STATUS_OK, "install the GPIO port");
+    ok(hw_gpio_add_pin("led", 2U, HW_GPIO_CAN_INPUT | HW_GPIO_CAN_OUTPUT, HW_GPIO_ACTIVE_LOW) == OS_STATUS_OK &&
+           hw_gpio_add_pin("gpio2", 2U, HW_GPIO_CAN_INPUT | HW_GPIO_CAN_OUTPUT, HW_GPIO_ACTIVE_LOW) == OS_STATUS_OK,
        "register the active-low LED under two names");
-    ok(os_gpio_add_pin("button-a", 0U, OS_GPIO_CAN_INPUT | OS_GPIO_CAN_PULL_UP | OS_GPIO_CAN_EDGES, 0U) == OS_STATUS_OK,
+    ok(hw_gpio_add_pin("button-a", 0U, HW_GPIO_CAN_INPUT | HW_GPIO_CAN_PULL_UP | HW_GPIO_CAN_EDGES, 0U) == OS_STATUS_OK,
        "register a button that reports edges");
-    ok(os_gpio_add_pin("sensor", 4U,
-                       OS_GPIO_CAN_INPUT | OS_GPIO_CAN_OUTPUT | OS_GPIO_CAN_OPEN_DRAIN | OS_GPIO_CAN_PULL_UP,
+    ok(hw_gpio_add_pin("sensor", 4U,
+                       HW_GPIO_CAN_INPUT | HW_GPIO_CAN_OUTPUT | HW_GPIO_CAN_OPEN_DRAIN | HW_GPIO_CAN_PULL_UP,
                        0U) == OS_STATUS_OK,
        "register an open-drain sensor pin");
 }
@@ -159,16 +159,16 @@ int main(void)
     os_task_delete(t);
 
     setup_board();
-    ok(os_gpio_add_pin("led", 3U, OS_GPIO_CAN_OUTPUT, 0U) == OS_STATUS_BUSY, "a name is registered once");
-    ok(os_gpio_add_pin("d2", 2U, OS_GPIO_CAN_OUTPUT, 0U) == OS_STATUS_INVALID_ARGUMENT,
+    ok(hw_gpio_add_pin("led", 3U, HW_GPIO_CAN_OUTPUT, 0U) == OS_STATUS_BUSY, "a name is registered once");
+    ok(hw_gpio_add_pin("d2", 2U, HW_GPIO_CAN_OUTPUT, 0U) == OS_STATUS_INVALID_ARGUMENT,
        "another name for a pin must describe it the same way");
-    ok(os_gpio_add_pin("a-name-that-is-longer-than-32-bytes", 5U, OS_GPIO_CAN_ALL, 0U) == OS_STATUS_INVALID_ARGUMENT,
+    ok(hw_gpio_add_pin("a-name-that-is-longer-than-32-bytes", 5U, HW_GPIO_CAN_ALL, 0U) == OS_STATUS_INVALID_ARGUMENT,
        "names longer than 32 bytes are refused");
 
     /* Logical levels over an inverted pin, and release at the end. */
     t = create(&b, "app_main_led");
     run_until_waiting(t);
-    ok(g_pins[2].flags == OS_GPIO_OUTPUT && g_pins[2].level == 0U,
+    ok(g_pins[2].flags == HW_GPIO_OUTPUT && g_pins[2].level == 0U,
        "\"on\" drives the active-low LED low from the start");
     os_tick(10U);
     run_until_waiting(t);
@@ -192,14 +192,14 @@ int main(void)
     g_pins[0].input = 1U;
     run_until_waiting(t);
     ok(os_task_get_state(t) == OS_TASK_WAITING, "the program waits for the button or its timer");
-    ok(g_pins[0].flags == (OS_GPIO_PULL_UP | OS_GPIO_EDGE_FALLING),
+    ok(g_pins[0].flags == (HW_GPIO_PULL_UP | HW_GPIO_EDGE_FALLING),
        "a logical press of an active-low button asks the port for falling edges");
     g_pins[0].input = 0U;
-    os_gpio_edge(0U, OS_GPIO_EDGE_FALLING);
+    hw_gpio_edge(0U, HW_GPIO_EDGE_FALLING);
     g_pins[0].input = 1U;
-    os_gpio_edge(0U, OS_GPIO_EDGE_RISING);
+    hw_gpio_edge(0U, HW_GPIO_EDGE_RISING);
     g_pins[0].input = 0U;
-    os_gpio_edge(0U, OS_GPIO_EDGE_FALLING);
+    hw_gpio_edge(0U, HW_GPIO_EDGE_FALLING);
     ok(os_task_get_state(t) == OS_TASK_WAITING, "edges wait for the scheduler");
     result = run_to_result(t);
     ok(result == 21, "two presses counted, releases ignored, the button reads pressed");
@@ -208,7 +208,7 @@ int main(void)
     /* One owner at a time; a stopped or crashed owner gives the pin back. */
     holder = create(&b, "app_main_hold");
     run_until_waiting(holder);
-    ok(os_gpio_get_owner(2U) == os_task_get_id(holder) && os_gpio_get_owner(4U) == 0U,
+    ok(hw_gpio_get_owner(2U) == os_task_get_id(holder) && hw_gpio_get_owner(4U) == 0U,
        "the host sees who owns a pin");
     t = create(&b, "app_main_try");
     ok(run_to_result(t) == -22, "a second program gets -WR_EINUSE");
