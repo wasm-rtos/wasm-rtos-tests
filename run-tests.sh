@@ -82,6 +82,10 @@ for dir in tests/*; do
     if [ "$name" = "custom_page_size" ]; then
         guest_flags=(-Wl,--page-size=1 -Wl,-z,stack-size=4096)
     fi
+    if [ "$name" = "page_clean" ]; then
+        # 4 KB of stack keeps the sleeper's memory at two pages (32 frames).
+        guest_flags=(-Wl,-z,stack-size=4096)
+    fi
 
     if [ "$name" = "dylink0" ]; then
         library_source="$dir/library.c"
