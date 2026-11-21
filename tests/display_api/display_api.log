@@ -6,7 +6,7 @@ PASS install the display port
 PASS register the round LCD
 PASS register the monochrome OLED
 PASS names and numbers are registered once
-PASS OS_DISPLAY_MAX displays
+PASS HW_DISPLAY_MAX displays
 PASS the native format must be accepted
 PASS size, shape, formats, dpi, brightness; one owner; not waitable
 PASS the display is free again when the program ends
