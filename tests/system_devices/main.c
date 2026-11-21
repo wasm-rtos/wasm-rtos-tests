@@ -92,7 +92,7 @@ static OsStatus gpio_configure(void* c, uint32_t pin, uint32_t flags)
 {
     (void)c;
     g_hw.gpio_flags[pin] = flags;
-    g_hw.gpio_level[pin] = (flags & OS_GPIO_INIT_HIGH) != 0U;
+    g_hw.gpio_level[pin] = (flags & HW_GPIO_INIT_HIGH) != 0U;
     return OS_STATUS_OK;
 }
 
@@ -244,33 +244,33 @@ static OsStatus uart_write(void* c, uint32_t uart, const uint8_t* data, uint32_t
     return OS_STATUS_OK;
 }
 
-static OsStatus i2c_transaction(void* c, uint32_t bus, uint32_t address, uint32_t hz, const OsI2cOp* ops, uint32_t count)
+static OsStatus i2c_transaction(void* c, uint32_t bus, uint32_t address, uint32_t hz, const HwI2cOp* ops, uint32_t count)
 {
     uint8_t reg = 0;
     uint32_t i;
     (void)c, (void)hz;
     for (i = 0; i < count; i++)
     {
-        if (ops[i].kind == OS_I2C_WRITE && ops[i].length > 0U)
+        if (ops[i].kind == HW_I2C_WRITE && ops[i].length > 0U)
             reg = ops[i].data[0];
-        else if (ops[i].kind == OS_I2C_READ && ops[i].length > 0U)
+        else if (ops[i].kind == HW_I2C_READ && ops[i].length > 0U)
             ops[i].data[0] = (uint8_t)(address + bus + reg * 3U);
     }
     return OS_STATUS_OK;
 }
 
-static OsStatus spi_transaction(void* c, uint32_t bus, uint32_t mode, uint32_t hz, const OsSpiOp* ops, uint32_t count)
+static OsStatus spi_transaction(void* c, uint32_t bus, uint32_t mode, uint32_t hz, const HwSpiOp* ops, uint32_t count)
 {
     uint32_t i;
     uint32_t k;
     (void)c, (void)bus;
     for (i = 0; i < count; i++)
-        for (k = 0; ops[i].kind == OS_SPI_TRANSFER && k < ops[i].length; k++)
+        for (k = 0; ops[i].kind == HW_SPI_TRANSFER && k < ops[i].length; k++)
             ops[i].read[k] = (uint8_t)(ops[i].write[k] ^ mode ^ (hz >> 16));
     return OS_STATUS_OK;
 }
 
-static OsStatus onewire_transaction(void* c, uint32_t bus, const OsOneWireOp* ops, uint32_t count)
+static OsStatus onewire_transaction(void* c, uint32_t bus, const HwOneWireOp* ops, uint32_t count)
 {
     (void)c, (void)bus, (void)ops, (void)count;
     return OS_STATUS_OK;
@@ -290,17 +290,17 @@ static OsStatus display_brightness(void* c, uint32_t display, uint8_t level)
     return OS_STATUS_OK;
 }
 
-static const OsGpioPort g_gpio_port = { NULL, gpio_configure, gpio_write, gpio_read };
-static const OsPwmPort g_pwm_port = { NULL, pwm_start, pwm_duty, pwm_frequency, pwm_stop };
-static const OsDacPort g_dac_port = { NULL, dac_start, dac_write, dac_stop };
-static const OsAdcPort g_adc_port = { NULL, adc_read, NULL };
-static const OsCounterPort g_counter_port = { NULL, counter_start, counter_read, counter_write, NULL, counter_stop };
-static const OsPulsePort g_pulse_port = { NULL, pulse_configure, pulse_send, NULL, NULL, pulse_finish, pulse_release, 125U };
-static const OsUartPort g_uart_port = { NULL, uart_configure, uart_write, NULL };
-static const OsI2cPort g_i2c_port = { NULL, i2c_transaction, NULL };
-static const OsSpiPort g_spi_port = { NULL, spi_transaction, NULL };
-static const OsOneWirePort g_onewire_port = { NULL, onewire_transaction, NULL, NULL };
-static const OsDisplayPort g_display_port = { NULL, display_write, NULL, NULL, display_brightness };
+static const HwGpioPort g_gpio_port = { NULL, gpio_configure, gpio_write, gpio_read };
+static const HwPwmPort g_pwm_port = { NULL, pwm_start, pwm_duty, pwm_frequency, pwm_stop };
+static const HwDacPort g_dac_port = { NULL, dac_start, dac_write, dac_stop };
+static const HwAdcPort g_adc_port = { NULL, adc_read, NULL };
+static const HwCounterPort g_counter_port = { NULL, counter_start, counter_read, counter_write, NULL, counter_stop };
+static const HwPulsePort g_pulse_port = { NULL, pulse_configure, pulse_send, NULL, NULL, pulse_finish, pulse_release, 125U };
+static const HwUartPort g_uart_port = { NULL, uart_configure, uart_write, NULL };
+static const HwI2cPort g_i2c_port = { NULL, i2c_transaction, NULL };
+static const HwSpiPort g_spi_port = { NULL, spi_transaction, NULL };
+static const HwOneWirePort g_onewire_port = { NULL, onewire_transaction, NULL, NULL };
+static const HwDisplayPort g_display_port = { NULL, display_write, NULL, NULL, display_brightness };
 
 /* Which devices the firmware registers this time. */
 static int g_with_counter = 1;
@@ -310,64 +310,64 @@ static int g_reordered;
 /* What the port does at every start: the kernel and every device, by name. */
 static void boot(void)
 {
-    OsDacInfo dac = { 10U, 3300U };
-    OsAdcInfo adc = { 12U, 3300U };
-    OsCounterInfo counter = { OS_COUNTER_PULSE, 0U };
-    OsInputInfo keys;
-    OsDisplayInfo display;
+    HwDacInfo dac = { 10U, 3300U };
+    HwAdcInfo adc = { 12U, 3300U };
+    HwCounterInfo counter = { HW_COUNTER_PULSE, 0U };
+    HwInputInfo keys;
+    HwDisplayInfo display;
 
     memset(&g_hw, 0, sizeof(g_hw));
     memset(&keys, 0, sizeof(keys));
     memset(&display, 0, sizeof(display));
-    keys.kind = OS_INPUT_BUTTONS;
+    keys.kind = HW_INPUT_BUTTONS;
     display.width = 64U;
     display.height = 32U;
-    display.format = OS_DISPLAY_RGB565;
-    display.formats = OS_DISPLAY_FORMAT_BIT(OS_DISPLAY_RGB565);
+    display.format = HW_DISPLAY_RGB565;
+    display.formats = HW_DISPLAY_FORMAT_BIT(HW_DISPLAY_RGB565);
     display.has_brightness = 1U;
     display.brightness = 200U;
     display.keeps_image = (uint8_t)g_display_keeps_image;
 
     os_init();
-    os_gpio_port_set(&g_gpio_port);
+    hw_gpio_port_set(&g_gpio_port);
     if (g_reordered)
     {
         /* Another firmware: the same names, registered in another order, so in other slots. */
-        os_gpio_add_pin("ir", 7U, OS_GPIO_CAN_OUTPUT | OS_GPIO_CAN_PULSE, 0U);
-        os_gpio_add_pin("spare", 3U, OS_GPIO_CAN_OUTPUT, 0U);
-        os_gpio_add_pin("cs", 6U, OS_GPIO_CAN_OUTPUT, 0U);
-        os_gpio_add_pin("motor", 5U, OS_GPIO_CAN_OUTPUT | OS_GPIO_CAN_PWM, 0U);
-        os_gpio_add_pin("led", 2U, OS_GPIO_CAN_INPUT | OS_GPIO_CAN_OUTPUT, 0U);
-        os_gpio_add_pin("button", 0U, OS_GPIO_CAN_INPUT | OS_GPIO_CAN_PULL_UP | OS_GPIO_CAN_EDGES, 0U);
+        hw_gpio_add_pin("ir", 7U, HW_GPIO_CAN_OUTPUT | HW_GPIO_CAN_PULSE, 0U);
+        hw_gpio_add_pin("spare", 3U, HW_GPIO_CAN_OUTPUT, 0U);
+        hw_gpio_add_pin("cs", 6U, HW_GPIO_CAN_OUTPUT, 0U);
+        hw_gpio_add_pin("motor", 5U, HW_GPIO_CAN_OUTPUT | HW_GPIO_CAN_PWM, 0U);
+        hw_gpio_add_pin("led", 2U, HW_GPIO_CAN_INPUT | HW_GPIO_CAN_OUTPUT, 0U);
+        hw_gpio_add_pin("button", 0U, HW_GPIO_CAN_INPUT | HW_GPIO_CAN_PULL_UP | HW_GPIO_CAN_EDGES, 0U);
     }
     else
     {
-        os_gpio_add_pin("button", 0U, OS_GPIO_CAN_INPUT | OS_GPIO_CAN_PULL_UP | OS_GPIO_CAN_EDGES, 0U);
-        os_gpio_add_pin("led", 2U, OS_GPIO_CAN_INPUT | OS_GPIO_CAN_OUTPUT, 0U);
-        os_gpio_add_pin("motor", 5U, OS_GPIO_CAN_OUTPUT | OS_GPIO_CAN_PWM, 0U);
-        os_gpio_add_pin("cs", 6U, OS_GPIO_CAN_OUTPUT, 0U);
-        os_gpio_add_pin("ir", 7U, OS_GPIO_CAN_OUTPUT | OS_GPIO_CAN_PULSE, 0U);
+        hw_gpio_add_pin("button", 0U, HW_GPIO_CAN_INPUT | HW_GPIO_CAN_PULL_UP | HW_GPIO_CAN_EDGES, 0U);
+        hw_gpio_add_pin("led", 2U, HW_GPIO_CAN_INPUT | HW_GPIO_CAN_OUTPUT, 0U);
+        hw_gpio_add_pin("motor", 5U, HW_GPIO_CAN_OUTPUT | HW_GPIO_CAN_PWM, 0U);
+        hw_gpio_add_pin("cs", 6U, HW_GPIO_CAN_OUTPUT, 0U);
+        hw_gpio_add_pin("ir", 7U, HW_GPIO_CAN_OUTPUT | HW_GPIO_CAN_PULSE, 0U);
     }
-    os_pwm_port_set(&g_pwm_port);
-    os_dac_port_set(&g_dac_port);
-    os_dac_add_channel("dac0", 1U, &dac);
-    os_adc_port_set(&g_adc_port);
-    os_adc_add_channel("adc0", 1U, &adc);
-    os_counter_port_set(&g_counter_port);
+    hw_pwm_port_set(&g_pwm_port);
+    hw_dac_port_set(&g_dac_port);
+    hw_dac_add_channel("dac0", 1U, &dac);
+    hw_adc_port_set(&g_adc_port);
+    hw_adc_add_channel("adc0", 1U, &adc);
+    hw_counter_port_set(&g_counter_port);
     if (g_with_counter)
-        os_counter_add("enc", 1U, &counter);
-    os_pulse_port_set(&g_pulse_port);
-    os_uart_port_set(&g_uart_port);
-    os_uart_add("uart1", 1U, 0U);
-    os_input_add("keys", 1U, &keys);
-    os_i2c_port_set(&g_i2c_port);
-    os_i2c_add_bus("i2c0", 0U, 400000U);
-    os_spi_port_set(&g_spi_port);
-    os_spi_add_bus("spi0", 0U, 8000000U);
-    os_onewire_port_set(&g_onewire_port);
-    os_onewire_add_bus("ow0", 0U);
-    os_display_port_set(&g_display_port);
-    os_display_add("main", 1U, &display);
+        hw_counter_add("enc", 1U, &counter);
+    hw_pulse_port_set(&g_pulse_port);
+    hw_uart_port_set(&g_uart_port);
+    hw_uart_add("uart1", 1U, 0U);
+    hw_input_add("keys", 1U, &keys);
+    hw_i2c_port_set(&g_i2c_port);
+    hw_i2c_add_bus("i2c0", 0U, 400000U);
+    hw_spi_port_set(&g_spi_port);
+    hw_spi_add_bus("spi0", 0U, 8000000U);
+    hw_onewire_port_set(&g_onewire_port);
+    hw_onewire_add_bus("ow0", 0U);
+    hw_display_port_set(&g_display_port);
+    hw_display_add("main", 1U, &display);
 }
 
 #define TASKS 6
@@ -410,22 +410,22 @@ static void world(void)
     if (g_with_counter)
         g_hw.count[1] += 1;
     if (g_ms == 4U || g_ms == 23U)
-        os_gpio_edge(0U, OS_GPIO_EDGE_FALLING);
+        hw_gpio_edge(0U, HW_GPIO_EDGE_FALLING);
     /* Two presses at 10 ms: one just before the sleep, one that wakes the board. */
     if (g_ms == 10U && !g_early_delivered)
-        os_gpio_edge(0U, OS_GPIO_EDGE_FALLING);
+        hw_gpio_edge(0U, HW_GPIO_EDGE_FALLING);
     if (g_ms == 10U && !g_button_delivered)
-        os_gpio_edge(0U, OS_GPIO_EDGE_FALLING);
+        hw_gpio_edge(0U, HW_GPIO_EDGE_FALLING);
     if (g_ms == 10U && !g_early_delivered)
-        os_input_key(1U, 31U, 1U);
+        hw_input_key(1U, 31U, 1U);
     if (g_ms == 7U)
-        os_uart_receive(1U, first, 5U);
+        hw_uart_receive(1U, first, 5U);
     if (g_ms == 17U)
-        os_uart_receive(1U, second, 5U);
+        hw_uart_receive(1U, second, 5U);
     if (g_ms == 6U || g_ms == 21U)
-        os_input_key(1U, 30U, 1U);
+        hw_input_key(1U, 30U, 1U);
     if (g_ms == 8U || g_ms == 22U)
-        os_input_key(1U, 30U, 0U);
+        hw_input_key(1U, 30U, 0U);
 }
 
 /* One millisecond: the world, then every task that is ready runs until none is. */
@@ -512,7 +512,7 @@ int main(void)
 {
     Stream s = {0};
     Hardware before;
-    OsGpioWake wake[4];
+    HwGpioWake wake[4];
     uint32_t i;
 
     l = fopen("system_devices.log", "w");
@@ -544,13 +544,13 @@ int main(void)
     start();
     for (i = 0; i < 9U; i++)
         step();
-    ok(os_gpio_wake_pins(wake, 4U) == 1U && wake[0].pin == 0U && wake[0].edges == OS_GPIO_EDGE_FALLING,
+    ok(hw_gpio_wake_pins(wake, 4U) == 1U && wake[0].pin == 0U && wake[0].edges == HW_GPIO_EDGE_FALLING,
        "the button the program waits on is the one wake pin, its falling edge");
     /* A press and a key just before the sleep: the kernel has them, no program has read them. */
-    os_gpio_edge(0U, OS_GPIO_EDGE_FALLING);
-    os_input_key(1U, 31U, 1U);
+    hw_gpio_edge(0U, HW_GPIO_EDGE_FALLING);
+    hw_input_key(1U, 31U, 1U);
     g_early_delivered = 1;
-    ok(g_hw.gpio_level[2] == 0U && (g_hw.gpio_flags[2] & OS_GPIO_INIT_HIGH) != 0U,
+    ok(g_hw.gpio_level[2] == 0U && (g_hw.gpio_flags[2] & HW_GPIO_INIT_HIGH) != 0U,
        "the LED was opened high and the program has set it low");
     before = g_hw;
     s.n = 0;
@@ -567,15 +567,15 @@ int main(void)
     /* A pin's state is its mode and level; how it was told its first level does not matter. */
     for (i = 0; i < 8U; i++)
     {
-        before.gpio_flags[i] &= ~OS_GPIO_INIT_HIGH;
-        g_hw.gpio_flags[i] &= ~OS_GPIO_INIT_HIGH;
+        before.gpio_flags[i] &= ~HW_GPIO_INIT_HIGH;
+        g_hw.gpio_flags[i] &= ~HW_GPIO_INIT_HIGH;
     }
     ok(memcmp(&before, &g_hw, sizeof(g_hw)) == 0,
        "every device is set up as it was: pins, levels, PWM, DAC, counter, pulse, serial port, brightness");
-    ok(os_spi_get_owner(0U, 6U) == g_ids[5] && os_gpio_get_owner(6U) == g_ids[5],
+    ok(hw_spi_get_owner(0U, 6U) == g_ids[5] && hw_gpio_get_owner(6U) == g_ids[5],
        "the SPI device and its chip select pin are the program's again");
     /* The press that woke the board, as the port reports it. */
-    os_gpio_edge(0U, OS_GPIO_EDGE_FALLING);
+    hw_gpio_edge(0U, HW_GPIO_EDGE_FALLING);
     g_button_delivered = 1;
     run_to_end();
     g_button_delivered = 0;
@@ -603,8 +603,8 @@ int main(void)
     start();
     for (i = 0; i < 9U; i++)
         step();
-    os_gpio_edge(0U, OS_GPIO_EDGE_FALLING);
-    os_input_key(1U, 31U, 1U);
+    hw_gpio_edge(0U, HW_GPIO_EDGE_FALLING);
+    hw_input_key(1U, 31U, 1U);
     g_early_delivered = 1;
     s.n = 0;
     os_system_save(stream_write, &s);
@@ -625,10 +625,10 @@ int main(void)
         ok(os_task_get_state(analog) == OS_TASK_DEAD && error &&
                strcmp(error, "restore: a device it held cannot be set up") == 0,
            "the program whose PWM output cannot start ended: restore: a device it held cannot be set up");
-        ok(os_gpio_get_owner(5U) == 0U && os_dac_get_owner(1U) == 0U,
+        ok(hw_gpio_get_owner(5U) == 0U && hw_dac_get_owner(1U) == 0U,
            "and its pin and analog output are free again");
     }
-    os_gpio_edge(0U, OS_GPIO_EDGE_FALLING);
+    hw_gpio_edge(0U, HW_GPIO_EDGE_FALLING);
     g_button_delivered = 1;
     run_to_end();
     g_button_delivered = 0;

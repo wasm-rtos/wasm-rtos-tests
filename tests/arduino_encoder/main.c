@@ -107,9 +107,9 @@ int main(void)
 {
     static const char expected[] =
         "position 0\r\nposition 4\r\nposition 8\r\n100\r\nposition 104\r\nposition 108\r\nreset 108\r\n0\r\n";
-    static const OsCounterInfo encoder = { OS_COUNTER_QUADRATURE, 0U };
+    static const HwCounterInfo encoder = { HW_COUNTER_QUADRATURE, 0U };
     Bin b = {0};
-    OsCounterPort port = { NULL, fake_start, fake_read, fake_write, NULL, fake_stop };
+    HwCounterPort port = { NULL, fake_start, fake_read, fake_write, NULL, fake_stop };
     OsOutputPort output = { NULL, capture };
     OsTaskHandle t = NULL;
     uint32_t i;
@@ -119,7 +119,7 @@ int main(void)
     ok(load(&b), "load arduino_encoder.wasm");
     if (!b.d)
         return 1;
-    ok(os_counter_port_set(&port) == OS_STATUS_OK && os_counter_add("gpio18", 0U, &encoder) == OS_STATUS_OK &&
+    ok(hw_counter_port_set(&port) == OS_STATUS_OK && hw_counter_add("gpio18", 0U, &encoder) == OS_STATUS_OK &&
            os_output_port_set(&output) == OS_STATUS_OK,
        "a board with a quadrature encoder on pins 18 and 19");
     ok(os_task_create(&t, b.d, b.n, "_start", "sketch", 65536U, OS_TASK_PRIORITY_NORMAL) == OS_STATUS_OK && t,
@@ -138,7 +138,7 @@ int main(void)
     ok(strcmp(g_output, expected) == 0, "Encoder read the turns, write moved the position, readAndReset lost no step");
     if (strcmp(g_output, expected) != 0)
         printf("got:\n%s\nexpected:\n%s\n", g_output, expected);
-    ok(g_mode == OS_COUNTER_X4 && !g_running && os_counter_get_owner(0U) == 0U,
+    ok(g_mode == HW_COUNTER_X4 && !g_running && hw_counter_get_owner(0U) == 0U,
        "Encoder(18, 19) counted every edge (x4) of counter \"gpio18\", stopped at exit");
 
     if (t)

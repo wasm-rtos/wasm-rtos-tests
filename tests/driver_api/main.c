@@ -1,4 +1,5 @@
-#include "driver.h"
+#include "os.h"
+#include "hw/hw_driver.h"
 
 #include <stdint.h>
 #include <stdio.h>
@@ -51,30 +52,30 @@ static int load(Bin* b)
 }
 
 /* The host's own driver: wasm-rtos:kernel/echo. */
-extern const OsDriver echo_driver;
+extern const HwDriver echo_driver;
 
-static OS_HOST_FUNCTION(echo_twice)
+static HW_HOST_FUNCTION(echo_twice)
 {
-    OS_HOST_RETURNS(int32_t);
-    OS_HOST_ARG(int32_t, value);
-    OS_ABI_UNUSED();
-    OS_HOST_RETURN(value * 2);
+    HW_HOST_RETURNS(int32_t);
+    HW_HOST_ARG(int32_t, value);
+    HW_ABI_UNUSED();
+    HW_HOST_RETURN(value * 2);
 }
 
-static OS_HOST_FUNCTION(echo_open)
+static HW_HOST_FUNCTION(echo_open)
 {
-    OS_HOST_RETURNS(int32_t);
-    OS_ABI_UNUSED();
-    OS_HOST_RETURN(os_driver_handle_new(&echo_driver, 7U));
+    HW_HOST_RETURNS(int32_t);
+    HW_ABI_UNUSED();
+    HW_HOST_RETURN(hw_driver_handle_new(&echo_driver, 7U));
 }
 
-static OS_HOST_FUNCTION(echo_id)
+static HW_HOST_FUNCTION(echo_id)
 {
-    OS_HOST_RETURNS(int32_t);
-    OS_HOST_ARG(int32_t, handle);
+    HW_HOST_RETURNS(int32_t);
+    HW_HOST_ARG(int32_t, handle);
     uint32_t id = 0U;
-    OS_ABI_UNUSED();
-    OS_HOST_RETURN(os_driver_handle_get(&echo_driver, handle, &id) ? (int32_t)id : -WR_EBADH);
+    HW_ABI_UNUSED();
+    HW_HOST_RETURN(hw_driver_handle_get(&echo_driver, handle, &id) ? (int32_t)id : -WR_EBADH);
 }
 
 static void echo_close(uint32_t id)
@@ -82,13 +83,13 @@ static void echo_close(uint32_t id)
     g_closed += id;
 }
 
-static const OsDriverCall echo_calls[] = {
+static const HwDriverCall echo_calls[] = {
     { "twice", "i(i)", echo_twice, 0U },
     { "open", "i()", echo_open, 0U },
     { "id", "i(i)", echo_id, 0U },
 };
 
-const OsDriver echo_driver = {
+const HwDriver echo_driver = {
     .interface = "echo",
     .calls = echo_calls,
     .call_count = 3U,
@@ -120,8 +121,8 @@ int main(void)
     {
         ok(run(&b, "app_main_absent") == 1,
            "a program that imports interfaces no driver offers loads; their calls are unsupported");
-        ok(os_driver_add(&echo_driver) == OS_STATUS_OK, "add the host's own driver");
-        ok(os_driver_add(&echo_driver) == OS_STATUS_OK, "adding it again does nothing");
+        ok(hw_driver_add(&echo_driver) == OS_STATUS_OK, "add the host's own driver");
+        ok(hw_driver_add(&echo_driver) == OS_STATUS_OK, "adding it again does nothing");
         ok(run(&b, "app_main_custom") == 42, "a program calls the driver and uses its handle");
         ok(g_closed == 7U, "closing the handle reached the driver");
         free(b.d);

@@ -70,17 +70,17 @@ static OsStatus fake_write(void* context, uint32_t display, uint32_t x, uint32_t
     {
         for (column = 0; column < width; column++)
         {
-            if (display == 0U && format == OS_DISPLAY_RGB565)
+            if (display == 0U && format == HW_DISPLAY_RGB565)
             {
                 const uint8_t* p = bytes + (row * width + column) * 2U;
                 g_lcd[(y + row) * 240U + x + column] = (uint16_t)(p[0] | (p[1] << 8));
             }
-            else if (display == 0U && format == OS_DISPLAY_XRGB8888)
+            else if (display == 0U && format == HW_DISPLAY_XRGB8888)
             {
                 const uint8_t* p = bytes + (row * width + column) * 4U;
                 g_lcd[(y + row) * 240U + x + column] = (uint16_t)(((p[2] >> 3) << 11) | ((p[1] >> 2) << 5) | (p[0] >> 3));
             }
-            else if (display == 1U && format == OS_DISPLAY_MONO1)
+            else if (display == 1U && format == HW_DISPLAY_MONO1)
             {
                 uint8_t byte = bytes[row * ((width + 7U) / 8U) + column / 8U];
                 g_oled[(y + row) * 128U + x + column] = (uint8_t)((byte >> (7U - column % 8U)) & 1U);
@@ -101,7 +101,7 @@ static OsStatus fake_fill(void* context, uint32_t display, uint32_t x, uint32_t 
     uint32_t row;
     uint32_t column;
     (void)context;
-    if (display != 0U || format != OS_DISPLAY_RGB565)
+    if (display != 0U || format != HW_DISPLAY_RGB565)
         return OS_STATUS_UNSUPPORTED;
     g_fills++;
     for (row = 0; row < height; row++)
@@ -159,14 +159,14 @@ static int oled_ones(void)
 int main(void)
 {
     Bin b = {0};
-    OsDisplayPort port = { NULL, fake_write, fake_fill, fake_flush, fake_brightness };
-    OsDisplayPort no_write = { NULL, NULL, NULL, NULL, NULL };
-    OsDisplayInfo round_lcd = { 240U, 240U, OS_DISPLAY_ROUND, OS_DISPLAY_RGB565, 260U,
-                                OS_DISPLAY_FORMAT_BIT(OS_DISPLAY_RGB565) | OS_DISPLAY_FORMAT_BIT(OS_DISPLAY_XRGB8888),
+    HwDisplayPort port = { NULL, fake_write, fake_fill, fake_flush, fake_brightness };
+    HwDisplayPort no_write = { NULL, NULL, NULL, NULL, NULL };
+    HwDisplayInfo round_lcd = { 240U, 240U, HW_DISPLAY_ROUND, HW_DISPLAY_RGB565, 260U,
+                                HW_DISPLAY_FORMAT_BIT(HW_DISPLAY_RGB565) | HW_DISPLAY_FORMAT_BIT(HW_DISPLAY_XRGB8888),
                                 1U, 200U };
-    OsDisplayInfo oled = { 128U, 64U, OS_DISPLAY_RECTANGLE, OS_DISPLAY_MONO1, 0U,
-                           OS_DISPLAY_FORMAT_BIT(OS_DISPLAY_MONO1), 0U, 0U };
-    OsDisplayInfo bad = round_lcd;
+    HwDisplayInfo oled = { 128U, 64U, HW_DISPLAY_RECTANGLE, HW_DISPLAY_MONO1, 0U,
+                           HW_DISPLAY_FORMAT_BIT(HW_DISPLAY_MONO1), 0U, 0U };
+    HwDisplayInfo bad = round_lcd;
 
     l = fopen("display_api.log", "w");
     ok(os_init() == OS_STATUS_OK, "initialize OS");
@@ -176,18 +176,18 @@ int main(void)
 
     ok(run_entry(&b, "app_main_try") == -13, "without a port display-open returns -WR_EUNSUPPORTED");
 
-    ok(os_display_port_set(&no_write) == OS_STATUS_INVALID_ARGUMENT, "a port needs write");
-    ok(os_display_port_set(&port) == OS_STATUS_OK, "install the display port");
-    ok(os_display_add("main", 0U, &round_lcd) == OS_STATUS_OK, "register the round LCD");
-    ok(os_display_add("oled", 1U, &oled) == OS_STATUS_OK, "register the monochrome OLED");
-    ok(os_display_add("main", 2U, &oled) == OS_STATUS_BUSY && os_display_add("other", 0U, &oled) == OS_STATUS_BUSY,
+    ok(hw_display_port_set(&no_write) == OS_STATUS_INVALID_ARGUMENT, "a port needs write");
+    ok(hw_display_port_set(&port) == OS_STATUS_OK, "install the display port");
+    ok(hw_display_add("main", 0U, &round_lcd) == OS_STATUS_OK, "register the round LCD");
+    ok(hw_display_add("oled", 1U, &oled) == OS_STATUS_OK, "register the monochrome OLED");
+    ok(hw_display_add("main", 2U, &oled) == OS_STATUS_BUSY && hw_display_add("other", 0U, &oled) == OS_STATUS_BUSY,
        "names and numbers are registered once");
-    ok(os_display_add("third", 2U, &oled) == OS_STATUS_LIMIT_REACHED, "OS_DISPLAY_MAX displays");
-    bad.formats = OS_DISPLAY_FORMAT_BIT(OS_DISPLAY_XRGB8888);
-    ok(os_display_add("bad", 3U, &bad) == OS_STATUS_INVALID_ARGUMENT, "the native format must be accepted");
+    ok(hw_display_add("third", 2U, &oled) == OS_STATUS_LIMIT_REACHED, "HW_DISPLAY_MAX displays");
+    bad.formats = HW_DISPLAY_FORMAT_BIT(HW_DISPLAY_XRGB8888);
+    ok(hw_display_add("bad", 3U, &bad) == OS_STATUS_INVALID_ARGUMENT, "the native format must be accepted");
 
     ok(run_entry(&b, "app_main_info") == 0, "size, shape, formats, dpi, brightness; one owner; not waitable");
-    ok(os_display_get_owner(0U) == 0U, "the display is free again when the program ends");
+    ok(hw_display_get_owner(0U) == 0U, "the display is free again when the program ends");
 
     ok(run_entry(&b, "app_main_draw") == 0, "writes are checked, fill, flush and brightness work");
     ok(g_lcd[20 * 240 + 10] == 0xF800U && g_lcd[20 * 240 + 11] == 0x07E0U &&
@@ -204,7 +204,7 @@ int main(void)
            g_oled[41 * 128 + 4] == 0U && g_oled[41 * 128 + 12] == 1U,
        "1-bit rows start on a byte, leftmost pixel in the top bit");
     ok(g_writes == 64U + 3U + 1U, "without a port fill the kernel writes one run per row");
-    ok(os_display_get_owner(1U) == 0U, "a display left open is given back");
+    ok(hw_display_get_owner(1U) == 0U, "a display left open is given back");
 
     free(b.d);
     ok(os_get_task_count() == 0U, "clean OS state");

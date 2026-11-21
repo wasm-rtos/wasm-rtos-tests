@@ -179,8 +179,8 @@ for dir in tests/*; do
     fi
 
     if ! "$CC_BIN" ${sanitize_flags[@]+"${sanitize_flags[@]}"} -std=c11 -Wall -Wextra -D_GNU_SOURCE -D_POSIX_C_SOURCE=200809L ${native_flags[@]+"${native_flags[@]}"} \
-        -Iwasm-rtos \
-        "$main" wasm-rtos/*.c wasm-rtos/vm/source/*.c \
+        -Iwasm-rtos -Iwasm-rtos/vm/source \
+        "$main" wasm-rtos/*.c wasm-rtos/hw/*.c wasm-rtos/vm/source/*.c \
         -lm -o "$runner" >>"$build_log" 2>&1; then
         { echo "FAIL building $runner"; cat "$build_log"; } | tee "$log"
         failed=1

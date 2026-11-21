@@ -68,10 +68,10 @@ static OsStatus gpio_configure(void* context, uint32_t pin, uint32_t flags)
     g_flags[pin] = flags;
     if (pin == 0U)
         g_pin0_configured |= flags;
-    if (flags & OS_GPIO_OUTPUT)
-        g_level[pin] = (flags & OS_GPIO_INIT_HIGH) ? 1U : 0U;
+    if (flags & HW_GPIO_OUTPUT)
+        g_level[pin] = (flags & HW_GPIO_INIT_HIGH) ? 1U : 0U;
     else
-        g_level[pin] = (flags & OS_GPIO_PULL_UP) ? 1U : 0U;
+        g_level[pin] = (flags & HW_GPIO_PULL_UP) ? 1U : 0U;
     return OS_STATUS_OK;
 }
 
@@ -92,7 +92,7 @@ static OsStatus gpio_read(void* context, uint32_t pin, uint8_t* out_level)
 }
 
 static OsStatus i2c_transaction(void* context, uint32_t bus, uint32_t address, uint32_t frequency_hz,
-                                const OsI2cOp* ops, uint32_t count)
+                                const HwI2cOp* ops, uint32_t count)
 {
     (void)context;
     (void)bus;
@@ -100,8 +100,8 @@ static OsStatus i2c_transaction(void* context, uint32_t bus, uint32_t address, u
     if (address != 0x48U)
         return OS_STATUS_NACK;
     /* Exactly one write of the pointer, then one read of two bytes. */
-    if (count == 2U && ops[0].kind == OS_I2C_WRITE && ops[0].length == 1U && ops[0].data[0] == 0U &&
-        ops[1].kind == OS_I2C_READ && ops[1].length == 2U)
+    if (count == 2U && ops[0].kind == HW_I2C_WRITE && ops[0].length == 1U && ops[0].data[0] == 0U &&
+        ops[1].kind == HW_I2C_READ && ops[1].length == 2U)
     {
         g_i2c_shapes++;
         ops[1].data[0] = 0x19;
@@ -112,7 +112,7 @@ static OsStatus i2c_transaction(void* context, uint32_t bus, uint32_t address, u
 }
 
 static OsStatus spi_transaction(void* context, uint32_t bus, uint32_t mode, uint32_t frequency_hz,
-                                const OsSpiOp* ops, uint32_t count)
+                                const HwSpiOp* ops, uint32_t count)
 {
     uint32_t index;
     uint32_t byte;
@@ -146,9 +146,9 @@ int main(void)
         "temperature 25.50\r\nno device: 2\r\nspi 0xA5 0xEDCB\r\nslept enough, presses 1\r\n"
         "temperature 25.50\r\nno device: 2\r\nspi 0xA5 0xEDCB\r\nslept enough, presses 1\r\n";
     Bin b = {0};
-    OsGpioPort gpio = { NULL, gpio_configure, gpio_write, gpio_read };
-    OsI2cPort i2c = { NULL, i2c_transaction };
-    OsSpiPort spi = { NULL, spi_transaction };
+    HwGpioPort gpio = { NULL, gpio_configure, gpio_write, gpio_read };
+    HwI2cPort i2c = { NULL, i2c_transaction };
+    HwSpiPort spi = { NULL, spi_transaction };
     OsOutputPort output = { NULL, capture };
     OsTaskHandle t = NULL;
     uint8_t pressed = 0;
@@ -159,10 +159,10 @@ int main(void)
     ok(load(&b), "load arduino_core.wasm");
     if (!b.d)
         return 1;
-    ok(os_gpio_port_set(&gpio) == OS_STATUS_OK && os_gpio_add_pin("gpio0", 0U, OS_GPIO_CAN_ALL, 0U) == OS_STATUS_OK &&
-           os_gpio_add_pin("led", 2U, OS_GPIO_CAN_ALL, 0U) == OS_STATUS_OK && os_i2c_port_set(&i2c) == OS_STATUS_OK &&
-           os_i2c_add_bus("i2c0", 0U, 400000U) == OS_STATUS_OK && os_spi_port_set(&spi) == OS_STATUS_OK &&
-           os_spi_add_bus("spi0", 0U, 20000000U) == OS_STATUS_OK && os_output_port_set(&output) == OS_STATUS_OK,
+    ok(hw_gpio_port_set(&gpio) == OS_STATUS_OK && hw_gpio_add_pin("gpio0", 0U, HW_GPIO_CAN_ALL, 0U) == OS_STATUS_OK &&
+           hw_gpio_add_pin("led", 2U, HW_GPIO_CAN_ALL, 0U) == OS_STATUS_OK && hw_i2c_port_set(&i2c) == OS_STATUS_OK &&
+           hw_i2c_add_bus("i2c0", 0U, 400000U) == OS_STATUS_OK && hw_spi_port_set(&spi) == OS_STATUS_OK &&
+           hw_spi_add_bus("spi0", 0U, 20000000U) == OS_STATUS_OK && os_output_port_set(&output) == OS_STATUS_OK,
        "a board with a button, an LED, i2c0 and spi0");
 
     ok(os_task_create(&t, b.d, b.n, "_start", "sketch", 65536U, OS_TASK_PRIORITY_NORMAL) == OS_STATUS_OK && t,
@@ -176,7 +176,7 @@ int main(void)
             {
                 pressed = 1;
                 g_level[0] = 0U;
-                os_gpio_edge(0U, OS_GPIO_EDGE_FALLING);
+                hw_gpio_edge(0U, HW_GPIO_EDGE_FALLING);
             }
             os_tick(10U);
         }
@@ -189,10 +189,10 @@ int main(void)
     if (strcmp(g_output, expected) != 0)
         printf("got %zu bytes:\n%s\nexpected %zu bytes:\n%s\n", strlen(g_output), g_output, strlen(expected), expected);
     ok(strcmp(g_led_history, "10") == 0, "digitalWrite drove LED_BUILTIN, the profile's \"led\"");
-    ok(g_pin0_configured == (OS_GPIO_PULL_UP | OS_GPIO_EDGE_FALLING), "INPUT_PULLUP and a FALLING interrupt on pin 0");
+    ok(g_pin0_configured == (HW_GPIO_PULL_UP | HW_GPIO_EDGE_FALLING), "INPUT_PULLUP and a FALLING interrupt on pin 0");
     ok(g_i2c_shapes == 2U, "endTransmission(false) and requestFrom made one write-read transaction each round");
     ok(g_spi_mode == 0U && g_spi_frequency == 8000000U, "SPISettings reached the bus: mode 0 at 8 MHz");
-    ok(os_spi_get_owner(0U, OS_BUS_NO_CS) == 0U && os_gpio_get_owner(2U) == 0U, "the bus and pins are free after exit");
+    ok(hw_spi_get_owner(0U, HW_BUS_NO_CS) == 0U && hw_gpio_get_owner(2U) == 0U, "the bus and pins are free after exit");
 
     if (t)
         os_task_delete(t);

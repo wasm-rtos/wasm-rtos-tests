@@ -143,7 +143,7 @@ static OsStatus uart_write(void* context, uint32_t uart, const uint8_t* data, ui
     strncat(g_uart_sent, (const char*)data, size < 16U ? size : 16U);
     *out_written = size;
     if (memchr(data, '\n', size) != NULL)
-        os_uart_receive(uart, pong, sizeof(pong) - 1U);
+        hw_uart_receive(uart, pong, sizeof(pong) - 1U);
     return OS_STATUS_OK;
 }
 
@@ -162,11 +162,11 @@ static void capture(void* context, uint32_t task_id, uint32_t fd, const void* da
 int main(void)
 {
     Bin b = {0};
-    OsAdcPort adc = { NULL, adc_read, NULL };
-    OsAdcInfo pot = { 12U, 3300U };
-    OsGpioPort gpio = { NULL, gpio_configure, gpio_write, gpio_read };
-    OsPwmPort pwm = { NULL, pwm_start, pwm_set_duty, pwm_set_frequency, pwm_stop };
-    OsUartPort uart = { NULL, uart_configure, uart_write, NULL };
+    HwAdcPort adc = { NULL, adc_read, NULL };
+    HwAdcInfo pot = { 12U, 3300U };
+    HwGpioPort gpio = { NULL, gpio_configure, gpio_write, gpio_read };
+    HwPwmPort pwm = { NULL, pwm_start, pwm_set_duty, pwm_set_frequency, pwm_stop };
+    HwUartPort uart = { NULL, uart_configure, uart_write, NULL };
     OsOutputPort output = { NULL, capture };
     OsTaskHandle t = NULL;
     uint32_t i;
@@ -176,10 +176,10 @@ int main(void)
     ok(load(&b), "load arduino_analog.wasm");
     if (!b.d)
         return 1;
-    ok(os_adc_port_set(&adc) == OS_STATUS_OK && os_adc_add_channel("a0", 0U, &pot) == OS_STATUS_OK &&
-           os_gpio_port_set(&gpio) == OS_STATUS_OK && os_gpio_add_pin("led", 2U, OS_GPIO_CAN_ALL, 0U) == OS_STATUS_OK &&
-           os_gpio_add_pin("gpio5", 5U, OS_GPIO_CAN_ALL, 0U) == OS_STATUS_OK && os_pwm_port_set(&pwm) == OS_STATUS_OK &&
-           os_uart_port_set(&uart) == OS_STATUS_OK && os_uart_add("uart1", 1U, 0U) == OS_STATUS_OK &&
+    ok(hw_adc_port_set(&adc) == OS_STATUS_OK && hw_adc_add_channel("a0", 0U, &pot) == OS_STATUS_OK &&
+           hw_gpio_port_set(&gpio) == OS_STATUS_OK && hw_gpio_add_pin("led", 2U, HW_GPIO_CAN_ALL, 0U) == OS_STATUS_OK &&
+           hw_gpio_add_pin("gpio5", 5U, HW_GPIO_CAN_ALL, 0U) == OS_STATUS_OK && hw_pwm_port_set(&pwm) == OS_STATUS_OK &&
+           hw_uart_port_set(&uart) == OS_STATUS_OK && hw_uart_add("uart1", 1U, 0U) == OS_STATUS_OK &&
            os_output_port_set(&output) == OS_STATUS_OK,
        "a board with a potentiometer, PWM pins and a serial port");
     ok(os_task_create(&t, b.d, b.n, "_start", "sketch", 65536U, OS_TASK_PRIORITY_NORMAL) == OS_STATUS_OK, "start the sketch");
@@ -196,7 +196,7 @@ int main(void)
        "analogWrite: 64 of 255 then 4095 of 4095 at 1 kHz; digitalWrite stops the PWM");
     ok(g_led_level == 0U, "and drives the pin low");
     ok(strstr(g_events, "start 5@440 freq 5=440 duty 5=32768 duty 5=0 ") != NULL, "tone: 440 Hz at half duty, off after its duration");
-    ok(g_uart_format == OS_UART_PARITY_EVEN && strcmp(g_uart_sent, "ping\n") == 0, "Serial1: SERIAL_8E1, the line sent");
+    ok(g_uart_format == HW_UART_PARITY_EVEN && strcmp(g_uart_sent, "ping\n") == 0, "Serial1: SERIAL_8E1, the line sent");
 
     os_task_delete(t);
     free(b.d);

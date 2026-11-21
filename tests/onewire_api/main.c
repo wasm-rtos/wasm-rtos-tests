@@ -102,7 +102,7 @@ static void device_init(Device* d, uint8_t family, uint8_t serial, int16_t tempe
     memset(d, 0, sizeof(*d));
     d->rom[0] = family;
     d->rom[1] = serial;
-    d->rom[7] = (uint8_t)(os_onewire_crc8(d->rom, 7U) ^ broken);
+    d->rom[7] = (uint8_t)(hw_onewire_crc8(d->rom, 7U) ^ broken);
     d->temperature = temperature;
     d->alarm = alarm;
     d->parasite = parasite;
@@ -116,7 +116,7 @@ static void device_init(Device* d, uint8_t family, uint8_t serial, int16_t tempe
     d->scratchpad[5] = 0xFFU;
     d->scratchpad[6] = 0x0CU;
     d->scratchpad[7] = 0x10U;
-    d->scratchpad[8] = os_onewire_crc8(d->scratchpad, 8U);
+    d->scratchpad[8] = hw_onewire_crc8(d->scratchpad, 8U);
 }
 
 static uint8_t rom_bit(const Device* d, uint32_t bit)
@@ -255,13 +255,13 @@ static void end_conversions(uint8_t powered)
             continue;
         d->scratchpad[0] = (uint8_t)d->temperature;
         d->scratchpad[1] = (uint8_t)((uint16_t)d->temperature >> 8);
-        d->scratchpad[8] = os_onewire_crc8(d->scratchpad, 8U);
+        d->scratchpad[8] = hw_onewire_crc8(d->scratchpad, 8U);
     }
 }
 
 static char g_shape[96];
 
-static OsStatus ow_transaction(void* context, uint32_t bus, const OsOneWireOp* ops, uint32_t count)
+static OsStatus ow_transaction(void* context, uint32_t bus, const HwOneWireOp* ops, uint32_t count)
 {
     uint8_t powered = 0U;
     uint8_t background = 0U;
@@ -277,31 +277,31 @@ static OsStatus ow_transaction(void* context, uint32_t bus, const OsOneWireOp* o
         used += (size_t)snprintf(g_shape + used, sizeof(g_shape) - used, "%s%c%u", i ? " " : "",
                                  "?WRwrPZ"[ops[i].kind < 7U ? ops[i].kind : 0U], (unsigned)ops[i].length);
     for (i = 0; i < count; i++)
-        if (ops[i].kind == OS_ONEWIRE_POWER && !g_power_supported)
+        if (ops[i].kind == HW_ONEWIRE_POWER && !g_power_supported)
             return OS_STATUS_UNSUPPORTED;
     for (i = 0; i < count; i++)
     {
-        const OsOneWireOp* op = &ops[i];
+        const HwOneWireOp* op = &ops[i];
         uint32_t bit;
-        uint32_t bits = op->kind == OS_ONEWIRE_WRITE || op->kind == OS_ONEWIRE_READ ? op->length * 8U : op->length;
+        uint32_t bits = op->kind == HW_ONEWIRE_WRITE || op->kind == HW_ONEWIRE_READ ? op->length * 8U : op->length;
         switch (op->kind)
         {
-        case OS_ONEWIRE_RESET:
+        case HW_ONEWIRE_RESET:
             if (!bus_reset())
                 return OS_STATUS_NACK;
             break;
-        case OS_ONEWIRE_WRITE:
-        case OS_ONEWIRE_WRITE_BITS:
+        case HW_ONEWIRE_WRITE:
+        case HW_ONEWIRE_WRITE_BITS:
             for (bit = 0; bit < bits; bit++)
                 slot((uint8_t)((op->data[bit / 8U] >> (bit % 8U)) & 1U));
             break;
-        case OS_ONEWIRE_READ:
-        case OS_ONEWIRE_READ_BITS:
+        case HW_ONEWIRE_READ:
+        case HW_ONEWIRE_READ_BITS:
             memset(op->data, 0, (bits + 7U) / 8U);
             for (bit = 0; bit < bits; bit++)
                 op->data[bit / 8U] = (uint8_t)(op->data[bit / 8U] | (slot(1U) << (bit % 8U)));
             break;
-        case OS_ONEWIRE_POWER:
+        case HW_ONEWIRE_POWER:
             powered = 1U;
             g_power_ms += op->length;
             if (op->length == 0U)
@@ -350,25 +350,25 @@ static void ow_finish(void* context, uint32_t bus)
     if (g_pending)
     {
         g_pending = 0U;
-        os_bus_complete(OS_BUS_ONEWIRE, bus, OS_STATUS_OK);
+        hw_bus_complete(HW_BUS_ONEWIRE, bus, OS_STATUS_OK);
     }
 }
 
 static uint32_t g_traces;
-static OsBusTrace g_last_trace;
-static OsOneWireOp g_trace_ops[2];
+static HwBusTrace g_last_trace;
+static HwOneWireOp g_trace_ops[2];
 static uint8_t g_trace_select[9];
 
-static void trace(void* context, const OsBusTrace* record)
+static void trace(void* context, const HwBusTrace* record)
 {
-    const OsOneWireOp* ops = (const OsOneWireOp*)record->ops;
+    const HwOneWireOp* ops = (const HwOneWireOp*)record->ops;
     (void)context;
     g_traces++;
     g_last_trace = *record;
     if (record->count >= 2U)
     {
         memcpy(g_trace_ops, ops, sizeof(g_trace_ops));
-        if (ops[1].kind == OS_ONEWIRE_WRITE && ops[1].length == 9U)
+        if (ops[1].kind == HW_ONEWIRE_WRITE && ops[1].length == 9U)
             memcpy(g_trace_select, ops[1].data, 9U);
     }
 }
@@ -418,9 +418,9 @@ static void put_devices(void)
 int main(void)
 {
     Bin b = {0};
-    OsOneWirePort port = { NULL, ow_transaction, ow_triplet, ow_finish };
-    OsOneWirePort bits_only = { NULL, ow_transaction, NULL, ow_finish };
-    OsOneWirePort empty = { NULL, NULL, NULL, NULL };
+    HwOneWirePort port = { NULL, ow_transaction, ow_triplet, ow_finish };
+    HwOneWirePort bits_only = { NULL, ow_transaction, NULL, ow_finish };
+    HwOneWirePort empty = { NULL, NULL, NULL, NULL };
     OsTaskHandle t = NULL;
     OsTaskHandle other = NULL;
     uint32_t slots;
@@ -434,18 +434,18 @@ int main(void)
     put_devices();
     {
         static const uint8_t rom[8] = { 0x02, 0x1C, 0xB8, 0x01, 0x00, 0x00, 0x00, 0xA2 };
-        ok(os_onewire_crc8(rom, 7U) == 0xA2U, "the 1-Wire CRC-8 matches the datasheet's example code");
+        ok(hw_onewire_crc8(rom, 7U) == 0xA2U, "the 1-Wire CRC-8 matches the datasheet's example code");
     }
 
     ok(finish(start(&b, "app_main_try"), "app_main_try") == -13, "without a port onewire-open returns -WR_EUNSUPPORTED");
-    ok(os_onewire_port_set(&empty) == OS_STATUS_INVALID_ARGUMENT, "a port needs transaction");
-    ok(os_onewire_port_set(&port) == OS_STATUS_OK, "install the 1-Wire port");
+    ok(hw_onewire_port_set(&empty) == OS_STATUS_INVALID_ARGUMENT, "a port needs transaction");
+    ok(hw_onewire_port_set(&port) == OS_STATUS_OK, "install the 1-Wire port");
     ok(finish(start(&b, "app_main_try"), "app_main_try") == -13, "without buses onewire-open returns -WR_EUNSUPPORTED");
-    ok(os_onewire_add_bus("ow0", 1U) == OS_STATUS_OK, "register bus ow0");
-    ok(os_onewire_add_bus("ow0", 2U) == OS_STATUS_BUSY && os_onewire_add_bus("other", 1U) == OS_STATUS_BUSY &&
-           os_onewire_add_bus("", 3U) == OS_STATUS_INVALID_ARGUMENT,
+    ok(hw_onewire_add_bus("ow0", 1U) == OS_STATUS_OK, "register bus ow0");
+    ok(hw_onewire_add_bus("ow0", 2U) == OS_STATUS_BUSY && hw_onewire_add_bus("other", 1U) == OS_STATUS_BUSY &&
+           hw_onewire_add_bus("", 3U) == OS_STATUS_INVALID_ARGUMENT,
        "names and numbers are registered once");
-    os_bus_trace_set(trace, NULL);
+    hw_bus_trace_set(trace, NULL);
 
     g_triplets = 0U;
     ok(finish(start(&b, "app_main_scan"), "app_main_scan") == 0x041003,
@@ -460,8 +460,8 @@ int main(void)
     ok(finish(start(&b, "app_main_temps"), "app_main_temps") == 21500 - 10125 + 30062,
        "three sensors convert and read: 21.5, -10.125 (parasite, through the pull-up) and 30.062 C");
     ok(g_power_ms == 3U * 750U, "each conversion held the line high for 750 ms");
-    ok(g_last_trace.kind == OS_BUS_ONEWIRE && g_last_trace.device == 0U && g_last_trace.status == OS_STATUS_OK &&
-           g_trace_ops[0].kind == OS_ONEWIRE_RESET && g_trace_select[0] == 0x55U &&
+    ok(g_last_trace.kind == HW_BUS_ONEWIRE && g_last_trace.device == 0U && g_last_trace.status == OS_STATUS_OK &&
+           g_trace_ops[0].kind == HW_ONEWIRE_RESET && g_trace_select[0] == 0x55U &&
            memcmp(g_trace_select + 1, g_devices[2].rom, 8U) == 0,
        "traced transactions start with the kernel's reset and match ROM with the code");
     ok(strcmp(g_shape, "Z0 W9 W1 R9") == 0, "a scratchpad read is reset, match ROM, command, 9 bytes in one transaction");
@@ -474,31 +474,31 @@ int main(void)
     g_power_supported = 1U;
 
     /* A port without triplet: the kernel searches with single time slots. */
-    ok(os_onewire_port_set(&bits_only) == OS_STATUS_OK, "install a port without triplet");
+    ok(hw_onewire_port_set(&bits_only) == OS_STATUS_OK, "install a port without triplet");
     g_triplets = 0U;
     slots = g_slots;
     ok(finish(start(&b, "app_main_scan"), "app_main_scan") == 0x041003, "the search finds the same four codes");
     ok(g_triplets == 0U && g_slots - slots > 4U * 64U * 3U, "through two read slots and a write slot per bit");
     ok(finish(start(&b, "app_main_alarm"), "app_main_alarm") == 0x0102, "and the alarm search the same sensor");
-    ok(os_onewire_port_set(&port) == OS_STATUS_OK, "back to the port with triplet");
+    ok(hw_onewire_port_set(&port) == OS_STATUS_OK, "back to the port with triplet");
 
     /* The whole bus: the program's own resets and ROM commands, the pull-up left on. */
     put_devices();
     t = start(&b, "app_main_hold");
     run_until_waiting(t);
-    ok(os_onewire_get_owner(1U, OS_ONEWIRE_WHOLE_BUS) == os_task_get_id(t) && g_power_on,
+    ok(hw_onewire_get_owner(1U, HW_ONEWIRE_WHOLE_BUS) == os_task_get_id(t) && g_power_on,
        "a program holds the whole bus, its pull-up left on while it sleeps");
     ok(finish(start(&b, "app_main_search_busy"), "app_main_search_busy") == 0,
        "meanwhile other programs can neither search the bus nor open a device on it");
     ok(finish(t, "app_main_hold") == 21500, "the program read sensor 1 through single time slots");
-    ok(!g_power_on && os_onewire_get_owner(1U, OS_ONEWIRE_WHOLE_BUS) == 0U,
+    ok(!g_power_on && hw_onewire_get_owner(1U, HW_ONEWIRE_WHOLE_BUS) == 0U,
        "the pull-up it left on ended when it closed the bus");
 
     /* A port that holds the pull-up in the background. */
     g_async = 1U;
     t = start(&b, "app_main_convert_one");
     run_until_waiting(t);
-    ok(os_task_get_state(t) == OS_TASK_WAITING && g_pending && os_bus_is_busy(OS_BUS_ONEWIRE, 1U),
+    ok(os_task_get_state(t) == OS_TASK_WAITING && g_pending && hw_bus_is_busy(HW_BUS_ONEWIRE, 1U),
        "a conversion with the pull-up runs in the background, the program waits");
     other = start(&b, "app_main_try");
     for (i = 0; i < 100U && os_task_get_state(other) != OS_TASK_DEAD; i++)
@@ -506,7 +506,7 @@ int main(void)
     ok(os_task_get_state(other) == OS_TASK_DEAD && g_pending, "another program runs meanwhile");
     ok(finish(other, "app_main_try") == -22, "(it found the device's bus in use for the whole bus)");
     g_pending = 0U;
-    os_bus_complete(OS_BUS_ONEWIRE, 1U, OS_STATUS_OK);
+    hw_bus_complete(HW_BUS_ONEWIRE, 1U, OS_STATUS_OK);
     ok(finish(t, "app_main_convert_one") == 21500, "the end delivered, the program reads the temperature");
 
     t = start(&b, "app_main_convert_one");
@@ -527,7 +527,7 @@ int main(void)
     ok(finish(start(&b, "app_main_empty"), "app_main_empty") == -23,
        "an empty bus: the search finds nothing, a device gets -WR_ENACK");
 
-    os_bus_trace_set(NULL, NULL);
+    hw_bus_trace_set(NULL, NULL);
     free(b.d);
     ok(os_get_task_count() == 0U, "clean OS state");
     os_shutdown();

@@ -139,13 +139,13 @@ static int32_t finish(OsTaskHandle t, const char* entry)
 
 int main(void)
 {
-    static const OsDacInfo own = { 8U, 3300U };
-    static const OsDacInfo chip = { 12U, 2500U };
-    static const OsDacInfo bad = { 0U, 3300U };
+    static const HwDacInfo own = { 8U, 3300U };
+    static const HwDacInfo chip = { 12U, 2500U };
+    static const HwDacInfo bad = { 0U, 3300U };
     Bin b = {0};
-    OsGpioPort gpio = { NULL, gpio_configure, gpio_write, gpio_read };
-    OsDacPort port = { NULL, dac_start, dac_write, dac_stop };
-    OsDacPort empty = { NULL, dac_start, NULL, dac_stop };
+    HwGpioPort gpio = { NULL, gpio_configure, gpio_write, gpio_read };
+    HwDacPort port = { NULL, dac_start, dac_write, dac_stop };
+    HwDacPort empty = { NULL, dac_start, NULL, dac_stop };
     OsTaskHandle t = NULL;
 
     l = fopen("dac_api.log", "w");
@@ -153,18 +153,18 @@ int main(void)
     ok(load(&b), "load dac_api.wasm");
     if (!b.d)
         return 1;
-    ok(os_gpio_port_set(&gpio) == OS_STATUS_OK && os_gpio_add_pin("gpio25", 25U, OS_GPIO_CAN_ALL, 0U) == OS_STATUS_OK &&
-           os_gpio_add_pin("gpio26", 26U, OS_GPIO_CAN_ALL, 0U) == OS_STATUS_OK,
+    ok(hw_gpio_port_set(&gpio) == OS_STATUS_OK && hw_gpio_add_pin("gpio25", 25U, HW_GPIO_CAN_ALL, 0U) == OS_STATUS_OK &&
+           hw_gpio_add_pin("gpio26", 26U, HW_GPIO_CAN_ALL, 0U) == OS_STATUS_OK,
        "GPIO pins 25 and 26");
 
     ok(finish(start(&b, "app_main_try"), "app_main_try") == -13, "without a port dac-open returns -WR_EUNSUPPORTED");
-    ok(os_dac_port_set(&empty) == OS_STATUS_INVALID_ARGUMENT, "a port needs write and stop");
-    ok(os_dac_port_set(&port) == OS_STATUS_OK, "install the DAC port");
+    ok(hw_dac_port_set(&empty) == OS_STATUS_INVALID_ARGUMENT, "a port needs write and stop");
+    ok(hw_dac_port_set(&port) == OS_STATUS_OK, "install the DAC port");
     ok(finish(start(&b, "app_main_try"), "app_main_try") == -13, "without outputs dac-open returns -WR_EUNSUPPORTED");
-    ok(os_dac_add_channel("gpio25", 1U, &own) == OS_STATUS_OK && os_dac_add_channel("dac0", 0U, &chip) == OS_STATUS_OK,
+    ok(hw_dac_add_channel("gpio25", 1U, &own) == OS_STATUS_OK && hw_dac_add_channel("dac0", 0U, &chip) == OS_STATUS_OK,
        "register GPIO 25's converter and an external chip");
-    ok(os_dac_add_channel("gpio25", 3U, &own) == OS_STATUS_BUSY && os_dac_add_channel("x", 1U, &own) == OS_STATUS_BUSY &&
-           os_dac_add_channel("y", 4U, &bad) == OS_STATUS_INVALID_ARGUMENT,
+    ok(hw_dac_add_channel("gpio25", 3U, &own) == OS_STATUS_BUSY && hw_dac_add_channel("x", 1U, &own) == OS_STATUS_BUSY &&
+           hw_dac_add_channel("y", 4U, &bad) == OS_STATUS_INVALID_ARGUMENT,
        "names and channels are registered once, with a resolution");
 
     ok(finish(start(&b, "app_main_basic"), "app_main_basic") == 0,
@@ -173,10 +173,10 @@ int main(void)
 
     t = start(&b, "app_main_hold");
     run_until_waiting(t);
-    ok(g_on[1] && g_value[1] == 200U && os_dac_get_owner(1U) == os_task_get_id(t) &&
-           os_gpio_get_owner(25U) == os_task_get_id(t),
+    ok(g_on[1] && g_value[1] == 200U && hw_dac_get_owner(1U) == os_task_get_id(t) &&
+           hw_gpio_get_owner(25U) == os_task_get_id(t),
        "a program holds the output at 200, and with it GPIO 25");
-    ok(finish(t, "app_main_hold") == 0 && !g_on[1] && os_dac_get_owner(1U) == 0U && os_gpio_get_owner(25U) == 0U &&
+    ok(finish(t, "app_main_hold") == 0 && !g_on[1] && hw_dac_get_owner(1U) == 0U && hw_gpio_get_owner(25U) == 0U &&
            g_pin25_flags == 0U,
        "when it ends the output is off and the pin back to a plain input");
 

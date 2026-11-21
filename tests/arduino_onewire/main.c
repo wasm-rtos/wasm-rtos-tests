@@ -93,7 +93,7 @@ static void device_init(Device* d, uint8_t family, uint8_t serial, int16_t tempe
     memset(d, 0, sizeof(*d));
     d->rom[0] = family;
     d->rom[1] = serial;
-    d->rom[7] = os_onewire_crc8(d->rom, 7U);
+    d->rom[7] = hw_onewire_crc8(d->rom, 7U);
     d->temperature = temperature;
     d->alarm = alarm;
     d->parasite = parasite;
@@ -107,7 +107,7 @@ static void device_init(Device* d, uint8_t family, uint8_t serial, int16_t tempe
     d->scratchpad[5] = 0xFFU;
     d->scratchpad[6] = 0x0CU;
     d->scratchpad[7] = 0x10U;
-    d->scratchpad[8] = os_onewire_crc8(d->scratchpad, 8U);
+    d->scratchpad[8] = hw_onewire_crc8(d->scratchpad, 8U);
 }
 
 static uint8_t rom_bit(const Device* d, uint32_t bit)
@@ -245,11 +245,11 @@ static void end_conversions(uint8_t powered)
             continue;
         d->scratchpad[0] = (uint8_t)d->temperature;
         d->scratchpad[1] = (uint8_t)((uint16_t)d->temperature >> 8);
-        d->scratchpad[8] = os_onewire_crc8(d->scratchpad, 8U);
+        d->scratchpad[8] = hw_onewire_crc8(d->scratchpad, 8U);
     }
 }
 
-static OsStatus ow_transaction(void* context, uint32_t bus, const OsOneWireOp* ops, uint32_t count)
+static OsStatus ow_transaction(void* context, uint32_t bus, const HwOneWireOp* ops, uint32_t count)
 {
     uint8_t powered = 0U;
     uint32_t i;
@@ -259,27 +259,27 @@ static OsStatus ow_transaction(void* context, uint32_t bus, const OsOneWireOp* o
     g_power_on = 0U;
     for (i = 0; i < count; i++)
     {
-        const OsOneWireOp* op = &ops[i];
+        const HwOneWireOp* op = &ops[i];
         uint32_t bit;
-        uint32_t bits = op->kind == OS_ONEWIRE_WRITE || op->kind == OS_ONEWIRE_READ ? op->length * 8U : op->length;
+        uint32_t bits = op->kind == HW_ONEWIRE_WRITE || op->kind == HW_ONEWIRE_READ ? op->length * 8U : op->length;
         switch (op->kind)
         {
-        case OS_ONEWIRE_RESET:
+        case HW_ONEWIRE_RESET:
             if (!bus_reset())
                 return OS_STATUS_NACK;
             break;
-        case OS_ONEWIRE_WRITE:
-        case OS_ONEWIRE_WRITE_BITS:
+        case HW_ONEWIRE_WRITE:
+        case HW_ONEWIRE_WRITE_BITS:
             for (bit = 0; bit < bits; bit++)
                 slot((uint8_t)((op->data[bit / 8U] >> (bit % 8U)) & 1U));
             break;
-        case OS_ONEWIRE_READ:
-        case OS_ONEWIRE_READ_BITS:
+        case HW_ONEWIRE_READ:
+        case HW_ONEWIRE_READ_BITS:
             memset(op->data, 0, (bits + 7U) / 8U);
             for (bit = 0; bit < bits; bit++)
                 op->data[bit / 8U] = (uint8_t)(op->data[bit / 8U] | (slot(1U) << (bit % 8U)));
             break;
-        case OS_ONEWIRE_POWER:
+        case HW_ONEWIRE_POWER:
             powered = 1U;
             if (op->length == 0U)
                 g_power_on = 1U;
@@ -335,7 +335,7 @@ int main(void)
         "2802000000000070 -10.1250\r\n2801000000000029 21.5000\r\n2803000000000047 30.0625\r\n"
         "converted after 0 polls\r\nBB3D\r\n";
     Bin b = {0};
-    OsOneWirePort port = { NULL, ow_transaction, ow_triplet, NULL };
+    HwOneWirePort port = { NULL, ow_transaction, ow_triplet, NULL };
     OsOutputPort output = { NULL, capture };
     OsTaskHandle t = NULL;
     uint32_t i;
@@ -349,7 +349,7 @@ int main(void)
     device_init(&g_devices[1], 0x28U, 2U, (int16_t)(-10.125 * 16), 1U, 1U);
     device_init(&g_devices[2], 0x28U, 3U, (int16_t)(30.0625 * 16), 0U, 0U);
     device_init(&g_devices[3], 0x10U, 7U, 0, 0U, 0U);
-    ok(os_onewire_port_set(&port) == OS_STATUS_OK && os_onewire_add_bus("gpio4", 1U) == OS_STATUS_OK &&
+    ok(hw_onewire_port_set(&port) == OS_STATUS_OK && hw_onewire_add_bus("gpio4", 1U) == OS_STATUS_OK &&
            os_output_port_set(&output) == OS_STATUS_OK,
        "a board with a 1-Wire bus on pin 4: three DS18B20 (one parasite-powered, one in alarm) and a DS18S20");
 
@@ -366,7 +366,7 @@ int main(void)
        "OneWire(4) searched the bus, by family and for alarms, converted on parasite power and read every sensor");
     if (strcmp(g_output, expected) != 0)
         printf("got %zu bytes:\n%s\nexpected %zu bytes:\n%s\n", strlen(g_output), g_output, strlen(expected), expected);
-    ok(!g_power_on && os_onewire_get_owner(1U, OS_ONEWIRE_WHOLE_BUS) == 0U,
+    ok(!g_power_on && hw_onewire_get_owner(1U, HW_ONEWIRE_WHOLE_BUS) == 0U,
        "depower() ended the pull-up, and the bus is free after exit");
 
     if (t)

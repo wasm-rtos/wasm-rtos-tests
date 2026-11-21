@@ -67,7 +67,7 @@ static OsStatus gpio_configure(void* context, uint32_t pin, uint32_t flags)
 {
     char text[32];
     (void)context;
-    snprintf(text, sizeof(text), "gpio%u:%s ", (unsigned)pin, (flags & OS_GPIO_OUTPUT) ? "out" : "in");
+    snprintf(text, sizeof(text), "gpio%u:%s ", (unsigned)pin, (flags & HW_GPIO_OUTPUT) ? "out" : "in");
     note(text);
     return OS_STATUS_OK;
 }
@@ -118,10 +118,10 @@ int main(void)
 {
     static const char expected[] =
         "gpio25:in on dac=0 dac=128 dac=255 off gpio25:in gpio25:out set25=1 gpio25:in gpio25:in on dac=0 dac=64 off gpio25:in ";
-    static const OsDacInfo own = { 8U, 3300U };
+    static const HwDacInfo own = { 8U, 3300U };
     Bin b = {0};
-    OsGpioPort gpio = { NULL, gpio_configure, gpio_write, gpio_read };
-    OsDacPort port = { NULL, dac_start, dac_write, dac_stop };
+    HwGpioPort gpio = { NULL, gpio_configure, gpio_write, gpio_read };
+    HwDacPort port = { NULL, dac_start, dac_write, dac_stop };
     OsTaskHandle t = NULL;
     uint32_t i;
 
@@ -130,8 +130,8 @@ int main(void)
     ok(load(&b), "load arduino_dac.wasm");
     if (!b.d)
         return 1;
-    ok(os_gpio_port_set(&gpio) == OS_STATUS_OK && os_gpio_add_pin("gpio25", 25U, OS_GPIO_CAN_ALL, 0U) == OS_STATUS_OK &&
-           os_dac_port_set(&port) == OS_STATUS_OK && os_dac_add_channel("gpio25", 1U, &own) == OS_STATUS_OK,
+    ok(hw_gpio_port_set(&gpio) == OS_STATUS_OK && hw_gpio_add_pin("gpio25", 25U, HW_GPIO_CAN_ALL, 0U) == OS_STATUS_OK &&
+           hw_dac_port_set(&port) == OS_STATUS_OK && hw_dac_add_channel("gpio25", 1U, &own) == OS_STATUS_OK,
        "a board with an 8-bit converter on GPIO 25");
     g_log_length = 0U;
     g_log[0] = '\0';

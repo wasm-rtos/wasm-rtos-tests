@@ -57,7 +57,7 @@ static OsStatus gpio_configure(void* context, uint32_t pin, uint32_t flags)
 {
     (void)context;
     g_pin_flags[pin] = flags;
-    g_pin_level[pin] = (flags & OS_GPIO_OUTPUT) && !(flags & OS_GPIO_INIT_HIGH) ? 0U : 1U;
+    g_pin_level[pin] = (flags & HW_GPIO_OUTPUT) && !(flags & HW_GPIO_INIT_HIGH) ? 0U : 1U;
     return OS_STATUS_OK;
 }
 
@@ -79,7 +79,7 @@ static OsStatus gpio_read(void* context, uint32_t pin, uint8_t* out_level)
  * A port with DMA: transaction only starts the transfer. complete() is the
  * "interrupt" at its end, which fills what the flash sends and reports.
  */
-static const OsSpiOp* g_spi_ops;
+static const HwSpiOp* g_spi_ops;
 static uint32_t g_spi_count;
 static uint32_t g_spi_started;
 static uint32_t g_finishes;
@@ -91,14 +91,14 @@ static void spi_complete(OsStatus status)
     uint32_t index;
     g_cs_low_at_end = g_pin_level[5] == 0U;
     for (index = 0; index < g_spi_count; index++)
-        if (g_spi_ops[index].kind == OS_SPI_READ)
+        if (g_spi_ops[index].kind == HW_SPI_READ)
             memcpy(g_spi_ops[index].read, jedec, 3);
     g_spi_ops = NULL;
-    os_bus_complete(OS_BUS_SPI, 0U, status);
+    hw_bus_complete(HW_BUS_SPI, 0U, status);
 }
 
 static OsStatus spi_transaction(void* context, uint32_t bus, uint32_t mode, uint32_t frequency_hz,
-                                const OsSpiOp* ops, uint32_t count)
+                                const HwSpiOp* ops, uint32_t count)
 {
     (void)context;
     (void)bus;
@@ -120,10 +120,10 @@ static void spi_finish(void* context, uint32_t bus)
         spi_complete(OS_STATUS_OK);
 }
 
-static const OsI2cOp* g_i2c_ops;
+static const HwI2cOp* g_i2c_ops;
 
 static OsStatus i2c_transaction(void* context, uint32_t bus, uint32_t address, uint32_t frequency_hz,
-                                const OsI2cOp* ops, uint32_t count)
+                                const HwI2cOp* ops, uint32_t count)
 {
     (void)context;
     (void)bus;
@@ -141,9 +141,9 @@ static void i2c_finish(void* context, uint32_t bus)
 }
 
 static uint32_t g_traces;
-static OsBusTrace g_last_trace;
+static HwBusTrace g_last_trace;
 
-static void trace(void* context, const OsBusTrace* record)
+static void trace(void* context, const HwBusTrace* record)
 {
     (void)context;
     g_traces++;
@@ -201,9 +201,9 @@ static int32_t result_of(OsTaskHandle t)
 int main(void)
 {
     Bin b = {0};
-    OsGpioPort gpio = { NULL, gpio_configure, gpio_write, gpio_read };
-    OsSpiPort spi = { NULL, spi_transaction, spi_finish };
-    OsI2cPort i2c = { NULL, i2c_transaction, i2c_finish };
+    HwGpioPort gpio = { NULL, gpio_configure, gpio_write, gpio_read };
+    HwSpiPort spi = { NULL, spi_transaction, spi_finish };
+    HwI2cPort i2c = { NULL, i2c_transaction, i2c_finish };
     OsPageStore store = { NULL, 256U, 64U, store_write, store_read, NULL, NULL, NULL };
     OsTaskHandle flash = NULL;
     OsTaskHandle spin = NULL;
@@ -216,19 +216,19 @@ int main(void)
     ok(load(&b), "load bus_async.wasm");
     if (!b.d)
         return 1;
-    ok(os_gpio_port_set(&gpio) == OS_STATUS_OK && os_gpio_add_pin("cs-a", 5U, OS_GPIO_CAN_ALL, 0U) == OS_STATUS_OK &&
-           os_gpio_add_pin("cs-b", 6U, OS_GPIO_CAN_ALL, 0U) == OS_STATUS_OK &&
-           os_spi_port_set(&spi) == OS_STATUS_OK && os_spi_add_bus("spi0", 0U, 10000000U) == OS_STATUS_OK &&
-           os_i2c_port_set(&i2c) == OS_STATUS_OK && os_i2c_add_bus("i2c0", 0U, 400000U) == OS_STATUS_OK &&
+    ok(hw_gpio_port_set(&gpio) == OS_STATUS_OK && hw_gpio_add_pin("cs-a", 5U, HW_GPIO_CAN_ALL, 0U) == OS_STATUS_OK &&
+           hw_gpio_add_pin("cs-b", 6U, HW_GPIO_CAN_ALL, 0U) == OS_STATUS_OK &&
+           hw_spi_port_set(&spi) == OS_STATUS_OK && hw_spi_add_bus("spi0", 0U, 10000000U) == OS_STATUS_OK &&
+           hw_i2c_port_set(&i2c) == OS_STATUS_OK && hw_i2c_add_bus("i2c0", 0U, 400000U) == OS_STATUS_OK &&
            os_page_store_set(&store) == OS_STATUS_OK,
        "a board whose SPI and I2C ports use DMA");
-    os_bus_trace_set(trace, NULL);
+    hw_bus_trace_set(trace, NULL);
 
     /* The transfer runs in the background: the program waits, the others run. */
     flash = start(&b, "app_main_flash");
     spin = start(&b, "app_main_spin");
     run_until_waiting(flash);
-    ok(os_task_get_state(flash) == OS_TASK_WAITING && g_spi_started == 1U && os_bus_is_busy(OS_BUS_SPI, 0U),
+    ok(os_task_get_state(flash) == OS_TASK_WAITING && g_spi_started == 1U && hw_bus_is_busy(HW_BUS_SPI, 0U),
        "the program waits while the port works");
     ok(g_pin_level[5] == 0U, "chip select stays low during the transfer");
     runs = os_task_get_run_count(spin);
@@ -241,7 +241,7 @@ int main(void)
     spi_complete(OS_STATUS_OK);
     ok(g_cs_low_at_end && os_task_get_state(flash) == OS_TASK_WAITING, "the end is only recorded, as in an interrupt handler");
     os_schedule();
-    ok(g_pin_level[5] == 1U && !os_bus_is_busy(OS_BUS_SPI, 0U), "the next schedule delivers it: chip select up");
+    ok(g_pin_level[5] == 1U && !hw_bus_is_busy(HW_BUS_SPI, 0U), "the next schedule delivers it: chip select up");
     ok(g_traces == 1U && g_last_trace.task_id == os_task_get_id(flash) && g_last_trace.status == OS_STATUS_OK &&
            g_last_trace.count == 2U,
        "the trace comes at the end, with the program and the result");
@@ -259,7 +259,7 @@ int main(void)
     flash = start(&b, "app_main_flash");
     run_until_waiting(flash);
     g_finishes = 0U;
-    ok(os_task_suspend(flash) == OS_STATUS_OK && g_finishes == 1U && !os_bus_is_busy(OS_BUS_SPI, 0U),
+    ok(os_task_suspend(flash) == OS_STATUS_OK && g_finishes == 1U && !hw_bus_is_busy(HW_BUS_SPI, 0U),
        "suspend makes the port finish first");
     ok(os_task_swap_out(flash) == OS_STATUS_OK, "after that it can be swapped out");
     ok(os_task_resume(flash) == OS_STATUS_OK && result_of(flash) == 0xEF4018, "on resume the program has its bytes");
@@ -298,15 +298,15 @@ int main(void)
     /* I2C works the same way. */
     flash = start(&b, "app_main_sensor");
     run_until_waiting(flash);
-    ok(os_task_get_state(flash) == OS_TASK_WAITING && os_bus_is_busy(OS_BUS_I2C, 0U), "an I2C transfer in the background");
+    ok(os_task_get_state(flash) == OS_TASK_WAITING && hw_bus_is_busy(HW_BUS_I2C, 0U), "an I2C transfer in the background");
     g_i2c_ops[1].data[0] = 0x19;
     g_i2c_ops[1].data[1] = 0x80;
-    os_bus_complete(OS_BUS_I2C, 0U, OS_STATUS_OK);
+    hw_bus_complete(HW_BUS_I2C, 0U, OS_STATUS_OK);
     ok(result_of(flash) == 0x1980, "its read arrives");
     os_task_delete(flash);
 
     os_task_delete(spin);
-    os_bus_trace_set(NULL, NULL);
+    hw_bus_trace_set(NULL, NULL);
     free(b.d);
     ok(os_get_task_count() == 0U, "clean OS state");
     os_shutdown();

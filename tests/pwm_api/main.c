@@ -158,9 +158,9 @@ static int32_t finish(OsTaskHandle t, const char* entry)
 int main(void)
 {
     Bin b = {0};
-    OsGpioPort gpio = { NULL, gpio_configure, gpio_write, gpio_read };
-    OsPwmPort pwm = { NULL, pwm_start, pwm_set_duty, pwm_set_frequency, pwm_stop };
-    OsPwmPort broken = { NULL, pwm_start, NULL, NULL, pwm_stop };
+    HwGpioPort gpio = { NULL, gpio_configure, gpio_write, gpio_read };
+    HwPwmPort pwm = { NULL, pwm_start, pwm_set_duty, pwm_set_frequency, pwm_stop };
+    HwPwmPort broken = { NULL, pwm_start, NULL, NULL, pwm_stop };
     OsTaskHandle t = NULL;
 
     l = fopen("pwm_api.log", "w");
@@ -168,21 +168,21 @@ int main(void)
     ok(load(&b), "load pwm_api.wasm");
     if (!b.d)
         return 1;
-    ok(os_gpio_port_set(&gpio) == OS_STATUS_OK &&
-           os_gpio_add_pin("led", 2U, OS_GPIO_CAN_OUTPUT | OS_GPIO_CAN_PWM, OS_GPIO_ACTIVE_LOW) == OS_STATUS_OK &&
-           os_gpio_add_pin("motor", 4U, OS_GPIO_CAN_OUTPUT | OS_GPIO_CAN_PWM, 0U) == OS_STATUS_OK &&
-           os_gpio_add_pin("gpio7", 7U, OS_GPIO_CAN_ALL, 0U) == OS_STATUS_OK &&
-           os_gpio_add_pin("button", 0U, OS_GPIO_CAN_INPUT, 0U) == OS_STATUS_OK,
+    ok(hw_gpio_port_set(&gpio) == OS_STATUS_OK &&
+           hw_gpio_add_pin("led", 2U, HW_GPIO_CAN_OUTPUT | HW_GPIO_CAN_PWM, HW_GPIO_ACTIVE_LOW) == OS_STATUS_OK &&
+           hw_gpio_add_pin("motor", 4U, HW_GPIO_CAN_OUTPUT | HW_GPIO_CAN_PWM, 0U) == OS_STATUS_OK &&
+           hw_gpio_add_pin("gpio7", 7U, HW_GPIO_CAN_ALL, 0U) == OS_STATUS_OK &&
+           hw_gpio_add_pin("button", 0U, HW_GPIO_CAN_INPUT, 0U) == OS_STATUS_OK,
        "pins: an active-low LED and a motor driver that can do PWM, a button that cannot");
     ok(finish(start(&b, "app_main_try"), "app_main_try") == -13, "without a port pwm-open returns -WR_EUNSUPPORTED");
-    ok(os_pwm_port_set(&broken) == OS_STATUS_INVALID_ARGUMENT && os_pwm_port_set(&pwm) == OS_STATUS_OK,
+    ok(hw_pwm_port_set(&broken) == OS_STATUS_INVALID_ARGUMENT && hw_pwm_port_set(&pwm) == OS_STATUS_OK,
        "a port needs start, set_duty and stop");
 
     t = start(&b, "app_main_led");
     run_until_waiting(t);
     ok(g_pwm[2].running && g_pwm[2].frequency == 1000U, "the LED runs at 1 kHz");
     ok(g_pwm[2].duty == 65535U - 16384U, "a quarter on, on an active-low pin, is three quarters high on the pin");
-    ok(g_gpio_flags[2] & OS_GPIO_OUTPUT, "the pin is owned as an output");
+    ok(g_gpio_flags[2] & HW_GPIO_OUTPUT, "the pin is owned as an output");
     ok(finish(t, "app_main_led") == 0, "duty, frequency rounding, ownership");
     ok(!g_pwm[2].running && g_gpio_flags[2] == 0U, "the output stops and the pin is an input again when the program ends");
 
