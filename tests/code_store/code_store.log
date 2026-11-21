@@ -1,0 +1,20 @@
+PASS read code_store.wasm
+PASS initialize OS
+PASS add a code store
+PASS the program runs and sleeps
+PASS with nothing ready, its image is written and mapped
+PASS loaded anew, the program maps the image it has
+PASS initialize OS again
+PASS the store comes back
+PASS the image is found in it after a restart
+PASS and mapped: nothing predecoded to start
+PASS an image changed is refused, and a new one written and mapped
+PASS initialize OS with two stores
+PASS add a store of priority 1 and one of priority 5
+PASS a store is added once
+PASS the image goes to the store of priority 5
+PASS initialize OS with a store of one sector
+PASS add it
+PASS the image fills it
+PASS added again full, it is erased
+ok

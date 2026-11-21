@@ -1,7 +1,7 @@
 PASS initialize OS
 PASS load task_memory_usage.wasm
 PASS create a small task with an 8 KiB stack
-MEASURED small, created stack=8200 linear=65536 resident=65536 code=0 interpreter=79331 image=0 kernel=472 total=79803
+MEASURED small, created stack=8200 linear=65536 resident=65536 code=0 interpreter=79331 image=0 kernel=480 total=79811
 PASS stack is the requested size plus guard slots
 PASS linear memory is whole 64 KiB pages plus a header
 PASS no more of the memory is in RAM than there is
@@ -10,22 +10,22 @@ PASS host-owned module bytes are not counted
 PASS task control block is counted
 PASS total adds the parts
 PASS create the same task again
-MEASURED twin, created stack=8200 linear=65536 resident=65536 code=0 interpreter=79331 image=0 kernel=472 total=79803
+MEASURED twin, created stack=8200 linear=65536 resident=65536 code=0 interpreter=79331 image=0 kernel=480 total=79811
 PASS identical tasks use identical memory
 PASS small task runs
-MEASURED small, finished stack=0 linear=0 resident=0 code=0 interpreter=0 image=0 kernel=472 total=472
+MEASURED small, finished stack=0 linear=0 resident=0 code=0 interpreter=0 image=0 kernel=480 total=480
 PASS a dead task holds no interpreter memory
 PASS its peak is still reported
 PASS only the control block remains until delete
 PASS create a task that grows its memory
-MEASURED grow, created stack=8200 linear=65536 resident=65536 code=0 interpreter=79331 image=0 kernel=472 total=79803
+MEASURED grow, created stack=8200 linear=65536 resident=65536 code=0 interpreter=79331 image=0 kernel=480 total=79811
 PASS it grew and now sleeps
-MEASURED grow, after memory.grow stack=8200 linear=131072 resident=131072 code=436 interpreter=144867 image=0 kernel=472 total=145339
+MEASURED grow, after memory.grow stack=8200 linear=131072 resident=131072 code=436 interpreter=144867 image=0 kernel=480 total=145347
 PASS linear memory grew by one page plus at most the spare room
 PASS the code that ran is decoded
 PASS the interpreter total grew with the memory in RAM
 PASS spawn the module as a process
-MEASURED spawned, created stack=8200 linear=65536 resident=65536 code=0 interpreter=79331 image=721 kernel=472 total=80524
+MEASURED spawned, created stack=8200 linear=65536 resident=65536 code=0 interpreter=79331 image=721 kernel=480 total=80532
 PASS the kernel's copy of the module is counted
 PASS total includes the copy
 PASS NULL task is rejected
