@@ -116,14 +116,14 @@ static uint32_t scenario(uint32_t ram_frames, uint32_t quiet_ms, uint32_t* out_a
     os_init();
     os_page_store_set(&store);
     g_writes = 0;
-    sleeper = start("sleeper");
+    sleeper = start("app_main_sleeper");
     for (int i = 0; i < 200 && os_task_get_state(sleeper) != OS_TASK_WAITING; i++)
         run(1);
     before = g_writes;
     run(quiet_ms);
     *out_ahead = g_writes - before;
     before = g_writes;
-    waker = start("waker");
+    waker = start("app_main_waker");
     for (int i = 0; i < 400 && waker && os_task_get_state(waker) != OS_TASK_DEAD; i++)
         run(1);
     during = g_writes - before;

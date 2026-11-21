@@ -10,7 +10,7 @@ static void sleep_ms(uint32_t ms)
     wr_wait_any(&timer, 1u, WR_WAIT_FOREVER);
 }
 
-__attribute__((export_name("sleeper"))) int sleeper(void)
+int app_main_sleeper(void)
 {
     uint32_t sum = 0;
     for (uint32_t i = 0; i < 25600u; i++)
@@ -21,7 +21,7 @@ __attribute__((export_name("sleeper"))) int sleeper(void)
     return (int)(sum & 0x7fffffff);
 }
 
-__attribute__((export_name("waker"))) int waker(void)
+int app_main_waker(void)
 {
     uint32_t sum = 0;
     for (uint32_t i = 0; i < 16384u; i += 7u)
