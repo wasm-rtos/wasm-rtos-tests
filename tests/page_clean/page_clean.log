@@ -1,0 +1,7 @@
+PASS load page_clean.wasm
+PASS with no quiet time, the sleeper's block is written when the waker needs room
+PASS with quiet time, its frames are written ahead
+PASS and its block then leaves RAM with no write
+PASS the sleeper's memory comes back as it was, both ways
+PASS with RAM to spare, nothing is written ahead
+ok
