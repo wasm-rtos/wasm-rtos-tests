@@ -173,6 +173,28 @@ int main(void)
     stop(task);
     os_shutdown();
 
+    /* Priorities change while the stores are in use: the image goes to the one now highest. */
+    free(flash.words);
+    free(fast.words);
+    flash_make(&flash, &store, 64U * 1024U);
+    flash_make(&fast, &high, 64U * 1024U);
+    expect(os_init() == OS_STATUS_OK, "initialize OS with two stores again");
+    expect(os_code_store_add(&store, 1U) == OS_STATUS_OK && os_code_store_add(&high, 5U) == OS_STATUS_OK,
+           "add them, priorities 1 and 5");
+    expect(os_code_store_priority(&store, 9U) == OS_STATUS_OK && os_code_store_get_stats(&store, &stats) == OS_STATUS_OK &&
+               stats.priority == 9U,
+           "the store of priority 1 is given priority 9");
+    {
+        static OsCodeStore unknown;
+        expect(os_code_store_priority(&unknown, 3U) == OS_STATUS_INVALID_ARGUMENT, "a store never added has no priority to change");
+    }
+    task = start(bytes, size);
+    expect(os_code_store_get_stats(&store, &stats) == OS_STATUS_OK && os_code_store_get_stats(&high, &high_stats) == OS_STATUS_OK &&
+               stats.images == 1U && high_stats.images == 0U,
+           "the image goes to the store now of priority 9");
+    stop(task);
+    os_shutdown();
+
     /* A store with no room left: erased when it is added, nothing being mapped then. */
     free(flash.words);
     flash_make(&flash, &store, 4096U);

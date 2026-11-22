@@ -1,4 +1,5 @@
 #include "os.h"
+#include "os_internal.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
