@@ -13,6 +13,11 @@ PASS initialize OS with two stores
 PASS add a store of priority 1 and one of priority 5
 PASS a store is added once
 PASS the image goes to the store of priority 5
+PASS initialize OS with two stores again
+PASS add them, priorities 1 and 5
+PASS the store of priority 1 is given priority 9
+PASS a store never added has no priority to change
+PASS the image goes to the store now of priority 9
 PASS initialize OS with a store of one sector
 PASS add it
 PASS the image fills it
