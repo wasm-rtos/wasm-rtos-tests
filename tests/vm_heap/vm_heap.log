@@ -1,0 +1,14 @@
+PASS make the interpreter's heap
+PASS initialize OS over the heap
+PASS load vm_heap.wasm
+PASS create task
+PASS task ends
+PASS task's result right
+PASS records come from the interpreter's heap
+PASS heap whole while code is cached
+PASS delete task
+PASS clean OS state
+PASS code cache empty after trim
+PASS heap checks after shutdown
+PASS everything back to the heap
+PASS free memory in one piece
