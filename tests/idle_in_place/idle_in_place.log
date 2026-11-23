@@ -1,0 +1,11 @@
+PASS initialize OS
+PASS load idle_in_place.wasm
+PASS normal task's result right
+PASS the task takes several slices
+PASS idle task's result right
+PASS idle task made no records
+PASS idle task took the same slices (same fuel)
+PASS raised task's result right
+PASS raised above idle, it made the records a normal task makes
+PASS raised task took the same slices (same fuel)
+PASS clean OS state
