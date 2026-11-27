@@ -87,45 +87,7 @@ for dir in tests/*; do
         guest_flags=(-Wl,-z,stack-size=4096)
     fi
 
-    if [ "$name" = "dylink0" ]; then
-        library_source="$dir/library.c"
-        app_object="$dir/dylink0.o"
-        library_object="$dir/library.o"
-        library_wasm="$dir/libdylink0.so"
-        if [ ! -f "$library_source" ]; then
-            echo "FAIL missing $library_source" | tee "$log"
-            failed=1
-            continue
-        fi
-
-        pic_flags=()
-        if "$WASM_LD" --help 2>&1 | grep -q -- '--experimental-pic'; then
-            pic_flags+=(--experimental-pic)
-        fi
-
-        if ! "$WASM_CC" --target=wasm32 -nostdlib -fPIC -O0 -c \
-                "$library_source" -o "$library_object" >"$build_log" 2>&1 \
-            || ! "$WASM_LD" -m wasm32 ${pic_flags[@]+"${pic_flags[@]}"} --shared --no-entry \
-                --unresolved-symbols=import-dynamic \
-                --export=library_add --export=library_name \
-                --export=library_fill --export=library_apply \
-                --export=library_increment \
-                -o "$library_wasm" "$library_object" >>"$build_log" 2>&1 \
-            || ! "$WASM_CC" --target=wasm32 -nostdlib -fPIC -O0 -c \
-                "$source" -o "$app_object" >>"$build_log" 2>&1 \
-            || ! "$WASM_LD" -m wasm32 ${pic_flags[@]+"${pic_flags[@]}"} --pie --no-entry \
-                --export=app_main --export=app_name_char \
-                --export=app_struct --export=app_callback \
-                --export=app_counter --export=app_work_only \
-                -o "$wasm" "$app_object" "$library_wasm" \
-                >>"$build_log" 2>&1; then
-            { echo "FAIL building dylink.0 C modules"; cat "$build_log"; } | tee "$log"
-            rm -f "$app_object" "$library_object" "$library_wasm"
-            failed=1
-            continue
-        fi
-        rm -f "$app_object" "$library_object"
-    elif [[ "$source" == *.ino ]]; then
+    if [[ "$source" == *.ino ]]; then
         if ! CXX="${WASM_CXX:-${WASM_CC}++}" WASI_TARGET="$WASI_TARGET" \
                 WASM_RTOS=wasm-rtos bash libraries/arduino/build.sh "$source" -o "$wasm" >"$build_log" 2>&1; then
             { echo "FAIL building Arduino sketch $source"; cat "$build_log"; } | tee "$log"
@@ -163,9 +125,7 @@ for dir in tests/*; do
     fi
 
     native_flags=()
-    if [ "$name" = "dylink0" ]; then
-        native_flags+=(-DOS_HAS_DYLINK=1)
-    elif [ "$name" = "proc_disabled" ]; then
+    if [ "$name" = "proc_disabled" ]; then
         native_flags+=(-DOS_HAS_PROCESSES=0)
     elif [ "$name" = "abi_freeze_minimal" ]; then
         native_flags+=(-DOS_HAS_PROCESSES=0 -DOS_HAS_FS=0)
@@ -199,9 +159,6 @@ for dir in tests/*; do
     rm -f "$runner" "$build_log"
     # clang on macOS leaves debug info next to sanitizer builds.
     rm -rf "$runner.dSYM"
-    if [ "$name" = "dylink0" ]; then
-        rm -f "$dir/libdylink0.so"
-    fi
 done
 
 if [ "$found" -eq 0 ]; then
